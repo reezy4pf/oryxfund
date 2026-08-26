@@ -50,12 +50,7 @@
       --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
 
     body {
       font-family: var(--font-body);
@@ -184,26 +179,9 @@
       margin-bottom: 12px;
     }
 
-    .hero-title {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      margin-bottom: 6px;
-    }
-
-    .hero-desc {
-      font-size: 13.5px;
-      color: #B4C6BA;
-      max-width: 520px;
-      line-height: 1.45;
-    }
-
-    .hero-account-badge {
-      font-size: 12px;
-      color: #9DB4A5;
-      margin-bottom: 12px;
-      text-align: right;
-    }
+    .hero-title { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px; }
+    .hero-desc { font-size: 13.5px; color: #B4C6BA; max-width: 520px; line-height: 1.45; }
+    .hero-account-badge { font-size: 12px; color: #9DB4A5; margin-bottom: 12px; text-align: right; }
 
     .hero-apply-btn {
       background: #FFFFFF !important;
@@ -217,7 +195,38 @@
       align-items: center;
       gap: 6px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-      transition: all 0.15s ease;
+    }
+
+    .oryx-subsequent-cta-card {
+      background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(0, 210, 106, 0.08) 100%);
+      border: 1.5px solid #00D26A;
+      border-radius: 16px;
+      padding: 20px 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .s-cta-badge { font-size: 10px; font-weight: 800; color: #059669; letter-spacing: 0.8px; }
+    [data-theme="dark"] .s-cta-badge { color: #00D26A; }
+    .s-cta-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 4px 0; }
+    .s-cta-desc { font-size: 13px; color: var(--text-secondary); max-width: 580px; }
+
+    .oryx-btn-express {
+      background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
     }
 
     .stats-kpi-row {
@@ -250,21 +259,8 @@
       font-size: 18px;
     }
 
-    .stat-label {
-      font-size: 10.5px;
-      font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-    }
-
-    .stat-number {
-      font-family: var(--font-mono);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-top: 2px;
-    }
+    .stat-label { font-size: 10.5px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; }
+    .stat-number { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
 
     .portal-section-card {
       background: var(--bg-surface);
@@ -274,19 +270,8 @@
       box-shadow: var(--card-shadow);
     }
 
-    .card-head-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .card-head-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-light);
-    }
+    .card-head-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+    .card-head-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
 
     .empty-state-wrap {
       padding: 48px 20px;
@@ -311,20 +296,8 @@
       font-size: 22px;
     }
 
-    .empty-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .empty-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      max-width: 440px;
-      margin-bottom: 18px;
-      line-height: 1.45;
-    }
+    .empty-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .empty-desc { font-size: 13px; color: var(--text-secondary); max-width: 440px; margin-bottom: 18px; line-height: 1.45; }
 
     .btn-apply-green {
       background: var(--primary) !important;
@@ -337,10 +310,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.15s ease;
       box-shadow: 0 2px 8px rgba(31, 50, 36, 0.15);
     }
-
     [data-theme="dark"] .btn-apply-green {
       background: var(--accent-emerald) !important;
       color: #000000 !important;
@@ -355,7 +326,6 @@
 </head>
 <body>
 
-  <!-- Header -->
   <header class="portal-nav-wrap">
     <a href="index.html" class="brand-logo-cluster">
       <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
@@ -368,16 +338,15 @@
     <div class="nav-actions-cluster">
       <a href="index.html" class="nav-pill-btn nav-pill-active">My Portal</a>
       <a href="apply.html" class="nav-pill-btn nav-pill-light">Loan Application</a>
-      <a href="my_account.html" class="nav-pill-btn nav-pill-light">👤 Reezy</a>
+      <a href="my_account.html" class="nav-pill-btn nav-pill-light" id="navUserPill">👤 Reezy</a>
       <button class="theme-icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Light / Dark Mode">🌙</button>
       <a href="admin.html" class="admin-switch-btn" title="View Admin Desk">🛡️ Admin Link</a>
+      <a href="login.html" class="admin-switch-btn" style="color:#E57373;" title="Switch Account / Sign Out">Switch Account</a>
     </div>
   </header>
 
-  <!-- Main Borrower Portal Content -->
   <main class="portal-container">
 
-    <!-- Hero Card -->
     <div class="portal-hero-card">
       <div>
         <span class="hero-pill-tag">MY PORTAL</span>
@@ -385,9 +354,19 @@
         <p class="hero-desc">View your active loans, outstanding balances, and official M-Pesa Paybill payment instructions.</p>
       </div>
       <div>
-        <div class="hero-account-badge">Account: reezyhoops@gmail.com</div>
+        <div class="hero-account-badge" id="heroAccountText">Account: reezyhoops@gmail.com</div>
         <a href="apply.html" class="hero-apply-btn">+ Apply for a New Loan</a>
       </div>
+    </div>
+
+    <!-- Express Repeat Banner for Verified Returning Borrowers -->
+    <div class="oryx-subsequent-cta-card">
+      <div>
+        <div class="s-cta-badge">⚡ EXPRESS REPEAT FACILITY</div>
+        <h3 class="s-cta-title">Fast-Track Subsequent Loan</h3>
+        <p class="s-cta-desc">Apply for a new advance using your existing verified profile. Fast underwriting with direct M-Pesa disbursal.</p>
+      </div>
+      <a href="apply.html?flow=express" class="oryx-btn-express">⚡ Apply in 60 Seconds ➔</a>
     </div>
 
     <!-- 3 KPI Cards -->
@@ -415,7 +394,6 @@
       </div>
     </div>
 
-    <!-- Active Loans Card -->
     <section class="portal-section-card">
       <h2 class="card-head-title">Active Loans</h2>
       <p class="card-head-desc">Manage existing loan terms, disbursals, and repayments.</p>
@@ -428,7 +406,6 @@
       </div>
     </section>
 
-    <!-- Application History Card -->
     <section class="portal-section-card">
       <h2 class="card-head-title">Application History</h2>
       <p class="card-head-desc">Track status and review records of all submitted loan applications.</p>
@@ -456,6 +433,14 @@
       document.documentElement.setAttribute('data-theme', saved);
       document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
     }
+
+    try {
+      const auth = JSON.parse(localStorage.getItem('oryx_auth_user'));
+      if (auth && auth.email) {
+        document.getElementById('heroAccountText').innerText = 'Account: ' + auth.email;
+        document.getElementById('navUserPill').innerText = '👤 ' + (auth.name || auth.email.split('@')[0]);
+      }
+    } catch(e) {}
   </script>
 </body>
 </html>
