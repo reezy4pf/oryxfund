@@ -18,13 +18,13 @@ def generate_full_admin_desk():
 
   <style>
     :root {
-      --desk-bg: #090909;
-      --desk-sidebar-bg: #0D0D0D;
-      --desk-card-bg: #121212;
-      --desk-card-hover: #171717;
-      --desk-card-surface: #181818;
-      --desk-border: #1F1F1F;
-      --desk-border-light: #181818;
+      --desk-bg: #09090B;
+      --desk-sidebar-bg: #0E0E11;
+      --desk-card-bg: #121215;
+      --desk-card-hover: #18181C;
+      --desk-card-surface: #18181C;
+      --desk-border: #27272A;
+      --desk-border-light: #1E1E22;
       --text-main: #FAF8F5;
       --text-sub: #9E9E9E;
       --text-dim: #666666;
@@ -33,7 +33,7 @@ def generate_full_admin_desk():
       --accent-red: #F87171;
       --accent-blue: #60A5FA;
       --accent-amber: #FBBF24;
-      --pill-active-bg: #1C1C1C;
+      --pill-active-bg: #202025;
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
     }
@@ -502,8 +502,8 @@ def generate_full_admin_desk():
     .search-modal-box {
       width: 100%;
       max-width: 540px;
-      background: #111412;
-      border: 1px solid #1E2D22;
+      background: #121215;
+      border: 1px solid #27272A;
       border-radius: 12px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
       overflow: hidden;
@@ -514,7 +514,7 @@ def generate_full_admin_desk():
       display: flex;
       align-items: center;
       gap: 10px;
-      border-bottom: 1px solid #1E2D22;
+      border-bottom: 1px solid #27272A;
     }
     .search-modal-input {
       flex: 1;
@@ -543,7 +543,7 @@ def generate_full_admin_desk():
       cursor: pointer;
     }
     .search-result-item:hover, .search-result-item.selected {
-      background: #1E2D22;
+      background: #27272A;
       color: #FAF8F5;
     }
 
@@ -562,8 +562,8 @@ def generate_full_admin_desk():
       top: 0; right: 0; bottom: 0;
       width: 520px;
       max-width: 90vw;
-      background: #111412;
-      border-left: 1px solid #1E2D22;
+      background: #121215;
+      border-left: 1px solid #27272A;
       box-shadow: -10px 0 40px rgba(0,0,0,0.8);
       z-index: 9995;
       display: flex;
@@ -577,7 +577,7 @@ def generate_full_admin_desk():
 
     .drawer-header {
       padding: 18px 24px;
-      border-bottom: 1px solid #1E2D22;
+      border-bottom: 1px solid #27272A;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -591,10 +591,10 @@ def generate_full_admin_desk():
 
     .drawer-footer {
       padding: 18px 24px;
-      border-top: 1px solid #1E2D22;
+      border-top: 1px solid #27272A;
       display: flex;
       gap: 10px;
-      background: #0D100E;
+      background: #0E0E11;
     }
 
     /* In-DOM Clearance Auth Modal */
@@ -612,8 +612,8 @@ def generate_full_admin_desk():
     .admin-auth-overlay.active { display: flex !important; }
 
     .admin-auth-modal {
-      background: #111412;
-      border: 1px solid #1E2D22;
+      background: #121215;
+      border: 1px solid #27272A;
       border-radius: 18px;
       padding: 36px 32px;
       max-width: 440px;
@@ -627,8 +627,8 @@ def generate_full_admin_desk():
       width: 100%;
       padding: 11px 14px;
       border-radius: 8px;
-      border: 1px solid #1E2D22;
-      background: #18241B;
+      border: 1px solid #27272A;
+      background: #18181C;
       color: #FAF8F5;
       font-size: 13.5px;
       outline: none;
@@ -660,7 +660,7 @@ def generate_full_admin_desk():
 
   <!-- RESTRICTED ACCESS GATE CONTAINER (SHOWN IF NOT AUTHENTICATED) -->
   <div id="adminGateContainer" style="display:none; min-height: 100vh; width: 100%; background: #090909; color: #FAF8F5; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; padding: 20px; box-sizing: border-box; position: fixed; top: 0; left: 0; z-index: 9000;">
-    <div style="background: #111412; border: 1px solid #1E2D22; border-radius: 18px; padding: 40px 32px; max-width: 460px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.85);">
+    <div style="background: #121215; border: 1px solid #27272A; border-radius: 18px; padding: 40px 32px; max-width: 460px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.85);">
       <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(220, 38, 38, 0.15); border: 1.5px solid rgba(220, 38, 38, 0.4); color: #F87171; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 28px;">
         🔒
       </div>
@@ -673,7 +673,7 @@ def generate_full_admin_desk():
         <button id="gateSignInBtn" onclick="openAdminClearanceModalDirect()" style="background: #00D26A; color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer; transition: all 0.15s ease;">
           🔑 Sign In with Clearance
         </button>
-        <a href="index.html" style="background: #18241B; color: #D6DFD8; border: 1px solid #233729; padding: 11px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; display: block;">
+        <a href="index.html" style="background: #18181C; color: #D6DFD8; border: 1px solid #27272A; padding: 11px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; display: block;">
           Return to Borrower Portal
         </a>
       </div>

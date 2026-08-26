@@ -41,26 +41,26 @@
 }
 
 [data-theme="dark"], html.dark, body.dark, [data-theme-mode="dark"] {
-  --bg-body: #080D0A;
-  --bg-card: #101712;
-  --bg-surface: #141F17;
-  --bg-surface-elevated: #18261C;
-  --text-color: #F3F4F6;
-  --text-muted: #9CA3AF;
-  --text-dim: #6B7280;
-  --border-color: #1E2D22;
-  --border-light: #18241B;
+  --bg-body: #09090B;
+  --bg-card: #121215;
+  --bg-surface: #18181C;
+  --bg-surface-elevated: #202025;
+  --text-color: #FAF8F5;
+  --text-muted: #A1A1AA;
+  --text-dim: #71717A;
+  --border-color: #27272A;
+  --border-light: #1E1E22;
   --primary-color: #00D26A;
-  --primary-hover: #00B85C;
+  --primary-hover: #05E575;
   --accent-green: #00D26A;
   --accent-emerald: #00D26A;
   --accent-gold: #F59E0B;
   --accent-amber: #F59E0B;
   --accent-red: #EF4444;
-  --hero-bg: linear-gradient(145deg, #132218 0%, #0E1812 100%);
+  --hero-bg: #121215;
   --hero-text: #FAF8F5;
-  --card-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.6);
-  --modal-backdrop: rgba(0, 0, 0, 0.82);
+  --card-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.7);
+  --modal-backdrop: rgba(0, 0, 0, 0.85);
 }
 
 * {
@@ -79,24 +79,7 @@ body {
   overflow-x: hidden;
 }
 
-/* NOISE OVERLAY */
-.oryx-noise-bg {
-  position: relative;
-  overflow: hidden;
-}
-.oryx-noise-bg::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  border-radius: inherit;
-  z-index: 1;
-}
-.oryx-noise-bg > * {
-  position: relative;
-  z-index: 2;
-}
+/* CLEAN BESPOKE STYLING */
 
 /* FULL-WIDTH STICKY NAVBAR */
 .oryx-navbar {
@@ -114,8 +97,8 @@ body {
 
 [data-theme="dark"] .oryx-navbar,
 html.dark .oryx-navbar {
-  background: rgba(8, 13, 10, 0.92);
-  border-bottom-color: #1A261D;
+  background: rgba(9, 9, 11, 0.94);
+  border-bottom-color: var(--border-color);
 }
 
 .oryx-nav-inner {
@@ -173,8 +156,8 @@ html.dark .oryx-logo-dark {
 
 [data-theme="dark"] .oryx-capsules-nav,
 html.dark .oryx-capsules-nav {
-  background: #111813;
-  border-color: #1E2D22;
+  background: var(--bg-surface);
+  border-color: var(--border-color);
 }
 
 .oryx-capsule-tab {
@@ -235,7 +218,7 @@ html.dark .oryx-capsule-tab.active {
 
 [data-theme="dark"] .oryx-theme-toggle-btn,
 html.dark .oryx-theme-toggle-btn {
-  border-color: #1E2D22;
+  border-color: var(--border-color);
   color: #FAF8F5;
 }
 
@@ -305,7 +288,8 @@ html.dark .moon-icon { display: none; }
 }
 
 [data-theme="dark"] .oryx-hero-card {
-  border: 1px solid #1D2E22;
+  background: var(--hero-bg);
+  border: 1px solid var(--border-color);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
@@ -380,8 +364,12 @@ html.dark .moon-icon { display: none; }
 }
 
 [data-theme="dark"] .oryx-hero-btn {
-  background: #FAF8F5 !important;
-  color: #0A0A0A !important;
+  background: #00D26A !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .oryx-hero-btn:hover {
+  background: #05E575 !important;
 }
 
 /* 4-STEP WIZARD STEPPERS */
@@ -629,13 +617,14 @@ html.dark .moon-icon { display: none; }
 }
 
 [data-theme="dark"] .oryx-btn-primary {
-  background: #1D3D27 !important;
-  border: 1px solid #316440 !important;
-  color: #FAF8F5 !important;
+  background: #00D26A !important;
+  border: none !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
 }
 
 [data-theme="dark"] .oryx-btn-primary:hover {
-  background: #254F33 !important;
+  background: #05E575 !important;
 }
 
 .oryx-btn-secondary {
@@ -1261,7 +1250,7 @@ html.dark .moon-icon { display: none; }
 
   </style>
 </head>
-<body class="oryx-noise-bg">
+<body >
 
   <!-- Sticky Full-Width Localhost Header -->
   <header class="oryx-navbar">
@@ -1319,7 +1308,7 @@ html.dark .moon-icon { display: none; }
   <main class="oryx-portal-wrapper">
 
     <!-- Hero Card (Matching Localhost 1:1) -->
-    <div class="oryx-hero-card oryx-noise-bg">
+    <div class="oryx-hero-card">
       <div class="hero-top-row">
         <div class="oryx-badge">MY PORTAL</div>
         <span class="user-greeting" id="heroAccountText">Account: Loading...</span>

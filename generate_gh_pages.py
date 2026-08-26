@@ -50,8 +50,8 @@ def generate_gh_pages_html():
     }
 
     [data-theme="dark"], html.dark {
-      --bg-page: #080D0A;
-      --bg-surface: #101712;
+      --bg-page: #09090B;
+      --bg-surface: #121215;
       --bg-surface-alt: #16221A;
       --bg-surface-elevated: #1C2B21;
       --border-color: #1F3325;
@@ -88,18 +88,7 @@ def generate_gh_pages_html():
       overflow-x: hidden;
     }
 
-    /* Noise overlay */
-    .bg-noise {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      opacity: 0.035;
-      z-index: 9999;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    }
+    /* Noise overlay removed */
 
     /* ==========================================================================
        2. Top Interactive Demo Navbar & Switcher
@@ -275,7 +264,7 @@ def generate_gh_pages_html():
     }
 
     [data-theme="dark"] .express-hero-bar {
-      background: linear-gradient(135deg, #101712 0%, #080D0A 100%);
+      background: linear-gradient(135deg, #121215 0%, #09090B 100%);
       border-color: var(--border-color);
     }
 
@@ -854,7 +843,7 @@ def generate_gh_pages_html():
   </style>
 </head>
 <body>
-  <div class="bg-noise"></div>
+  
 
   <!-- Top Sticky Navigation -->
   <header class="oryx-top-nav">

@@ -35,8 +35,8 @@ login_html = """<!DOCTYPE html>
     }
 
     [data-theme="dark"], html.dark {
-      --bg-page: #080D0A;
-      --bg-surface: #101712;
+      --bg-page: #09090B;
+      --bg-surface: #121215;
       --bg-surface-alt: #16221A;
       --border-color: #1F3325;
       --border-light: #18281D;
@@ -362,8 +362,8 @@ borrower_html = """<!DOCTYPE html>
     }
 
     [data-theme="dark"], html.dark {
-      --bg-page: #080D0A;
-      --bg-surface: #101712;
+      --bg-page: #09090B;
+      --bg-surface: #121215;
       --bg-surface-alt: #152019;
       --border-color: #1E3023;
       --border-light: #17241B;
@@ -374,7 +374,7 @@ borrower_html = """<!DOCTYPE html>
       --primary-hover: #00FF80;
       --accent-green: #00D26A;
       --accent-emerald: #00D26A;
-      --hero-bg: #101712;
+      --hero-bg: #121215;
       --hero-text: #FAF8F5;
       --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }

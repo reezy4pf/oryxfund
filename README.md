@@ -203,7 +203,7 @@ All placeholder SVG headers and text marks have been replaced with the official 
 1. **Light Mode Logo (`oryx_logo_light.png`)**:
    - Tailored with deep forest green wordmark and high-contrast styling for ivory/sand surfaces (`#EAE0D8` / `#FFFFFF`).
 2. **Dark Mode Logo (`oryx_logo_dark.png`)**:
-   - Tailored with luminous emerald branding and crisp white typography for obsidian/dark surfaces (`#080D0A` / `#090909`).
+   - Tailored with luminous emerald branding and crisp white typography for obsidian/dark surfaces (`#09090B` / `#090909`).
 3. **Adaptive CSS Engine**:
    - Real-time CSS attribute matching (`[data-theme="dark"]`, `html.dark`) toggles between the light and dark logo assets instantaneously without layout shift or blur.
 

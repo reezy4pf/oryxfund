@@ -1094,12 +1094,12 @@ body, html, main, .page-container, .page-content-wrapper {
 }
 
 [data-theme="dark"], html.dark, body.dark, [data-theme-mode="dark"] {
-  --bg-body: #080D0A;
-  --bg-card: #101712;
-  --bg-surface: #141F17;
+  --bg-body: #09090B;
+  --bg-card: #121215;
+  --bg-surface: #18181C;
   --text-color: #F3F4F6;
   --text-muted: #9CA3AF;
-  --border-color: #1E2D22;
+  --border-color: #27272A;
   --primary-color: #00D26A;
   --primary-hover: #00B85C;
   --accent-gold: #F59E0B;
@@ -1114,7 +1114,7 @@ html.dark #oryx-app-root,
 html.dark main,
 [data-theme="dark"] .page-content-wrapper,
 html.dark .page-content-wrapper {
-  background-color: #080D0A !important;
+  background-color: #09090B !important;
   color: #F3F4F6 !important;
 }
 
@@ -1254,7 +1254,7 @@ html.dark .oryx-logo-dark { display: block !important; }
 [data-theme="dark"] .oryx-hero-card.express-hero,
 html.dark .oryx-hero-card.express-hero {
   border-color: rgba(0, 210, 106, 0.4);
-  background: linear-gradient(145deg, #101712 0%, rgba(0, 210, 106, 0.08) 100%);
+  background: linear-gradient(145deg, #121215 0%, rgba(0, 210, 106, 0.08) 100%);
   box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
 }
 
@@ -1795,7 +1795,7 @@ html.dark .amount-large-input {
 
 [data-theme="dark"] .oryx-range-slider,
 html.dark .oryx-range-slider {
-  background: #1E2D22;
+  background: #27272A;
 }
 
 .oryx-range-slider::-webkit-slider-thumb {
@@ -1852,7 +1852,7 @@ html.dark .oryx-range-slider::-webkit-slider-thumb {
 
 [data-theme="dark"] .preset-pill,
 html.dark .preset-pill {
-  background: #141F17;
+  background: #18181C;
   color: #F3F4F6;
 }
 
@@ -1885,7 +1885,7 @@ html.dark .preset-pill.active {
 
 [data-theme="dark"] .calc-hud-card,
 html.dark .calc-hud-card {
-  background: linear-gradient(135deg, #101712 0%, rgba(0, 210, 106, 0.1) 100%);
+  background: linear-gradient(135deg, #121215 0%, rgba(0, 210, 106, 0.1) 100%);
   border: 1.5px solid rgba(0, 210, 106, 0.4);
 }
 
@@ -2567,7 +2567,7 @@ html.dark .success-title {
 
 [data-theme="dark"] .app-ref-box,
 html.dark .app-ref-box {
-  background: #141F17 !important;
+  background: #18181C !important;
 }
 
 .ref-label {
@@ -2599,7 +2599,7 @@ html.dark .ref-code {
 
 [data-theme="dark"] .next-steps-card,
 html.dark .next-steps-card {
-  background: #141F17 !important;
+  background: #18181C !important;
 }
 
 .next-steps-card h4 {
