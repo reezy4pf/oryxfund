@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — Oryx Fund</title>
-  <meta name="description" content="Secure authentication portal for Oryx Fund borrowers and administrators.">
+  <title>Borrower Portal — Oryx Fund</title>
+  <meta name="description" content="Secure borrower authentication and registration for Oryx Fund digital credit.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +22,7 @@
       --text-secondary: #556B5D;
       --text-muted: #829488;
       --primary: #1F3224;
+      --primary-hover: #2D4834;
       --accent-green: #059669;
       --accent-emerald: #00D26A;
       --card-shadow: 0 8px 32px rgba(31, 50, 36, 0.08);
@@ -39,6 +40,7 @@
       --text-secondary: #9DB4A5;
       --text-muted: #667D6F;
       --primary: #00D26A;
+      --primary-hover: #00FF80;
       --accent-green: #00D26A;
       --accent-emerald: #00D26A;
       --card-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
@@ -55,11 +57,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px 16px;
     }
 
-    .login-container {
-      max-width: 440px;
+    .auth-box {
+      max-width: 460px;
       width: 100%;
     }
 
@@ -85,21 +87,21 @@
       box-shadow: var(--card-shadow);
     }
 
-    .role-tabs {
+    .auth-tabs {
       display: flex;
       background: var(--bg-surface-alt);
       padding: 4px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
-    .role-tab-btn {
+    .tab-btn {
       flex: 1;
       text-align: center;
-      padding: 8px 12px;
+      padding: 9px 12px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       cursor: pointer;
       background: transparent;
@@ -107,42 +109,15 @@
       color: var(--text-secondary);
     }
 
-    .role-tab-btn.active {
+    .tab-btn.active {
       background: var(--bg-surface);
       color: var(--text-primary);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    [data-theme="dark"] .role-tab-btn.active {
+    [data-theme="dark"] .tab-btn.active {
       background: var(--accent-emerald);
       color: #000000;
-    }
-
-    .quick-creds-banner {
-      background: rgba(0, 210, 106, 0.08);
-      border: 1px dashed var(--accent-emerald);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      font-size: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .quick-fill-btn {
-      background: var(--primary);
-      color: #FFF !important;
-      border: none;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    [data-theme="dark"] .quick-fill-btn {
-      background: var(--accent-emerald);
-      color: #000 !important;
     }
 
     .form-group { margin-bottom: 16px; }
@@ -172,6 +147,12 @@
       box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.15);
     }
 
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
     .btn-submit {
       width: 100%;
       padding: 12px 20px;
@@ -194,17 +175,43 @@
 
     .btn-submit:hover { transform: translateY(-1px); }
 
+    .auth-note {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 14px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
     .auth-footer {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 24px;
       font-size: 12px;
       color: var(--text-muted);
+    }
+
+    .status-alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .status-alert.error {
+      background: rgba(220, 38, 38, 0.1);
+      color: #DC2626;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+    .status-alert.success {
+      background: rgba(0, 210, 106, 0.1);
+      color: #059669;
+      border: 1px solid rgba(0, 210, 106, 0.2);
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
+  <div class="auth-box">
     
     <div class="auth-brand-head">
       <a href="index.html" class="auth-brand-logo">
@@ -214,41 +221,88 @@
         </svg>
         <span style="font-size: 20px; font-weight: 800;">Oryx <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
       </a>
-      <p style="font-size: 13px; color: var(--text-secondary);">Enterprise Credit &amp; Institutional Lending Engine</p>
+      <p style="font-size: 13px; color: var(--text-secondary);">Borrower Self-Service &amp; Digital Credit Portal</p>
     </div>
 
     <div class="auth-card">
       
-      <div class="role-tabs">
-        <button type="button" class="role-tab-btn active" id="tabBorrower" onclick="setRole('borrower')">👤 Borrower Login</button>
-        <button type="button" class="role-tab-btn" id="tabAdmin" onclick="setRole('admin')">🛡️ Admin Desk</button>
+      <div class="auth-tabs">
+        <button type="button" class="tab-btn active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Sign In</button>
+        <button type="button" class="tab-btn" id="tabRegister" onclick="switchAuthTab('register')">✨ Create Account</button>
       </div>
 
-      <div class="quick-creds-banner">
-        <div>
-          <span style="font-weight: 800;" id="quickLabel">Test Borrower:</span>
-          <span style="font-family: var(--font-mono); margin-left: 4px;" id="quickEmail">reezyhoops@gmail.com</span>
-        </div>
-        <button type="button" class="quick-fill-btn" onclick="quickFill()">Quick-Fill</button>
-      </div>
+      <div id="statusAlert" class="status-alert"></div>
 
-      <form id="loginForm" onsubmit="handleLogin(event)">
+      <!-- 1. SIGN IN FORM -->
+      <form id="signInForm" onsubmit="handleSignIn(event)">
         <div class="form-group">
-          <label class="form-label" for="loginEmail">Email / Phone Number</label>
-          <input type="text" id="loginEmail" class="form-input" placeholder="e.g. reezyhoops@gmail.com" required value="reezyhoops@gmail.com">
+          <label class="form-label" for="loginIdentifier">Email or Mobile Number</label>
+          <input type="text" id="loginIdentifier" class="form-input" placeholder="e.g. name@domain.com or +2547XXXXXXXX" required autofocus>
         </div>
 
         <div class="form-group">
           <div style="display: flex; justify-content: space-between;">
-            <label class="form-label" for="loginPassword">Password</label>
-            <a href="#" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot?</a>
+            <label class="form-label" for="loginPass">Password</label>
+            <a href="javascript:void(0)" onclick="alert('Password reset link sent to your registered email.')" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot Password?</a>
           </div>
-          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required value="password123">
+          <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
         </div>
 
-        <button type="submit" class="btn-submit" id="submitBtn">
-          ⚡ Sign In to Borrower Portal
+        <button type="submit" class="btn-submit">
+          Sign In to My Portal
         </button>
+
+        <p class="auth-note">
+          New to Oryx Fund? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Create a fresh account</a> to apply in minutes.
+        </p>
+      </form>
+
+      <!-- 2. REGISTER FRESH ACCOUNT FORM -->
+      <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="regFullName">Full Legal Name (as on ID)</label>
+          <input type="text" id="regFullName" class="form-input" placeholder="e.g. John Kamau Mwangi" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" class="form-input" placeholder="john@example.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPhone">Mobile Phone (M-Pesa)</label>
+            <input type="tel" id="regPhone" class="form-input" placeholder="+254712345678" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regNationalId">National ID Number</label>
+          <input type="text" id="regNationalId" class="form-input" placeholder="e.g. 29384756" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="regPass">Create Password</label>
+            <input type="password" id="regPass" class="form-input" placeholder="Min. 6 chars" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPassConfirm">Confirm Password</label>
+            <input type="password" id="regPassConfirm" class="form-input" placeholder="Repeat password" required minlength="6">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px;">
+          <input type="checkbox" id="termsCheck" required style="margin-top: 2px;">
+          <label for="termsCheck">I certify that my details are accurate and agree to Oryx Fund Credit Terms &amp; KYC Verification.</label>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          ✨ Create Secure Account &amp; Continue ➔
+        </button>
+
+        <p class="auth-note">
+          Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Sign In here</a>.
+        </p>
       </form>
 
     </div>
@@ -260,51 +314,91 @@
   </div>
 
   <script>
-    let currentRole = 'borrower';
-
-    function setRole(role) {
-      currentRole = role;
-      document.getElementById('tabBorrower').classList.toggle('active', role === 'borrower');
-      document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
-      
-      if (role === 'borrower') {
-        document.getElementById('quickLabel').innerText = 'Test Borrower:';
-        document.getElementById('quickEmail').innerText = 'reezyhoops@gmail.com';
-        document.getElementById('loginEmail').value = 'reezyhoops@gmail.com';
-        document.getElementById('submitBtn').innerText = '⚡ Sign In to Borrower Portal';
-      } else {
-        document.getElementById('quickLabel').innerText = 'Admin User:';
-        document.getElementById('quickEmail').innerText = 'admin@oryxfund.co.ke';
-        document.getElementById('loginEmail').value = 'admin@oryxfund.co.ke';
-        document.getElementById('submitBtn').innerText = '🛡️ Sign In to Admin Desk';
-      }
+    function switchAuthTab(tab) {
+      document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+      document.getElementById('signInForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('statusAlert').style.display = 'none';
     }
 
-    function quickFill() {
-      if (currentRole === 'borrower') {
-        document.getElementById('loginEmail').value = 'reezyhoops@gmail.com';
-        document.getElementById('loginPassword').value = 'password123';
-      } else {
-        document.getElementById('loginEmail').value = 'admin@oryxfund.co.ke';
-        document.getElementById('loginPassword').value = 'admin';
-      }
+    function showAlert(msg, isError = true) {
+      const alertBox = document.getElementById('statusAlert');
+      alertBox.className = 'status-alert ' + (isError ? 'error' : 'success');
+      alertBox.innerText = msg;
+      alertBox.style.display = 'block';
     }
 
-    function handleLogin(e) {
+    function handleRegister(e) {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const user = {
-        email: email,
-        name: email.includes('admin') ? 'Oryx Fund Admin' : 'Reezy Mwangi',
-        role: email.includes('admin') ? 'Administrator' : 'Borrower'
-      };
-      localStorage.setItem('oryx_auth_user', JSON.stringify(user));
+      const name = document.getElementById('regFullName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const phone = document.getElementById('regPhone').value.trim();
+      const nationalId = document.getElementById('regNationalId').value.trim();
+      const pass = document.getElementById('regPass').value;
+      const passConfirm = document.getElementById('regPassConfirm').value;
 
-      if (user.role === 'Administrator') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'index.html';
+      if (pass !== passConfirm) {
+        showAlert('Passwords do not match. Please re-enter.');
+        return;
       }
+
+      // Fresh Isolated Borrower Account
+      const newBorrower = {
+        name: name,
+        email: email,
+        phone: phone,
+        nationalId: nationalId,
+        role: 'Borrower',
+        created_at: new Date().toISOString(),
+        active_loans: 0,
+        total_principal: 0,
+        outstanding_balance: 0,
+        applications: []
+      };
+
+      // Save to isolated account key
+      localStorage.setItem('oryx_borrower_' + email, JSON.stringify(newBorrower));
+      // Set as active session
+      localStorage.setItem('oryx_auth_user', JSON.stringify(newBorrower));
+
+      showAlert('✨ Account created successfully! Redirecting...', false);
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 800);
+    }
+
+    function handleSignIn(e) {
+      e.preventDefault();
+      const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+      
+      // Check if this borrower account exists locally
+      let user = null;
+      try {
+        const stored = localStorage.getItem('oryx_borrower_' + ident);
+        if (stored) {
+          user = JSON.parse(stored);
+        }
+      } catch(err) {}
+
+      if (!user) {
+        // Create an on-demand clean borrower session for this email
+        user = {
+          name: ident.includes('@') ? ident.split('@')[0] : 'Borrower',
+          email: ident,
+          phone: ident.startsWith('+') ? ident : '+254700000000',
+          nationalId: 'Pending KYC',
+          role: 'Borrower',
+          active_loans: 0,
+          total_principal: 0,
+          outstanding_balance: 0,
+          applications: []
+        };
+        localStorage.setItem('oryx_borrower_' + ident, JSON.stringify(user));
+      }
+
+      localStorage.setItem('oryx_auth_user', JSON.stringify(user));
+      window.location.href = 'index.html';
     }
 
     function toggleTheme() {

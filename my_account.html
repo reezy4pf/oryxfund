@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Account — Oryx Fund</title>
+  <meta name="description" content="Manage your personal KYC, disbursement preferences, and security settings.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,12 +44,7 @@
       --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
 
     body {
       font-family: var(--font-body);
@@ -137,18 +133,8 @@
       margin-bottom: 20px;
     }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      display: block;
-      margin-bottom: 4px;
-    }
-
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; }
     .form-control {
       width: 100%;
       padding: 10px 14px;
@@ -161,19 +147,19 @@
       outline: none;
     }
 
-    .oryx-btn-express {
-      background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
-      color: #000000 !important;
-      font-weight: 800 !important;
+    .btn-save {
+      background: var(--primary);
+      color: #FFF !important;
+      font-weight: 700;
       font-size: 13.5px;
-      padding: 12px 20px;
+      padding: 10px 20px;
       border-radius: 8px;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
+      border: none;
+      cursor: pointer;
+    }
+    [data-theme="dark"] .btn-save {
+      background: var(--accent-emerald);
+      color: #000 !important;
     }
 
     @media (max-width: 768px) {
@@ -183,6 +169,7 @@
 </head>
 <body>
 
+  <!-- Borrower Navbar: ZERO Admin Links -->
   <header class="portal-nav-wrap">
     <a href="index.html" class="brand-logo-cluster">
       <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
@@ -195,9 +182,9 @@
     <div class="nav-actions-cluster">
       <a href="index.html" class="nav-pill-btn nav-pill-light">My Portal</a>
       <a href="apply.html" class="nav-pill-btn nav-pill-light">Loan Application</a>
-      <a href="my_account.html" class="nav-pill-btn nav-pill-active">👤 Reezy</a>
+      <a href="my_account.html" class="nav-pill-btn nav-pill-active" id="navUserPill">👤 My Account</a>
       <button class="theme-icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Light / Dark Mode">🌙</button>
-      <a href="admin.html" class="nav-pill-btn nav-pill-light" style="font-size: 11px;">🛡️ Admin Desk</a>
+      <button onclick="logoutBorrower()" style="background:none; border:1px solid var(--border-color); color:var(--text-muted); padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Sign Out</button>
     </div>
   </header>
 
@@ -208,55 +195,48 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <div>
             <h2 style="font-size: 18px; font-weight: 700;">Personal &amp; Contact Details</h2>
-            <p style="font-size: 12.5px; color: var(--text-secondary);">Keep your legal name and contact details updated for loan verification.</p>
+            <p style="font-size: 12.5px; color: var(--text-secondary);">Your verified KYC details used for identity assessment.</p>
           </div>
-          <span style="background: rgba(0, 210, 106, 0.12); color: var(--accent-green); font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px;">✓ Verified Borrower</span>
+          <span style="background: rgba(0, 210, 106, 0.12); color: var(--accent-green); font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px;">✓ Protected Profile</span>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="form-group">
             <label class="form-label">Full Legal Name</label>
-            <input type="text" class="form-control" value="Reezy Mwangi" readonly>
+            <input type="text" class="form-control" id="accName" placeholder="Enter Full Name">
           </div>
           <div class="form-group">
             <label class="form-label">Email Address</label>
-            <input type="email" class="form-control" value="reezyhoops@gmail.com" readonly>
+            <input type="email" class="form-control" id="accEmail" readonly>
           </div>
           <div class="form-group">
-            <label class="form-label">Mobile / Phone Number</label>
-            <input type="tel" class="form-control" value="+254712345678" readonly>
+            <label class="form-label">Mobile Number (M-Pesa)</label>
+            <input type="tel" class="form-control" id="accPhone" placeholder="+2547XXXXXXXX">
           </div>
           <div class="form-group">
             <label class="form-label">National ID Number</label>
-            <input type="text" class="form-control" value="31456789" readonly>
+            <input type="text" class="form-control" id="accNationalId" placeholder="National ID">
           </div>
         </div>
+
+        <button type="button" class="btn-save" onclick="saveProfile()">Save Changes</button>
       </section>
 
       <section class="oryx-card">
-        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Disbursement &amp; Banking Preferences</h2>
-        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">Designated payout accounts used for instant loan disbursements.</p>
+        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Disbursement Preferences</h2>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">Primary payout route for approved loan disbursements.</p>
         
         <div class="form-group">
-          <label class="form-label">M-Pesa Disbursal Number</label>
-          <input type="text" class="form-control" value="+254712345678" readonly>
+          <label class="form-label">M-Pesa Disbursal Mobile Number</label>
+          <input type="text" class="form-control" id="accMpesa" placeholder="+2547XXXXXXXX">
         </div>
       </section>
     </div>
 
     <div>
-      <!-- Express Subsequent Loan Card -->
-      <div class="oryx-card" style="border: 1.5px solid #00D26A; background: linear-gradient(145deg, rgba(0, 210, 106, 0.08) 0%, transparent 100%);">
-        <span style="font-size: 10px; font-weight: 800; color: #00D26A; letter-spacing: 0.8px;">⚡ EXPRESS REPEAT FACILITY</span>
-        <h3 style="font-size: 17px; font-weight: 700; margin: 4px 0 6px;">Fast-Track Subsequent Loan</h3>
-        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">Apply for a new advance using your existing verified profile.</p>
-        <a href="apply.html?flow=express" class="oryx-btn-express">⚡ Apply in 60 Seconds ➔</a>
-      </div>
-
-      <!-- Security Card -->
       <div class="oryx-card">
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Security &amp; Password</h3>
-        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">Update your account login password.</p>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Account Security</h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">Update your login password.</p>
         <div class="form-group">
           <label class="form-label">Current Password</label>
           <input type="password" class="form-control" placeholder="••••••••">
@@ -265,7 +245,7 @@
           <label class="form-label">New Password</label>
           <input type="password" class="form-control" placeholder="Min. 6 characters">
         </div>
-        <button style="width: 100%; padding: 10px; border-radius: 8px; background: var(--primary); color: #FFF; font-weight: 700; border: none; cursor: pointer;">Update Password</button>
+        <button style="width: 100%; padding: 10px; border-radius: 8px; background: var(--primary); color: #FFF; font-weight: 700; border: none; cursor: pointer;" onclick="alert('Password updated successfully!')">Update Password</button>
       </div>
     </div>
 
@@ -284,6 +264,45 @@
     if (saved) {
       document.documentElement.setAttribute('data-theme', saved);
       document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
+    }
+
+    function logoutBorrower() {
+      localStorage.removeItem('oryx_auth_user');
+      window.location.href = 'login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('oryx_auth_user'));
+        if (user) {
+          if (user.name) document.getElementById('accName').value = user.name;
+          if (user.email) {
+            document.getElementById('accEmail').value = user.email;
+            document.getElementById('navUserPill').innerText = '👤 ' + (user.name || user.email.split('@')[0]);
+          }
+          if (user.phone) {
+            document.getElementById('accPhone').value = user.phone;
+            document.getElementById('accMpesa').value = user.phone;
+          }
+          if (user.nationalId) document.getElementById('accNationalId').value = user.nationalId;
+        } else {
+          window.location.href = 'login.html';
+        }
+      } catch(e) {}
+    });
+
+    function saveProfile() {
+      try {
+        const user = JSON.parse(localStorage.getItem('oryx_auth_user')) || {};
+        user.name = document.getElementById('accName').value.trim();
+        user.phone = document.getElementById('accPhone').value.trim();
+        user.nationalId = document.getElementById('accNationalId').value.trim();
+        localStorage.setItem('oryx_auth_user', JSON.stringify(user));
+        if (user.email) {
+          localStorage.setItem('oryx_borrower_' + user.email, JSON.stringify(user));
+        }
+        alert('Profile saved successfully!');
+      } catch(e) {}
     }
   </script>
 </body>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Application — Oryx Fund</title>
-  <meta name="description" content="Instant digital loan applications and returning borrower subsequent facility portal.">
+  <meta name="description" content="Instant digital loan application portal for Oryx Fund.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,12 +44,7 @@
       --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
 
     body {
       font-family: var(--font-body);
@@ -130,7 +125,7 @@
       gap: 20px;
     }
 
-    .express-hero-bar {
+    .apply-hero-bar {
       background: linear-gradient(135deg, #1F3224 0%, #101B13 100%);
       color: #FAF8F5;
       padding: 28px 32px;
@@ -140,34 +135,9 @@
       align-items: center;
       box-shadow: var(--card-shadow);
     }
-    [data-theme="dark"] .express-hero-bar {
+    [data-theme="dark"] .apply-hero-bar {
       background: linear-gradient(135deg, #101712 0%, #080D0A 100%);
       border: 1px solid var(--border-color);
-    }
-
-    .verified-kyc-banner {
-      background: var(--bg-surface);
-      border: 1.5px solid #00D26A;
-      border-radius: 14px;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
-      box-shadow: var(--card-shadow);
-    }
-
-    .kyc-val {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .kyc-label {
-      font-size: 10.5px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 800;
     }
 
     .oryx-card {
@@ -183,7 +153,7 @@
       border: 1px solid var(--border-color);
       border-radius: 14px;
       padding: 24px;
-      margin-top: 18px;
+      margin-top: 14px;
     }
 
     .amount-slider {
@@ -242,27 +212,35 @@
       padding: 16px 20px;
     }
 
-    .hud-title {
-      font-size: 10.5px;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
+    .hud-title { font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+    .hud-number { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--text-primary); margin-top: 4px; }
 
-    .hud-number {
-      font-family: var(--font-mono);
-      font-size: 17px;
-      font-weight: 700;
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface-alt);
       color: var(--text-primary);
-      margin-top: 4px;
+      font-size: 13.5px;
+      font-family: var(--font-body);
+      outline: none;
     }
 
-    .oryx-btn-express {
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .btn-submit-app {
       background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
       color: #000000 !important;
       font-weight: 800 !important;
-      font-size: 14px;
-      padding: 12px 26px;
+      font-size: 14.5px;
+      padding: 13px 28px;
       border-radius: 8px;
       text-decoration: none;
       display: inline-flex;
@@ -272,10 +250,15 @@
       cursor: pointer;
       border: none;
     }
+
+    @media (max-width: 768px) {
+      .metrics-live-hud, .form-grid-3 { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Borrower Navbar: ZERO Admin Links -->
   <header class="portal-nav-wrap">
     <a href="index.html" class="brand-logo-cluster">
       <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
@@ -288,49 +271,29 @@
     <div class="nav-actions-cluster">
       <a href="index.html" class="nav-pill-btn nav-pill-light">My Portal</a>
       <a href="apply.html" class="nav-pill-btn nav-pill-active">Loan Application</a>
-      <a href="my_account.html" class="nav-pill-btn nav-pill-light">👤 Reezy</a>
+      <a href="my_account.html" class="nav-pill-btn nav-pill-light" id="navUserPill">👤 My Account</a>
       <button class="theme-icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Light / Dark Mode">🌙</button>
-      <a href="admin.html" class="nav-pill-btn nav-pill-light" style="font-size: 11px;">🛡️ Admin Desk</a>
     </div>
   </header>
 
   <main class="apply-container">
 
-    <div class="express-hero-bar">
+    <div class="apply-hero-bar">
       <div>
-        <span style="background: rgba(0, 210, 106, 0.15); border: 1px solid #00D26A; color: #00D26A; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 12px; display: inline-block; margin-bottom: 6px;">⚡ FAST-TRACK RETURNING BORROWER</span>
-        <h1 style="font-size: 24px; font-weight: 800;">Subsequent Facility Application</h1>
-        <p style="font-size: 13px; color: #B4C6BA;">Choose your facility terms for priority underwriting and direct disbursal.</p>
+        <span style="background: rgba(0, 210, 106, 0.15); border: 1px solid #00D26A; color: #00D26A; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 12px; display: inline-block; margin-bottom: 6px;">DIGITAL APPLICATION</span>
+        <h1 style="font-size: 24px; font-weight: 800;">Apply for an Oryx Credit Facility</h1>
+        <p style="font-size: 13px; color: #B4C6BA;">Complete your loan terms and disbursal preferences below.</p>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 11px; color: #9DB4A5; font-weight: 700; text-transform: uppercase;">Average SLA</div>
-        <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #00D26A;">15 Minutes</div>
+        <div style="font-size: 11px; color: #9DB4A5; font-weight: 700; text-transform: uppercase;">Average Decision</div>
+        <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #00D26A;">Same Day</div>
       </div>
     </div>
 
-    <!-- Verified KYC Banner -->
-    <div class="verified-kyc-banner">
-      <div>
-        <div class="kyc-label">Borrower</div>
-        <div class="kyc-val">Reezy Mwangi</div>
-      </div>
-      <div>
-        <div class="kyc-label">National ID</div>
-        <div class="kyc-val" style="font-family: var(--font-mono);">31****89</div>
-      </div>
-      <div>
-        <div class="kyc-label">Payout Route</div>
-        <div class="kyc-val">M-Pesa (+254***678)</div>
-      </div>
-      <div style="background: rgba(0, 210, 106, 0.12); color: var(--accent-green); font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 20px;">
-        ✓ Verified KYC on Record
-      </div>
-    </div>
-
-    <!-- Interactive Facility Specs Card -->
+    <!-- 1. Facility Terms Card -->
     <section class="oryx-card">
-      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">1. Facility Specifications</h2>
-      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Configure your loan amount and view live monthly repayments.</p>
+      <h2 style="font-size: 18px; font-weight: 700;">1. Facility Terms &amp; Amortization</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Adjust the requested principal amount and view real-time installment calculations.</p>
 
       <div class="calc-box">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -354,7 +317,7 @@
             <div class="hud-number" id="hudPrincipal">KES 100,000</div>
           </div>
           <div>
-            <div class="hud-title">Est. Interest</div>
+            <div class="hud-title">Est. Interest (14% p.a.)</div>
             <div class="hud-number" id="hudInterest">KES 7,000</div>
           </div>
           <div>
@@ -367,10 +330,66 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- 2. Borrower Verification Details -->
+    <section class="oryx-card">
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">2. Borrower KYC &amp; Contact Details</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">Your registered borrower information is securely linked to this application.</p>
+
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="form-label">Full Legal Name</label>
+          <input type="text" id="appFullName" class="form-control" placeholder="Enter Full Name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="appEmail" class="form-control" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mobile Number</label>
+          <input type="tel" id="appPhone" class="form-control" placeholder="+2547XXXXXXXX" required>
+        </div>
+      </div>
+
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="form-label">National ID Number</label>
+          <input type="text" id="appNationalId" class="form-control" placeholder="National ID" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Employer / Business Name</label>
+          <input type="text" id="appEmployer" class="form-control" placeholder="e.g. Acme Enterprise" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Net Income (KES)</label>
+          <input type="number" id="appIncome" class="form-control" placeholder="e.g. 150000" required>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Disbursal Preferences -->
+    <section class="oryx-card">
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">3. Direct Disbursal Preferences</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">Designate the payout route where loan funds will be disbursed upon approval.</p>
+
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="form-label">Disbursement Route</label>
+          <select class="form-control" id="appDisbursalMethod">
+            <option value="M-Pesa">M-Pesa Direct Payout</option>
+            <option value="Bank Transfer">Bank Wire (EFT / RTGS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">M-Pesa Number / Account</label>
+          <input type="text" id="appDisbursalAccount" class="form-control" placeholder="+2547XXXXXXXX" required>
+        </div>
+      </div>
 
       <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
-        <button class="oryx-btn-express" onclick="alert('⚡ Subsequent Loan Application Submitted! Disbursal scheduled within 15 minutes to M-Pesa +254***678')">
-          ⚡ Submit Subsequent Loan Application
+        <button type="button" class="btn-submit-app" onclick="submitLoanApplication()">
+          🚀 Submit Loan Application for Underwriting
         </button>
       </div>
     </section>
@@ -407,6 +426,41 @@
       document.getElementById('hudInterest').innerText = 'KES ' + interest.toLocaleString('en-US');
       document.getElementById('hudMonthly').innerText = 'KES ' + monthly.toLocaleString('en-US') + ' / mo';
       document.getElementById('hudTotal').innerText = 'KES ' + total.toLocaleString('en-US');
+    }
+
+    // Populate user from active session if logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('oryx_auth_user'));
+        if (user) {
+          if (user.name && user.name !== 'Borrower') document.getElementById('appFullName').value = user.name;
+          if (user.email) {
+            document.getElementById('appEmail').value = user.email;
+            document.getElementById('navUserPill').innerText = '👤 ' + (user.name || user.email.split('@')[0]);
+          }
+          if (user.phone) {
+            document.getElementById('appPhone').value = user.phone;
+            document.getElementById('appDisbursalAccount').value = user.phone;
+          }
+          if (user.nationalId && user.nationalId !== 'Pending KYC') {
+            document.getElementById('appNationalId').value = user.nationalId;
+          }
+        }
+      } catch(e) {}
+    });
+
+    function submitLoanApplication() {
+      const amount = document.getElementById('hudPrincipal').innerText;
+      const name = document.getElementById('appFullName').value.trim();
+      const email = document.getElementById('appEmail').value.trim();
+
+      if (!name || !email) {
+        alert('Please provide your Full Legal Name and Email to submit.');
+        return;
+      }
+
+      alert('🎉 Application for ' + amount + ' submitted successfully! Our credit team is reviewing your file.');
+      window.location.href = 'index.html';
     }
   </script>
 </body>
