@@ -137,8 +137,8 @@ def generate_clean_isolated_system():
     .auth-card {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
-      border-radius: 18px;
-      padding: 32px 30px;
+      border-radius: 16px;
+      padding: 10px;
       box-shadow: var(--card-shadow);
     }}
 
