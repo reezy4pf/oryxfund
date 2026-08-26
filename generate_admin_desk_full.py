@@ -768,10 +768,10 @@ def generate_full_admin_desk():
     <!-- User Footer -->
     <div class="sidebar-user-footer" onclick="logoutAdmin()" title="Click to Sign Out" style="cursor:pointer;">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <div class="user-avatar-circle">OF</div>
+        <div class="user-avatar-circle">DA</div>
         <div>
-          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-main);">Oryx Fund Admin</div>
-          <div style="font-size: 9.5px; color: var(--text-sub);">admin@oryxfund.co.ke &bull; <span style="color:#F87171;">Sign Out</span></div>
+          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-main);">Dervin Aziza</div>
+          <div style="font-size: 9.5px; color: var(--text-sub);">dervinaziza9@gmail.com &bull; <span style="color:#F87171;">Sign Out</span></div>
         </div>
       </div>
       <span style="font-size: 11px; color: var(--accent-red);">🚪</span>
@@ -882,11 +882,11 @@ def generate_full_admin_desk():
       <form onsubmit="handleAdminClearanceSubmit(event)">
         <div style="text-align:left; margin-bottom:12px;">
           <label style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; display:block; margin-bottom:4px;">Staff Email Address</label>
-          <input type="text" id="clearanceEmailInput" class="modal-input" value="admin@oryxfund.co.ke" placeholder="admin@oryxfund.co.ke" required>
+          <input type="text" id="clearanceEmailInput" class="modal-input" value="dervinaziza9@gmail.com" placeholder="dervinaziza9@gmail.com" required>
         </div>
         <div style="text-align:left; margin-bottom:16px; position:relative;">
           <label style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; display:block; margin-bottom:4px;">Security Key / Password</label>
-          <input type="password" id="clearancePassInput" class="modal-input" placeholder="Enter clearance password (e.g. Admin@2026!)" required autofocus style="padding-right:40px;">
+          <input type="password" id="clearancePassInput" class="modal-input" placeholder="Enter clearance password (e.g. Oryx2026)" required autofocus style="padding-right:40px;">
           <span onclick="toggleClearanceEye()" style="position:absolute; right:12px; top:32px; cursor:pointer; font-size:14px; user-select:none;" id="clearanceEyeIcon">👁️</span>
         </div>
         
@@ -981,11 +981,11 @@ def generate_full_admin_desk():
 
       const hashed = await hashPassword(pass);
       const validAdminHashes = [
+        await hashPassword('Oryx2026'),
+        await hashPassword('Admin@26'),
+        await hashPassword('Dervin26'),
         await hashPassword('Admin@2026!'),
-        await hashPassword('password'),
-        await hashPassword('oryx2026'),
-        await hashPassword('admin'),
-        await hashPassword('Secret123')
+        await hashPassword('password')
       ];
 
       if (!validAdminHashes.includes(hashed)) {
@@ -997,7 +997,7 @@ def generate_full_admin_desk():
 
       const adminSession = {
         id: "usr_admin_001",
-        name: "Oryx Fund Admin",
+        name: "Dervin Aziza",
         email: email,
         role: "Admin",
         expires_at: Date.now() + (4 * 3600 * 1000)

@@ -1332,15 +1332,15 @@ html.dark .moon-icon { display: none; }
           },
           {
             id: 'usr_admin_001',
-            name: 'Oryx Fund Admin',
-            email: 'admin@oryxfund.co.ke',
+            name: 'Dervin Aziza',
+            email: 'dervinaziza9@gmail.com',
             phone: '+254700000000',
             nationalId: 'ADM-001',
             kraPin: 'A000000000Z',
             address: 'Upper Hill, Nairobi',
             county: 'Nairobi',
             role: 'Admin',
-            passwordHash: '3190a7c246a9c205f2ade1cc48ba235429c186dc7a2662be6403a792b74242ef', // Admin@2026!
+            passwordHash: '91521ad19aee4d15e8ed916c75354a4411e6a5c43703ddb048411c41b67732c7', // Oryx2026 (8 chars)
             created_at: new Date().toISOString()
           }
         ];
@@ -3313,13 +3313,14 @@ html.dark .moon-icon { display: none; }
       document.getElementById('signInSubmitBtn').innerText = 'Verifying credentials...';
 
       // 1. Administrator Authentication
-      if (ident === 'admin' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
+      if (ident === 'admin' || ident === 'dervinaziza9@gmail.com' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
         const hashed = await hashPassword(pass);
         const validAdminHashes = [
+          await hashPassword('Oryx2026'),
+          await hashPassword('Admin@26'),
+          await hashPassword('Dervin26'),
           await hashPassword('Admin@2026!'),
-          await hashPassword('password'),
-          await hashPassword('oryx2026'),
-          await hashPassword('admin')
+          await hashPassword('password')
         ];
 
         if (!validAdminHashes.includes(hashed)) {
@@ -3330,8 +3331,8 @@ html.dark .moon-icon { display: none; }
 
         const adminUser = {
           id: 'usr_admin_001',
-          name: 'Oryx Fund Admin',
-          email: 'admin@oryxfund.co.ke',
+          name: 'Dervin Aziza',
+          email: 'dervinaziza9@gmail.com',
           role: 'Admin'
         };
         setAuthSession(adminUser);
