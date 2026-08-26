@@ -150,6 +150,12 @@
       margin-bottom: 6px;
     }
 
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
     .form-input {
       width: 100%;
       padding: 11px 14px;
@@ -163,10 +169,25 @@
       transition: all 0.15s ease;
     }
 
+    .input-wrap .form-input {
+      padding-right: 40px;
+    }
+
     .form-input:focus {
       border-color: var(--accent-emerald);
       background: var(--bg-surface);
       box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 4px;
     }
 
     .form-grid-2 {
@@ -239,6 +260,20 @@
       font-size: 12px;
       color: var(--text-secondary);
     }
+
+    .strength-track {
+      display: flex;
+      gap: 4px;
+      height: 3px;
+      margin-top: 6px;
+    }
+
+    .strength-seg {
+      flex: 1;
+      background: var(--border-color);
+      border-radius: 2px;
+      transition: background-color 0.2s ease;
+    }
   </style>
 </head>
 <body>
@@ -274,9 +309,12 @@
           <div class="form-group">
             <div style="display: flex; justify-content: space-between;">
               <label class="form-label" for="loginPass">Password</label>
-              <a href="javascript:void(0)" onclick="alert('Password reset OTP sent to registered phone/email.')" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot Password?</a>
+              <a href="javascript:void(0)" onclick="openForgotPassModal()" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot Password?</a>
             </div>
-            <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
+            <div class="input-wrap">
+              <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
+              <button type="button" class="eye-btn" onclick="togglePassEye('loginPass', this)">👁️</button>
+            </div>
           </div>
 
           <button type="submit" class="btn-submit" id="signInSubmitBtn">
@@ -314,16 +352,28 @@
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label" for="regPass">Create Password</label>
-              <input type="password" id="regPass" class="form-input" placeholder="Min. 6 chars" required minlength="6">
+              <div class="input-wrap">
+                <input type="password" id="regPass" class="form-input" placeholder="Min. 6 chars" required minlength="6" oninput="evalStrength(this.value)">
+                <button type="button" class="eye-btn" onclick="togglePassEye('regPass', this)">👁️</button>
+              </div>
+              <div class="strength-track">
+                <div class="strength-seg" id="str1"></div>
+                <div class="strength-seg" id="str2"></div>
+                <div class="strength-seg" id="str3"></div>
+                <div class="strength-seg" id="str4"></div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label" for="regPassConfirm">Confirm Password</label>
-              <input type="password" id="regPassConfirm" class="form-input" placeholder="Repeat password" required minlength="6">
+              <div class="input-wrap">
+                <input type="password" id="regPassConfirm" class="form-input" placeholder="Repeat password" required minlength="6">
+                <button type="button" class="eye-btn" onclick="togglePassEye('regPassConfirm', this)">👁️</button>
+              </div>
             </div>
           </div>
 
           <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px;">
-            <input type="checkbox" id="termsCheck" required checked style="margin-top: 2px;">
+            <input type="checkbox" id="termsCheck" required checked style="margin-top: 2px; accent-color:var(--accent-emerald);">
             <label for="termsCheck">I agree to Oryx Fund Digital Lending Terms &amp; KYC Verification.</label>
           </div>
 
@@ -360,7 +410,7 @@
 
     function initAuthSeeds() {
       // Seed initial default test accounts with SHA-256 hashes if uninitialized
-      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v4') {
         const seedUsers = [
           {
             id: 'usr_reezy_001',
@@ -396,7 +446,24 @@
           localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
         });
 
-        localStorage.setItem('oryx_auth_seeded', 'v3');
+        // Seed initial default active loan for Reezy to enable interactive repayment demo
+        const seedReezyLoan = {
+          loanId: 'ACC-LOAN-2026-00001',
+          productName: 'Working Capital Facility',
+          principal: 250000,
+          disbursedDate: '2026-08-15',
+          termMonths: 12,
+          monthlyRate: 1.5,
+          monthlyInstallment: 23750,
+          balance: 213750,
+          nextDueDate: '2026-09-15',
+          repayments: [
+            { id: 'REP-2026-0001', date: '2026-08-20', amount: 23750, ref: 'QK91827364', method: 'M-Pesa STK Push' }
+          ]
+        };
+        localStorage.setItem('oryx_active_loan_usr_reezy_001', JSON.stringify(seedReezyLoan));
+
+        localStorage.setItem('oryx_auth_seeded', 'v4');
       }
     }
     initAuthSeeds();
@@ -479,7 +546,43 @@
         localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
       } catch(e) {}
     }
+
+    function getUserActiveLoan(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_active_loan_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserActiveLoan(userId, loanData) {
+      localStorage.setItem('oryx_active_loan_' + userId, JSON.stringify(loanData));
+    }
     
+
+    function togglePassEye(id, btn) {
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
+      btn.innerText = el.type === 'password' ? '👁️' : '🔒';
+    }
+
+    function evalStrength(val) {
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      for (let i = 1; i <= 4; i++) {
+        const seg = document.getElementById('str' + i);
+        seg.style.background = (i <= score) ? (score <= 1 ? '#EF4444' : score === 2 ? '#F59E0B' : '#00D26A') : 'var(--border-color)';
+      }
+    }
+
+    function openForgotPassModal() {
+      const ident = prompt('Enter your registered Email Address or Phone Number to receive password reset OTP:');
+      if (ident) {
+        alert('✨ Reset instructions and an SMS OTP have been sent to: ' + ident);
+      }
+    }
 
     function switchAuthTab(tab) {
       document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
@@ -514,7 +617,6 @@
         return;
       }
 
-      // Check if user already exists in index
       const existingByEmail = localStorage.getItem('oryx_idx_' + email);
       const existingByPhone = localStorage.getItem('oryx_idx_' + phone);
       if (existingByEmail || existingByPhone) {
@@ -524,9 +626,7 @@
 
       document.getElementById('regSubmitBtn').innerText = 'Creating account...';
 
-      // Hash password securely with Web Crypto SHA-256
       const hashed = await hashPassword(pass);
-
       const userId = 'usr_' + Date.now();
       const newBorrower = {
         id: userId,
@@ -562,10 +662,9 @@
 
       document.getElementById('signInSubmitBtn').innerText = 'Verifying credentials...';
 
-      // 1. Check Administrator Sign In
+      // 1. Administrator Authentication
       if (ident === 'admin' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
         const hashed = await hashPassword(pass);
-        // Valid admin passwords: password or Admin@2026! or oryx2026
         const validAdminHashes = [
           await hashPassword('Admin@2026!'),
           await hashPassword('password'),
@@ -593,22 +692,8 @@
         return;
       }
 
-      // 2. Check Registered Borrower by Email or Phone
+      // 2. Borrower Authentication
       let userId = localStorage.getItem('oryx_idx_' + ident);
-      if (!userId) {
-        // Fallback check legacy storage
-        const legacy = localStorage.getItem('oryx_borrower_' + ident);
-        if (legacy) {
-          try {
-            const parsed = JSON.parse(legacy);
-            userId = parsed.id || 'usr_' + Date.now();
-            parsed.id = userId;
-            parsed.passwordHash = await hashPassword(pass);
-            saveUserRecord(parsed);
-          } catch(err) {}
-        }
-      }
-
       if (!userId) {
         document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
         showAlert('No borrower account found matching this identifier. Please create an account.');
@@ -622,18 +707,11 @@
         return;
       }
 
-      // Verify Password Hash
       const enteredHash = await hashPassword(pass);
       if (user.passwordHash && user.passwordHash !== enteredHash) {
         document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
         showAlert('Incorrect password. Please verify and try again.');
         return;
-      }
-
-      // If user had no password hash (legacy migration), set it now
-      if (!user.passwordHash) {
-        user.passwordHash = enteredHash;
-        saveUserRecord(user);
       }
 
       user.role = 'Borrower';

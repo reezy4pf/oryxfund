@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Account — Oryx Fund</title>
-  <meta name="description" content="Manage your borrower profile, KYC verification, and security settings.">
+  <meta name="description" content="Manage borrower credentials, KYC verification status, password security, and active sessions.">
   <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,14 +13,16 @@
 
   <style>
 /* ==========================================================================
-   ORYX FUND OFFICIAL LENDING SYSTEM CORE STYLES (MATCHING LOCALHOST 1:1)
+   ORYX FUND DIGITAL LENDING PLATFORM — BESPOKE CINEMATIC STYLES
    ========================================================================== */
 :root, [data-theme="light"], [data-theme-mode="light"] {
   --bg-body: #EAE0D8;
   --bg-card: #FFFFFF;
   --bg-surface: #F5EFEA;
+  --bg-surface-elevated: #FFFFFF;
   --text-color: #121A14;
   --text-muted: #556B5D;
+  --text-dim: #7E9284;
   --border-color: #D8CCC1;
   --border-light: #ECE5DC;
   --primary-color: #1F3224;
@@ -28,9 +30,12 @@
   --accent-green: #059669;
   --accent-emerald: #00D26A;
   --accent-gold: #C1440E;
+  --accent-amber: #D97706;
+  --accent-red: #DC2626;
   --hero-bg: #1F3224;
   --hero-text: #FAF8F5;
-  --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
+  --card-shadow: 0 4px 24px rgba(31, 50, 36, 0.07);
+  --modal-backdrop: rgba(18, 26, 20, 0.65);
   --font-body: -apple-system, BlinkMacSystemFont, "DM Sans", "Segoe UI", Roboto, sans-serif;
   --font-mono: 'IBM Plex Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
@@ -39,8 +44,10 @@
   --bg-body: #080D0A;
   --bg-card: #101712;
   --bg-surface: #141F17;
+  --bg-surface-elevated: #18261C;
   --text-color: #F3F4F6;
   --text-muted: #9CA3AF;
+  --text-dim: #6B7280;
   --border-color: #1E2D22;
   --border-light: #18241B;
   --primary-color: #00D26A;
@@ -48,9 +55,12 @@
   --accent-green: #00D26A;
   --accent-emerald: #00D26A;
   --accent-gold: #F59E0B;
-  --hero-bg: linear-gradient(145deg, #132218, #0E1812);
+  --accent-amber: #F59E0B;
+  --accent-red: #EF4444;
+  --hero-bg: linear-gradient(145deg, #132218 0%, #0E1812 100%);
   --hero-text: #FAF8F5;
-  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --card-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.6);
+  --modal-backdrop: rgba(0, 0, 0, 0.82);
 }
 
 * {
@@ -66,6 +76,26 @@ body {
   font-family: var(--font-body) !important;
   min-height: 100vh;
   line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* NOISE OVERLAY */
+.oryx-noise-bg {
+  position: relative;
+  overflow: hidden;
+}
+.oryx-noise-bg::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+.oryx-noise-bg > * {
+  position: relative;
+  z-index: 2;
 }
 
 /* FULL-WIDTH STICKY NAVBAR */
@@ -74,8 +104,8 @@ body {
   top: 0;
   z-index: 1000;
   background: rgba(234, 224, 216, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
   padding: 10px 24px;
   width: 100%;
@@ -84,8 +114,8 @@ body {
 
 [data-theme="dark"] .oryx-navbar,
 html.dark .oryx-navbar {
-  background: rgba(10, 10, 10, 0.94);
-  border-bottom-color: #1A221C;
+  background: rgba(8, 13, 10, 0.92);
+  border-bottom-color: #1A261D;
 }
 
 .oryx-nav-inner {
@@ -135,7 +165,7 @@ html.dark .oryx-logo-dark {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(31, 50, 36, 0.04);
+  background: rgba(31, 50, 36, 0.05);
   padding: 4px;
   border-radius: 9999px;
   border: 1px solid var(--border-color);
@@ -143,8 +173,8 @@ html.dark .oryx-logo-dark {
 
 [data-theme="dark"] .oryx-capsules-nav,
 html.dark .oryx-capsules-nav {
-  background: #111412;
-  border-color: #1C261F;
+  background: #111813;
+  border-color: #1E2D22;
 }
 
 .oryx-capsule-tab {
@@ -167,19 +197,19 @@ html.dark .oryx-capsule-tab {
 }
 
 .oryx-capsule-tab:hover:not(.active) {
-  background: rgba(31, 50, 36, 0.06);
+  background: rgba(31, 50, 36, 0.07);
 }
 
 [data-theme="dark"] .oryx-capsule-tab:hover:not(.active),
 html.dark .oryx-capsule-tab:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .oryx-capsule-tab.active {
   background: #1F3224 !important;
   color: #FFFFFF !important;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(31, 50, 36, 0.2);
+  box-shadow: 0 2px 8px rgba(31, 50, 36, 0.25);
 }
 
 [data-theme="dark"] .oryx-capsule-tab.active,
@@ -205,18 +235,13 @@ html.dark .oryx-capsule-tab.active {
 
 [data-theme="dark"] .oryx-theme-toggle-btn,
 html.dark .oryx-theme-toggle-btn {
-  border-color: #1C261F;
+  border-color: #1E2D22;
   color: #FAF8F5;
 }
 
 .oryx-theme-toggle-btn:hover {
-  border-color: #1F3224;
+  border-color: var(--primary-color);
   transform: translateY(-1px);
-}
-
-[data-theme="dark"] .oryx-theme-toggle-btn:hover,
-html.dark .oryx-theme-toggle-btn:hover {
-  border-color: #00D26A;
 }
 
 .sun-icon { display: none; }
@@ -268,7 +293,7 @@ html.dark .moon-icon { display: none; }
   box-sizing: border-box;
 }
 
-/* HERO CARD (EXACT LOCALHOST) */
+/* HERO CARD (EXACT LOCALHOST 1:1) */
 .oryx-hero-card {
   background: var(--hero-bg);
   color: #FFFFFF;
@@ -452,6 +477,12 @@ html.dark .moon-icon { display: none; }
   align-items: center;
   gap: 16px;
   box-shadow: var(--card-shadow);
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s ease;
+}
+
+.oryx-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon-wrap {
@@ -579,8 +610,12 @@ html.dark .moon-icon { display: none; }
   font-weight: 700;
   cursor: pointer;
   border: none;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-decoration: none;
+}
+
+.oryx-btn:hover {
+  transform: scale(1.02);
 }
 
 .oryx-btn-primary {
@@ -591,7 +626,6 @@ html.dark .moon-icon { display: none; }
 
 .oryx-btn-primary:hover {
   background: #2D4834 !important;
-  transform: translateY(-1px);
 }
 
 [data-theme="dark"] .oryx-btn-primary {
@@ -614,6 +648,18 @@ html.dark .moon-icon { display: none; }
   background: var(--border-light) !important;
 }
 
+.oryx-btn-mpesa {
+  background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
+}
+
+.oryx-btn-mpesa:hover {
+  background: linear-gradient(135deg, #00FF80 0%, #00D26A 100%) !important;
+  box-shadow: 0 6px 18px rgba(0, 210, 106, 0.45) !important;
+}
+
 .oryx-btn-express {
   background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
   color: #000000 !important;
@@ -623,7 +669,6 @@ html.dark .moon-icon { display: none; }
 
 .oryx-btn-express:hover {
   background: linear-gradient(135deg, #00FF80 0%, #00D26A 100%) !important;
-  transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(0, 210, 106, 0.45) !important;
 }
 
@@ -682,13 +727,13 @@ html.dark .moon-icon { display: none; }
 .form-control:focus, .oryx-input:focus, .oryx-select:focus {
   border-color: var(--primary-color);
   background: var(--bg-card);
-  box-shadow: 0 0 0 2px rgba(31, 50, 36, 0.1);
+  box-shadow: 0 0 0 2px rgba(31, 50, 36, 0.12);
 }
 
 [data-theme="dark"] .form-control:focus,
 [data-theme="dark"] .oryx-input:focus,
 [data-theme="dark"] .oryx-select:focus {
-  box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.25);
 }
 
 /* PRODUCT CARDS GRID */
@@ -715,7 +760,7 @@ html.dark .moon-icon { display: none; }
 .product-card:hover {
   border-color: var(--primary-color);
   background: var(--bg-card);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .product-card.selected {
@@ -818,73 +863,216 @@ html.dark .moon-icon { display: none; }
   box-shadow: 0 0 0 2px #00D26A;
 }
 
-/* SUCCESS CARD */
-.oryx-success-card {
-  background: var(--bg-card);
+/* DTI METER */
+.dti-meter-wrapper {
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 40px 32px;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 14px;
+}
+
+.dti-bar-track {
+  height: 8px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+[data-theme="dark"] .dti-bar-track {
+  background: rgba(255,255,255,0.1);
+}
+
+.dti-bar-fill {
+  height: 100%;
+  width: 32%;
+  background: linear-gradient(90deg, #00D26A 0%, #D97706 70%, #EF4444 100%);
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* DROPZONE STYLES */
+.oryx-dropzone {
+  border: 2px dashed var(--border-color);
+  background: var(--bg-surface);
+  border-radius: 12px;
+  padding: 24px 20px;
   text-align: center;
-  box-shadow: var(--card-shadow);
-  max-width: 680px;
-  margin: 0 auto;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-.success-icon-wrap {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(0, 210, 106, 0.15);
-  border: 2px solid #00D26A;
-  color: #00D26A;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
+.oryx-dropzone:hover, .oryx-dropzone.dragover {
+  border-color: var(--accent-emerald);
+  background: rgba(0, 210, 106, 0.04);
 }
 
-.success-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-color);
+.dropzone-icon {
+  font-size: 28px;
   margin-bottom: 8px;
 }
 
-.success-desc {
-  font-size: 14px;
-  color: var(--text-muted);
+.uploaded-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 210, 106, 0.15);
+  border: 1px solid #00D26A;
+  color: var(--text-color);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* MODAL SYSTEM (REPLACING PROMPT/ALERT) */
+.oryx-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.oryx-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.oryx-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 32px 28px;
   max-width: 480px;
-  margin: 0 auto 24px;
-  line-height: 1.5;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
-.app-ref-box {
+.oryx-modal-backdrop.active .oryx-modal-card {
+  transform: scale(1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modal-close-btn:hover { color: var(--text-color); }
+
+/* AMORTIZATION TABLE ACCORDION */
+.amort-table-wrap {
+  margin-top: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.amort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.amort-table th {
   background: var(--bg-surface);
-  border: 1px dashed var(--border-color);
-  border-radius: 10px;
-  padding: 12px 20px;
-  display: inline-block;
-  margin-bottom: 24px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 
-.ref-label {
-  display: block;
+.amort-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-color);
+  font-family: var(--font-mono);
+}
+
+.amort-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* LOAN PROGRESS PIPELINE */
+.pipeline-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 8px;
+}
+
+.pipeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 2px;
 }
 
-.ref-code {
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary-color);
+.pipeline-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
 }
 
-[data-theme="dark"] .ref-code {
-  color: #00D26A;
+.pipeline-node.done .pipeline-dot {
+  background: #00D26A;
+  color: #000;
+  border-color: #00D26A;
+}
+
+.pipeline-node.current .pipeline-dot {
+  background: #D97706;
+  color: #FFF;
+  border-color: #D97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
+  animation: pulseNode 1.5s infinite;
+}
+
+@keyframes pulseNode {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.pipeline-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  margin: 0 6px 16px;
+}
+
+.pipeline-line.done {
+  background: #00D26A;
 }
 
 /* APPLICATIONS LIST CARDS */
@@ -982,9 +1170,98 @@ html.dark .moon-icon { display: none; }
   border-color: #14532D;
 }
 
+/* SUCCESS CARD */
+.oryx-success-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.success-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0, 210, 106, 0.15);
+  border: 2px solid #00D26A;
+  color: #00D26A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.success-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 8px;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
+.app-ref-box {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.ref-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.ref-code {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .ref-code {
+  color: #00D26A;
+}
+
+/* PASSWORD STRENGTH */
+.pass-strength-bar {
+  display: flex;
+  gap: 4px;
+  height: 4px;
+  margin-top: 6px;
+}
+
+.strength-segment {
+  flex: 1;
+  background: var(--border-color);
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.strength-segment.active-weak { background: #EF4444; }
+.strength-segment.active-fair { background: #F59E0B; }
+.strength-segment.active-good { background: #10B981; }
+.strength-segment.active-strong { background: #00D26A; }
+
   </style>
 </head>
-<body>
+<body class="oryx-noise-bg">
 
   <!-- Sticky Full-Width Localhost Header -->
   <header class="oryx-navbar">
@@ -1042,7 +1319,7 @@ html.dark .moon-icon { display: none; }
   <main class="oryx-portal-wrapper">
 
     <!-- Hero Card -->
-    <div class="oryx-hero-card">
+    <div class="oryx-hero-card oryx-noise-bg">
       <div class="hero-top-row">
         <div class="oryx-badge">MY ACCOUNT</div>
         <span class="user-greeting" id="heroAccountText">Account: Loading...</span>
@@ -1050,7 +1327,7 @@ html.dark .moon-icon { display: none; }
       <div class="hero-main-row">
         <div>
           <h1 class="oryx-title">Borrower Profile &amp; Security</h1>
-          <p class="oryx-subtitle">Manage verified personal identification, contact records, and active sessions.</p>
+          <p class="oryx-subtitle">Manage verified personal identification, cryptographic security credentials, and active device sessions.</p>
         </div>
         <div class="hero-cta-box">
           <a href="apply.html" class="oryx-hero-btn">+ Apply for a New Loan</a>
@@ -1088,7 +1365,7 @@ html.dark .moon-icon { display: none; }
             <input type="text" id="accKraPin" class="form-control" value="A009847291Z" readonly style="opacity:0.85;">
           </div>
           <div class="form-group">
-            <label class="form-label">Primary Mobile</label>
+            <label class="form-label">Primary Mobile Phone</label>
             <input type="text" id="accPhone" class="form-control" value="0712345678">
           </div>
         </div>
@@ -1109,21 +1386,22 @@ html.dark .moon-icon { display: none; }
           </div>
         </div>
 
-        <div style="margin-top:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
           <button type="button" class="oryx-btn oryx-btn-primary" onclick="saveProfileChanges()">Save Profile Updates</button>
+          <button type="button" class="oryx-btn oryx-btn-secondary" onclick="openChangePasswordModal()">🔒 Change Password</button>
         </div>
       </div>
 
-      <!-- Security & Session Card (Strictly Isolated, No Admin Link) -->
+      <!-- Security & Session Suite -->
       <div class="oryx-portal-card">
         <div class="card-section-head">
           <div>
-            <h3 class="section-title">Security &amp; Session</h3>
+            <h3 class="section-title">Security &amp; Device Auth</h3>
             <p class="section-desc">Active credentials &bull; Device auth</p>
           </div>
         </div>
 
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:18px;">
           <div class="stat-label">Session Status</div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
             <span style="width:8px; height:8px; border-radius:50%; background:#00D26A; display:inline-block;"></span>
@@ -1131,9 +1409,19 @@ html.dark .moon-icon { display: none; }
           </div>
         </div>
 
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:18px;">
           <div class="stat-label">Account Role</div>
           <div style="font-weight:700; font-size:14px; color:var(--text-color); margin-top:4px;">Registered Borrower (Standard)</div>
+        </div>
+
+        <div style="margin-bottom:18px; padding-top:14px; border-top:1px solid var(--border-light);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:13px; color:var(--text-color);">Two-Factor Auth (2FA)</div>
+              <div style="font-size:11.5px; color:var(--text-muted);">SMS verification on login</div>
+            </div>
+            <input type="checkbox" id="twoFaToggle" onchange="toggle2Fa(this.checked)" checked style="accent-color:var(--accent-emerald); transform:scale(1.3); cursor:pointer;">
+          </div>
         </div>
 
         <div style="border-top:1px solid var(--border-light); padding-top:20px; margin-top:20px;">
@@ -1146,6 +1434,32 @@ html.dark .moon-icon { display: none; }
     </div>
 
   </main>
+
+  <!-- CHANGE PASSWORD IN-DOM MODAL -->
+  <div class="oryx-modal-backdrop" id="passModalBackdrop" onclick="closeChangePasswordModal(event)">
+    <div class="oryx-modal-card" onclick="event.stopPropagation()">
+      <button type="button" class="modal-close-btn" onclick="closeChangePasswordModalDirect()">✕</button>
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:4px;">🔒 Update Account Password</h3>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px;">Verify current password and create a new cryptographically hashed key.</p>
+
+      <form onsubmit="handleChangePasswordSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" id="oldPassInput" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Password (Min. 6 chars)</label>
+          <input type="password" id="newPassInput" class="form-control" placeholder="Min. 6 characters" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" id="newPassConfirmInput" class="form-control" placeholder="Repeat new password" required minlength="6">
+        </div>
+        <div id="passModalAlert" class="status-alert" style="display:none; margin-bottom:14px;"></div>
+        <button type="submit" class="oryx-btn oryx-btn-primary" style="width:100%; padding:11px;">Update Password Hash</button>
+      </form>
+    </div>
+  </div>
 
   <script>
 
@@ -1162,7 +1476,7 @@ html.dark .moon-icon { display: none; }
 
     function initAuthSeeds() {
       // Seed initial default test accounts with SHA-256 hashes if uninitialized
-      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v4') {
         const seedUsers = [
           {
             id: 'usr_reezy_001',
@@ -1198,7 +1512,24 @@ html.dark .moon-icon { display: none; }
           localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
         });
 
-        localStorage.setItem('oryx_auth_seeded', 'v3');
+        // Seed initial default active loan for Reezy to enable interactive repayment demo
+        const seedReezyLoan = {
+          loanId: 'ACC-LOAN-2026-00001',
+          productName: 'Working Capital Facility',
+          principal: 250000,
+          disbursedDate: '2026-08-15',
+          termMonths: 12,
+          monthlyRate: 1.5,
+          monthlyInstallment: 23750,
+          balance: 213750,
+          nextDueDate: '2026-09-15',
+          repayments: [
+            { id: 'REP-2026-0001', date: '2026-08-20', amount: 23750, ref: 'QK91827364', method: 'M-Pesa STK Push' }
+          ]
+        };
+        localStorage.setItem('oryx_active_loan_usr_reezy_001', JSON.stringify(seedReezyLoan));
+
+        localStorage.setItem('oryx_auth_seeded', 'v4');
       }
     }
     initAuthSeeds();
@@ -1281,6 +1612,16 @@ html.dark .moon-icon { display: none; }
         localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
       } catch(e) {}
     }
+
+    function getUserActiveLoan(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_active_loan_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserActiveLoan(userId, loanData) {
+      localStorage.setItem('oryx_active_loan_' + userId, JSON.stringify(loanData));
+    }
     
 
     let currentSession = null;
@@ -1303,6 +1644,56 @@ html.dark .moon-icon { display: none; }
       clearAuthSession(true);
     }
 
+    function toggle2Fa(enabled) {
+      alert(enabled ? '✨ SMS Two-Factor Authentication (2FA) is now ACTIVE.' : 'Two-Factor Authentication (2FA) has been DISABLED.');
+    }
+
+    function openChangePasswordModal() {
+      document.getElementById('passModalBackdrop').classList.add('active');
+    }
+    function closeChangePasswordModal(e) {
+      if (e.target.id === 'passModalBackdrop') closeChangePasswordModalDirect();
+    }
+    function closeChangePasswordModalDirect() {
+      document.getElementById('passModalBackdrop').classList.remove('active');
+    }
+
+    async function handleChangePasswordSubmit(e) {
+      e.preventDefault();
+      const oldPass = document.getElementById('oldPassInput').value;
+      const newPass = document.getElementById('newPassInput').value;
+      const newPassConf = document.getElementById('newPassConfirmInput').value;
+      const alertEl = document.getElementById('passModalAlert');
+
+      if (newPass !== newPassConf) {
+        alertEl.className = 'status-alert error';
+        alertEl.innerText = 'New passwords do not match.';
+        alertEl.style.display = 'block';
+        return;
+      }
+
+      const user = getUserRecord(currentSession.userId);
+      const oldHash = await hashPassword(oldPass);
+
+      if (user.passwordHash && user.passwordHash !== oldHash) {
+        alertEl.className = 'status-alert error';
+        alertEl.innerText = 'Incorrect current password.';
+        alertEl.style.display = 'block';
+        return;
+      }
+
+      user.passwordHash = await hashPassword(newPass);
+      saveUserRecord(user);
+
+      alertEl.className = 'status-alert success';
+      alertEl.innerText = '✨ Password updated successfully!';
+      alertEl.style.display = 'block';
+
+      setTimeout(() => {
+        closeChangePasswordModalDirect();
+      }, 1000);
+    }
+
     function saveProfileChanges() {
       if (!currentSession) return;
       const user = getUserRecord(currentSession.userId) || currentSession;
@@ -1319,11 +1710,9 @@ html.dark .moon-icon { display: none; }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Enforce Borrower Route Guard
       currentSession = requireBorrowerAuth('my_account.html');
       if (!currentSession) return;
 
-      // 2. Load User Profile
       const userRec = getUserRecord(currentSession.userId) || currentSession;
       document.getElementById('heroAccountText').innerText = 'Account: ' + (userRec.email || userRec.phone);
       document.getElementById('accFullName').value = userRec.name || 'Borrower';

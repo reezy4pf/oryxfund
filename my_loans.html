@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Loans — Oryx Fund</title>
-  <meta name="description" content="View your active loans, outstanding balances, and official M-Pesa Paybill payment instructions.">
+  <meta name="description" content="View active loans, amortizations, submit repayments via M-Pesa STK Push, and track applications.">
   <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,14 +13,16 @@
 
   <style>
 /* ==========================================================================
-   ORYX FUND OFFICIAL LENDING SYSTEM CORE STYLES (MATCHING LOCALHOST 1:1)
+   ORYX FUND DIGITAL LENDING PLATFORM — BESPOKE CINEMATIC STYLES
    ========================================================================== */
 :root, [data-theme="light"], [data-theme-mode="light"] {
   --bg-body: #EAE0D8;
   --bg-card: #FFFFFF;
   --bg-surface: #F5EFEA;
+  --bg-surface-elevated: #FFFFFF;
   --text-color: #121A14;
   --text-muted: #556B5D;
+  --text-dim: #7E9284;
   --border-color: #D8CCC1;
   --border-light: #ECE5DC;
   --primary-color: #1F3224;
@@ -28,9 +30,12 @@
   --accent-green: #059669;
   --accent-emerald: #00D26A;
   --accent-gold: #C1440E;
+  --accent-amber: #D97706;
+  --accent-red: #DC2626;
   --hero-bg: #1F3224;
   --hero-text: #FAF8F5;
-  --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
+  --card-shadow: 0 4px 24px rgba(31, 50, 36, 0.07);
+  --modal-backdrop: rgba(18, 26, 20, 0.65);
   --font-body: -apple-system, BlinkMacSystemFont, "DM Sans", "Segoe UI", Roboto, sans-serif;
   --font-mono: 'IBM Plex Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
@@ -39,8 +44,10 @@
   --bg-body: #080D0A;
   --bg-card: #101712;
   --bg-surface: #141F17;
+  --bg-surface-elevated: #18261C;
   --text-color: #F3F4F6;
   --text-muted: #9CA3AF;
+  --text-dim: #6B7280;
   --border-color: #1E2D22;
   --border-light: #18241B;
   --primary-color: #00D26A;
@@ -48,9 +55,12 @@
   --accent-green: #00D26A;
   --accent-emerald: #00D26A;
   --accent-gold: #F59E0B;
-  --hero-bg: linear-gradient(145deg, #132218, #0E1812);
+  --accent-amber: #F59E0B;
+  --accent-red: #EF4444;
+  --hero-bg: linear-gradient(145deg, #132218 0%, #0E1812 100%);
   --hero-text: #FAF8F5;
-  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  --card-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.6);
+  --modal-backdrop: rgba(0, 0, 0, 0.82);
 }
 
 * {
@@ -66,6 +76,26 @@ body {
   font-family: var(--font-body) !important;
   min-height: 100vh;
   line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* NOISE OVERLAY */
+.oryx-noise-bg {
+  position: relative;
+  overflow: hidden;
+}
+.oryx-noise-bg::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+.oryx-noise-bg > * {
+  position: relative;
+  z-index: 2;
 }
 
 /* FULL-WIDTH STICKY NAVBAR */
@@ -74,8 +104,8 @@ body {
   top: 0;
   z-index: 1000;
   background: rgba(234, 224, 216, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
   padding: 10px 24px;
   width: 100%;
@@ -84,8 +114,8 @@ body {
 
 [data-theme="dark"] .oryx-navbar,
 html.dark .oryx-navbar {
-  background: rgba(10, 10, 10, 0.94);
-  border-bottom-color: #1A221C;
+  background: rgba(8, 13, 10, 0.92);
+  border-bottom-color: #1A261D;
 }
 
 .oryx-nav-inner {
@@ -135,7 +165,7 @@ html.dark .oryx-logo-dark {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(31, 50, 36, 0.04);
+  background: rgba(31, 50, 36, 0.05);
   padding: 4px;
   border-radius: 9999px;
   border: 1px solid var(--border-color);
@@ -143,8 +173,8 @@ html.dark .oryx-logo-dark {
 
 [data-theme="dark"] .oryx-capsules-nav,
 html.dark .oryx-capsules-nav {
-  background: #111412;
-  border-color: #1C261F;
+  background: #111813;
+  border-color: #1E2D22;
 }
 
 .oryx-capsule-tab {
@@ -167,19 +197,19 @@ html.dark .oryx-capsule-tab {
 }
 
 .oryx-capsule-tab:hover:not(.active) {
-  background: rgba(31, 50, 36, 0.06);
+  background: rgba(31, 50, 36, 0.07);
 }
 
 [data-theme="dark"] .oryx-capsule-tab:hover:not(.active),
 html.dark .oryx-capsule-tab:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .oryx-capsule-tab.active {
   background: #1F3224 !important;
   color: #FFFFFF !important;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(31, 50, 36, 0.2);
+  box-shadow: 0 2px 8px rgba(31, 50, 36, 0.25);
 }
 
 [data-theme="dark"] .oryx-capsule-tab.active,
@@ -205,18 +235,13 @@ html.dark .oryx-capsule-tab.active {
 
 [data-theme="dark"] .oryx-theme-toggle-btn,
 html.dark .oryx-theme-toggle-btn {
-  border-color: #1C261F;
+  border-color: #1E2D22;
   color: #FAF8F5;
 }
 
 .oryx-theme-toggle-btn:hover {
-  border-color: #1F3224;
+  border-color: var(--primary-color);
   transform: translateY(-1px);
-}
-
-[data-theme="dark"] .oryx-theme-toggle-btn:hover,
-html.dark .oryx-theme-toggle-btn:hover {
-  border-color: #00D26A;
 }
 
 .sun-icon { display: none; }
@@ -268,7 +293,7 @@ html.dark .moon-icon { display: none; }
   box-sizing: border-box;
 }
 
-/* HERO CARD (EXACT LOCALHOST) */
+/* HERO CARD (EXACT LOCALHOST 1:1) */
 .oryx-hero-card {
   background: var(--hero-bg);
   color: #FFFFFF;
@@ -452,6 +477,12 @@ html.dark .moon-icon { display: none; }
   align-items: center;
   gap: 16px;
   box-shadow: var(--card-shadow);
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s ease;
+}
+
+.oryx-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon-wrap {
@@ -579,8 +610,12 @@ html.dark .moon-icon { display: none; }
   font-weight: 700;
   cursor: pointer;
   border: none;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-decoration: none;
+}
+
+.oryx-btn:hover {
+  transform: scale(1.02);
 }
 
 .oryx-btn-primary {
@@ -591,7 +626,6 @@ html.dark .moon-icon { display: none; }
 
 .oryx-btn-primary:hover {
   background: #2D4834 !important;
-  transform: translateY(-1px);
 }
 
 [data-theme="dark"] .oryx-btn-primary {
@@ -614,6 +648,18 @@ html.dark .moon-icon { display: none; }
   background: var(--border-light) !important;
 }
 
+.oryx-btn-mpesa {
+  background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
+}
+
+.oryx-btn-mpesa:hover {
+  background: linear-gradient(135deg, #00FF80 0%, #00D26A 100%) !important;
+  box-shadow: 0 6px 18px rgba(0, 210, 106, 0.45) !important;
+}
+
 .oryx-btn-express {
   background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
   color: #000000 !important;
@@ -623,7 +669,6 @@ html.dark .moon-icon { display: none; }
 
 .oryx-btn-express:hover {
   background: linear-gradient(135deg, #00FF80 0%, #00D26A 100%) !important;
-  transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(0, 210, 106, 0.45) !important;
 }
 
@@ -682,13 +727,13 @@ html.dark .moon-icon { display: none; }
 .form-control:focus, .oryx-input:focus, .oryx-select:focus {
   border-color: var(--primary-color);
   background: var(--bg-card);
-  box-shadow: 0 0 0 2px rgba(31, 50, 36, 0.1);
+  box-shadow: 0 0 0 2px rgba(31, 50, 36, 0.12);
 }
 
 [data-theme="dark"] .form-control:focus,
 [data-theme="dark"] .oryx-input:focus,
 [data-theme="dark"] .oryx-select:focus {
-  box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.25);
 }
 
 /* PRODUCT CARDS GRID */
@@ -715,7 +760,7 @@ html.dark .moon-icon { display: none; }
 .product-card:hover {
   border-color: var(--primary-color);
   background: var(--bg-card);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .product-card.selected {
@@ -818,73 +863,216 @@ html.dark .moon-icon { display: none; }
   box-shadow: 0 0 0 2px #00D26A;
 }
 
-/* SUCCESS CARD */
-.oryx-success-card {
-  background: var(--bg-card);
+/* DTI METER */
+.dti-meter-wrapper {
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 40px 32px;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 14px;
+}
+
+.dti-bar-track {
+  height: 8px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+[data-theme="dark"] .dti-bar-track {
+  background: rgba(255,255,255,0.1);
+}
+
+.dti-bar-fill {
+  height: 100%;
+  width: 32%;
+  background: linear-gradient(90deg, #00D26A 0%, #D97706 70%, #EF4444 100%);
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* DROPZONE STYLES */
+.oryx-dropzone {
+  border: 2px dashed var(--border-color);
+  background: var(--bg-surface);
+  border-radius: 12px;
+  padding: 24px 20px;
   text-align: center;
-  box-shadow: var(--card-shadow);
-  max-width: 680px;
-  margin: 0 auto;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-.success-icon-wrap {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(0, 210, 106, 0.15);
-  border: 2px solid #00D26A;
-  color: #00D26A;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
+.oryx-dropzone:hover, .oryx-dropzone.dragover {
+  border-color: var(--accent-emerald);
+  background: rgba(0, 210, 106, 0.04);
 }
 
-.success-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-color);
+.dropzone-icon {
+  font-size: 28px;
   margin-bottom: 8px;
 }
 
-.success-desc {
-  font-size: 14px;
-  color: var(--text-muted);
+.uploaded-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 210, 106, 0.15);
+  border: 1px solid #00D26A;
+  color: var(--text-color);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* MODAL SYSTEM (REPLACING PROMPT/ALERT) */
+.oryx-modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.oryx-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.oryx-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 32px 28px;
   max-width: 480px;
-  margin: 0 auto 24px;
-  line-height: 1.5;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
-.app-ref-box {
+.oryx-modal-backdrop.active .oryx-modal-card {
+  transform: scale(1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.modal-close-btn:hover { color: var(--text-color); }
+
+/* AMORTIZATION TABLE ACCORDION */
+.amort-table-wrap {
+  margin-top: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.amort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.amort-table th {
   background: var(--bg-surface);
-  border: 1px dashed var(--border-color);
-  border-radius: 10px;
-  padding: 12px 20px;
-  display: inline-block;
-  margin-bottom: 24px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 
-.ref-label {
-  display: block;
+.amort-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-color);
+  font-family: var(--font-mono);
+}
+
+.amort-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* LOAN PROGRESS PIPELINE */
+.pipeline-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 8px;
+}
+
+.pipeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 2px;
 }
 
-.ref-code {
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary-color);
+.pipeline-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
 }
 
-[data-theme="dark"] .ref-code {
-  color: #00D26A;
+.pipeline-node.done .pipeline-dot {
+  background: #00D26A;
+  color: #000;
+  border-color: #00D26A;
+}
+
+.pipeline-node.current .pipeline-dot {
+  background: #D97706;
+  color: #FFF;
+  border-color: #D97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
+  animation: pulseNode 1.5s infinite;
+}
+
+@keyframes pulseNode {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.pipeline-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  margin: 0 6px 16px;
+}
+
+.pipeline-line.done {
+  background: #00D26A;
 }
 
 /* APPLICATIONS LIST CARDS */
@@ -982,9 +1170,98 @@ html.dark .moon-icon { display: none; }
   border-color: #14532D;
 }
 
+/* SUCCESS CARD */
+.oryx-success-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.success-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0, 210, 106, 0.15);
+  border: 2px solid #00D26A;
+  color: #00D26A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.success-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 8px;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 480px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
+.app-ref-box {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.ref-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.ref-code {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .ref-code {
+  color: #00D26A;
+}
+
+/* PASSWORD STRENGTH */
+.pass-strength-bar {
+  display: flex;
+  gap: 4px;
+  height: 4px;
+  margin-top: 6px;
+}
+
+.strength-segment {
+  flex: 1;
+  background: var(--border-color);
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.strength-segment.active-weak { background: #EF4444; }
+.strength-segment.active-fair { background: #F59E0B; }
+.strength-segment.active-good { background: #10B981; }
+.strength-segment.active-strong { background: #00D26A; }
+
   </style>
 </head>
-<body>
+<body class="oryx-noise-bg">
 
   <!-- Sticky Full-Width Localhost Header -->
   <header class="oryx-navbar">
@@ -1042,7 +1319,7 @@ html.dark .moon-icon { display: none; }
   <main class="oryx-portal-wrapper">
 
     <!-- Hero Card (Matching Localhost 1:1) -->
-    <div class="oryx-hero-card">
+    <div class="oryx-hero-card oryx-noise-bg">
       <div class="hero-top-row">
         <div class="oryx-badge">MY PORTAL</div>
         <span class="user-greeting" id="heroAccountText">Account: Loading...</span>
@@ -1050,10 +1327,13 @@ html.dark .moon-icon { display: none; }
       <div class="hero-main-row">
         <div>
           <h1 class="oryx-title">My Loans &amp; Repayments</h1>
-          <p class="oryx-subtitle">View your active loans, outstanding balances, and official M-Pesa Paybill payment instructions.</p>
+          <p class="oryx-subtitle">View your active facilities, schedule amortizations, and make instant M-Pesa Paybill repayments.</p>
         </div>
-        <div class="hero-cta-box">
-          <a href="apply.html" class="oryx-hero-btn">+ Apply for a New Loan</a>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="oryx-hero-btn" onclick="openMpesaModal()" style="background:#00D26A !important; color:#000 !important; cursor:pointer;">
+            <span>💚 Make Repayment</span>
+          </button>
+          <a href="apply.html" class="oryx-hero-btn">+ Apply for Loan</a>
         </div>
       </div>
     </div>
@@ -1100,36 +1380,34 @@ html.dark .moon-icon { display: none; }
       </div>
     </div>
 
-    <!-- Active Loans Section -->
-    <div class="oryx-portal-card">
+    <!-- Active Facility Details Card -->
+    <div class="oryx-portal-card" id="activeLoanSection">
       <div class="card-section-head">
         <div>
-          <h3 class="section-title">Active Loans</h3>
-          <p class="section-desc">Manage existing loan terms, disbursals, and repayments.</p>
+          <h3 class="section-title">Active Facility Overview</h3>
+          <p class="section-desc">Real-time facility balance, next due date, and M-Pesa STK Push clearing.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="oryx-btn oryx-btn-secondary" style="font-size:12px; padding:6px 14px;" onclick="printStatement()">
+            📄 Download Statement
+          </button>
+          <button type="button" class="oryx-btn oryx-btn-mpesa" style="font-size:12px; padding:6px 14px;" onclick="openMpesaModal()">
+            ⚡ Pay via M-Pesa
+          </button>
         </div>
       </div>
 
-      <div class="oryx-empty-state" id="loansEmptyState">
-        <div class="empty-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-          </svg>
-        </div>
-        <h4 class="empty-title">No Active Loans</h4>
-        <p class="empty-desc">You do not currently have any active loans. You can submit a new loan application in under 2 minutes.</p>
-        <a href="apply.html" class="oryx-btn oryx-btn-primary">+ Apply for a Loan</a>
+      <div id="activeLoanCardContent">
+        <!-- Injected dynamically -->
       </div>
-
-      <div id="activeLoansContainer" style="display:none;"></div>
     </div>
 
-    <!-- Application History Section -->
+    <!-- Application History & Real-Time Pipeline Tracker -->
     <div class="oryx-portal-card">
       <div class="card-section-head">
         <div>
-          <h3 class="section-title">Application History</h3>
-          <p class="section-desc">Track status and review records of your submitted loan applications.</p>
+          <h3 class="section-title">Application Status Pipeline</h3>
+          <p class="section-desc">Track status updates and review records of your submitted loan applications.</p>
         </div>
       </div>
 
@@ -1143,14 +1421,99 @@ html.dark .moon-icon { display: none; }
             <polyline points="10 9 9 9 8 9"></polyline>
           </svg>
         </div>
-        <h4 class="empty-title">No Applications Found</h4>
-        <p class="empty-desc">Your submitted applications will appear here with real-time status updates.</p>
+        <h4 class="empty-title">No Pending Applications</h4>
+        <p class="empty-desc">Your submitted applications will appear here with real-time status tracking.</p>
+        <a href="apply.html" class="oryx-btn oryx-btn-primary">+ Apply for a New Loan</a>
       </div>
 
       <div id="appsListContainer" style="display:none;"></div>
     </div>
 
   </main>
+
+  <!-- BESPOKE IN-DOM M-PESA STK PUSH REPAYMENT MODAL -->
+  <div class="oryx-modal-backdrop" id="mpesaModalBackdrop" onclick="closeMpesaModal(event)">
+    <div class="oryx-modal-card" onclick="event.stopPropagation()">
+      <button type="button" class="modal-close-btn" onclick="closeMpesaModalDirect()">✕</button>
+      
+      <!-- Stage 1: Payment Form -->
+      <div id="mpesaFormStage">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(0, 210, 106, 0.15); border: 1.5px solid #00D26A; color: #00D26A; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px;">
+            💚
+          </div>
+          <div class="oryx-badge" style="background:rgba(0,210,106,0.15); color:#00D26A; border-color:#00D26A; margin-bottom:6px;">LIPA NA M-PESA ONLINE</div>
+          <h3 style="font-size: 19px; font-weight: 700; color: var(--text-color);">Direct M-Pesa Repayment</h3>
+          <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">Paybill: <strong>522522</strong> &bull; Acc: <strong id="mpesaModalAccRef">ACC-LOAN-001</strong></p>
+        </div>
+
+        <form onsubmit="handleTriggerMpesaStk(event)">
+          <div class="form-group">
+            <label class="form-label">M-Pesa Registered Phone Number</label>
+            <input type="tel" id="mpesaPhoneInput" class="form-control" placeholder="0712345678" required style="font-family:var(--font-mono); font-size:15px; font-weight:600;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Repayment Amount (KES)</label>
+            <input type="number" id="mpesaAmountInput" class="form-control" placeholder="23750" required min="100" style="font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--primary-color);">
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 18px;">
+            <button type="button" class="oryx-btn oryx-btn-secondary" style="flex:1; font-size:11.5px; padding:6px;" onclick="setMpesaAmount(23750)">Full Installment (23.7K)</button>
+            <button type="button" class="oryx-btn oryx-btn-secondary" style="flex:1; font-size:11.5px; padding:6px;" onclick="setMpesaAmount(10000)">Partial (10K)</button>
+            <button type="button" class="oryx-btn oryx-btn-secondary" style="flex:1; font-size:11.5px; padding:6px;" onclick="setMpesaAmount(5000)">Partial (5K)</button>
+          </div>
+
+          <button type="submit" class="oryx-btn oryx-btn-mpesa" style="width: 100%; padding: 12px;" id="mpesaTriggerBtn">
+            <span>⚡ Send STK Push to Phone</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Stage 2: STK Countdown & Processing Animation -->
+      <div id="mpesaCountdownStage" style="display:none; text-align:center; padding: 20px 0;">
+        <div style="width: 68px; height: 68px; border-radius: 50%; border: 3px solid #00D26A; border-top-color: transparent; display: inline-block; animation: spin 1s linear infinite; margin-bottom: 16px;"></div>
+        <h3 style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-bottom: 6px;">STK Push Sent to Handset</h3>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.45;">Please check your phone (<strong id="mpesaTargetPhoneDisplay">0712345678</strong>) and enter your M-Pesa PIN to authorize payment.</p>
+        
+        <div style="font-family: var(--font-mono); font-size: 28px; font-weight: 800; color: var(--accent-emerald); margin: 16px 0;" id="stkTimerCount">15s</div>
+        <p style="font-size: 11px; color: var(--text-dim);">Connecting to Safaricom Daraja M-Pesa Gateway...</p>
+      </div>
+
+      <!-- Stage 3: Instant Success Receipt -->
+      <div id="mpesaSuccessStage" style="display:none; text-align:center; padding: 10px 0;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(0, 210, 106, 0.2); border: 2px solid #00D26A; color: #00D26A; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 28px;">
+          ✓
+        </div>
+        <h3 style="font-size: 20px; font-weight: 700; color: var(--text-color); margin-bottom: 4px;">Payment Received!</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Safaricom M-Pesa Ref: <strong id="mpesaReceiptRef" style="font-family:var(--font-mono); color:var(--primary-color);">QK98210492</strong></p>
+
+        <div style="background:var(--bg-surface); border:1px dashed var(--border-color); border-radius:12px; padding:14px 18px; text-align:left; margin-bottom:20px; font-size:12.5px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="color:var(--text-muted);">Amount Paid:</span>
+            <strong id="mpesaSuccessAmount" style="font-family:var(--font-mono); color:var(--accent-green);">KES 23,750.00</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="color:var(--text-muted);">New Loan Balance:</span>
+            <strong id="mpesaSuccessNewBal" style="font-family:var(--font-mono); color:var(--text-color);">KES 190,000.00</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-muted);">Status:</span>
+            <span style="color:#00D26A; font-weight:700;">Cleared &bull; Instant Ledger Updated</span>
+          </div>
+        </div>
+
+        <button type="button" class="oryx-btn oryx-btn-primary" style="width:100%;" onclick="closeMpesaModalDirect()">
+          Done &amp; Return to Dashboard
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
 
   <script>
 
@@ -1167,7 +1530,7 @@ html.dark .moon-icon { display: none; }
 
     function initAuthSeeds() {
       // Seed initial default test accounts with SHA-256 hashes if uninitialized
-      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v4') {
         const seedUsers = [
           {
             id: 'usr_reezy_001',
@@ -1203,7 +1566,24 @@ html.dark .moon-icon { display: none; }
           localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
         });
 
-        localStorage.setItem('oryx_auth_seeded', 'v3');
+        // Seed initial default active loan for Reezy to enable interactive repayment demo
+        const seedReezyLoan = {
+          loanId: 'ACC-LOAN-2026-00001',
+          productName: 'Working Capital Facility',
+          principal: 250000,
+          disbursedDate: '2026-08-15',
+          termMonths: 12,
+          monthlyRate: 1.5,
+          monthlyInstallment: 23750,
+          balance: 213750,
+          nextDueDate: '2026-09-15',
+          repayments: [
+            { id: 'REP-2026-0001', date: '2026-08-20', amount: 23750, ref: 'QK91827364', method: 'M-Pesa STK Push' }
+          ]
+        };
+        localStorage.setItem('oryx_active_loan_usr_reezy_001', JSON.stringify(seedReezyLoan));
+
+        localStorage.setItem('oryx_auth_seeded', 'v4');
       }
     }
     initAuthSeeds();
@@ -1286,7 +1666,20 @@ html.dark .moon-icon { display: none; }
         localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
       } catch(e) {}
     }
+
+    function getUserActiveLoan(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_active_loan_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserActiveLoan(userId, loanData) {
+      localStorage.setItem('oryx_active_loan_' + userId, JSON.stringify(loanData));
+    }
     
+
+    let currentSession = null;
+    let currentActiveLoan = null;
 
     function toggleOryxTheme() {
       const html = document.documentElement;
@@ -1302,18 +1695,116 @@ html.dark .moon-icon { display: none; }
       document.documentElement.classList.toggle('dark', savedTheme === 'dark');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1. Enforce Borrower Route Guard
-      const session = requireBorrowerAuth('index.html');
-      if (!session) return;
+    function renderDashboardState() {
+      if (!currentSession) return;
 
-      // 2. Render dynamic user identification
-      document.getElementById('heroAccountText').innerText = 'Account: ' + (session.email || session.phone);
-      const displayName = session.name || (session.email ? session.email.split('@')[0] : 'Borrower');
+      // 1. Identification
+      document.getElementById('heroAccountText').innerText = 'Account: ' + (currentSession.email || currentSession.phone);
+      const displayName = currentSession.name || (currentSession.email ? currentSession.email.split('@')[0] : 'Borrower');
       document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = displayName);
 
-      // 3. Render User-Scoped Applications (Zero Cross-Account Leakage)
-      const userApps = getUserScopedApplications(session.userId);
+      // 2. Active Loan Data
+      currentActiveLoan = getUserActiveLoan(currentSession.userId);
+      const loanCardEl = document.getElementById('activeLoanCardContent');
+
+      if (currentActiveLoan && currentActiveLoan.balance > 0) {
+        document.getElementById('statActiveLoans').innerText = '1';
+        document.getElementById('statPrincipal').innerText = 'KES ' + Number(currentActiveLoan.principal).toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('statOutstanding').innerText = 'KES ' + Number(currentActiveLoan.balance).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        loanCardEl.innerHTML = `
+          <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:12px; padding:20px; margin-bottom:16px;">
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+              <div>
+                <span class="hud-title">Facility Reference</span>
+                <div style="font-family:var(--font-mono); font-weight:700; font-size:14px; color:var(--primary-color); margin-top:2px;">${currentActiveLoan.loanId}</div>
+              </div>
+              <div>
+                <span class="hud-title">Facility Type</span>
+                <div style="font-weight:700; font-size:14px; color:var(--text-color); margin-top:2px;">${currentActiveLoan.productName}</div>
+              </div>
+              <div>
+                <span class="hud-title">Next Installment Due</span>
+                <div style="font-family:var(--font-mono); font-weight:700; font-size:14px; color:var(--accent-amber); margin-top:2px;">${currentActiveLoan.nextDueDate}</div>
+              </div>
+              <div>
+                <span class="hud-title">Installment Amount</span>
+                <div style="font-family:var(--font-mono); font-weight:700; font-size:14px; color:var(--accent-green); margin-top:2px;">KES ${Number(currentActiveLoan.monthlyInstallment).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collapsible Repayment Schedule -->
+          <div style="margin-top: 14px;">
+            <button type="button" class="oryx-btn oryx-btn-secondary" style="width:100%; justify-content:space-between; font-size:12.5px; padding:8px 14px;" onclick="toggleAmortSchedule()">
+              <span>📅 View 12-Month Amortization Breakdown</span>
+              <span id="scheduleArrow">▼</span>
+            </button>
+            <div id="amortScheduleDrawer" style="display:none;" class="amort-table-wrap">
+              <table class="amort-table">
+                <thead>
+                  <tr>
+                    <th>Inst #</th>
+                    <th>Due Date</th>
+                    <th>Principal Component</th>
+                    <th>Interest Component</th>
+                    <th>Total Installment</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="scheduleRowsBody">
+                  <tr>
+                    <td>Inst 1 of 12</td>
+                    <td>2026-08-15</td>
+                    <td>KES 20,833.33</td>
+                    <td>KES 2,916.67</td>
+                    <td>KES 23,750.00</td>
+                    <td><span style="color:#00D26A; font-weight:700;">Paid &check;</span></td>
+                  </tr>
+                  <tr>
+                    <td>Inst 2 of 12</td>
+                    <td>2026-09-15</td>
+                    <td>KES 20,833.33</td>
+                    <td>KES 2,916.67</td>
+                    <td>KES 23,750.00</td>
+                    <td><span style="color:#D97706; font-weight:700;">Upcoming ⏳</span></td>
+                  </tr>
+                  <tr>
+                    <td>Inst 3 of 12</td>
+                    <td>2026-10-15</td>
+                    <td>KES 20,833.33</td>
+                    <td>KES 2,916.67</td>
+                    <td>KES 23,750.00</td>
+                    <td><span style="color:var(--text-muted);">Scheduled</span></td>
+                  </tr>
+                  <tr>
+                    <td>Inst 4 of 12</td>
+                    <td>2026-11-15</td>
+                    <td>KES 20,833.33</td>
+                    <td>KES 2,916.67</td>
+                    <td>KES 23,750.00</td>
+                    <td><span style="color:var(--text-muted);">Scheduled</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      } else {
+        document.getElementById('statActiveLoans').innerText = '0';
+        document.getElementById('statPrincipal').innerText = 'KES 0.00';
+        document.getElementById('statOutstanding').innerText = 'KES 0.00';
+
+        loanCardEl.innerHTML = `
+          <div class="oryx-empty-state" style="padding: 24px 10px;">
+            <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:12px;">You currently do not have any active loans running. Apply for a fast-track facility to receive instant disbursal.</p>
+            <a href="apply.html" class="oryx-btn oryx-btn-primary">+ Apply for a New Facility</a>
+          </div>
+        `;
+      }
+
+      // 3. User Scoped Applications
+      const userApps = getUserScopedApplications(currentSession.userId);
       if (userApps.length > 0) {
         document.getElementById('appsEmptyState').style.display = 'none';
         const listEl = document.getElementById('appsListContainer');
@@ -1324,19 +1815,140 @@ html.dark .moon-icon { display: none; }
           const card = document.createElement('div');
           card.className = 'app-item-card';
           card.innerHTML = `
-            <div class="app-item-info">
-              <div class="app-item-id">${app.id || 'ACC-LOAP-2026-001'}</div>
-              <div class="app-item-prod">${app.productName || 'Working Capital Facility'}</div>
-              <div class="app-item-meta">Applicant: ${app.fullName || session.name} &bull; ${app.date || 'Today'} &bull; ${app.term || '6'} Months</div>
+            <div style="flex:1;">
+              <div class="app-item-info">
+                <div class="app-item-id">${app.id || 'ACC-LOAP-2026-001'}</div>
+                <div class="app-item-prod">${app.productName || 'Working Capital Facility'}</div>
+                <div class="app-item-meta">Applicant: ${app.fullName || currentSession.name} &bull; ${app.date || 'Today'} &bull; ${app.term || '6'} Months</div>
+              </div>
+
+              <!-- Animated Visual Pipeline -->
+              <div class="pipeline-track">
+                <div class="pipeline-node done">
+                  <span class="pipeline-dot">✓</span>
+                  <span>Submitted</span>
+                </div>
+                <div class="pipeline-line done"></div>
+                <div class="pipeline-node done">
+                  <span class="pipeline-dot">✓</span>
+                  <span>KYC Verified</span>
+                </div>
+                <div class="pipeline-line done"></div>
+                <div class="pipeline-node ${app.status === 'Sanctioned & Disbursed' ? 'done' : 'current'}">
+                  <span class="pipeline-dot">${app.status === 'Sanctioned & Disbursed' ? '✓' : '⚡'}</span>
+                  <span>${app.status === 'Sanctioned & Disbursed' ? 'Sanctioned' : 'Underwriting'}</span>
+                </div>
+                <div class="pipeline-line ${app.status === 'Sanctioned & Disbursed' ? 'done' : ''}"></div>
+                <div class="pipeline-node ${app.status === 'Sanctioned & Disbursed' ? 'done' : ''}">
+                  <span class="pipeline-dot">${app.status === 'Sanctioned & Disbursed' ? '✓' : '4'}</span>
+                  <span>Disbursed</span>
+                </div>
+              </div>
             </div>
-            <div class="app-item-right">
+            
+            <div class="app-item-right" style="margin-left: 20px;">
               <div class="app-item-amt">KES ${Number(app.amount || 250000).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-              <span class="app-item-badge badge-review">⚡ ${app.status || 'Under Review'}</span>
+              <span class="app-item-badge ${app.status === 'Sanctioned & Disbursed' ? 'badge-approved' : 'badge-review'}">
+                ${app.status === 'Sanctioned & Disbursed' ? '✓ Active & Disbursed' : '⚡ Under Review'}
+              </span>
             </div>
           `;
           listEl.appendChild(card);
         });
       }
+    }
+
+    function toggleAmortSchedule() {
+      const drawer = document.getElementById('amortScheduleDrawer');
+      const arrow = document.getElementById('scheduleArrow');
+      const isOpen = drawer.style.display === 'block';
+      drawer.style.display = isOpen ? 'none' : 'block';
+      arrow.innerText = isOpen ? '▼' : '▲';
+    }
+
+    function openMpesaModal() {
+      const modal = document.getElementById('mpesaModalBackdrop');
+      document.getElementById('mpesaFormStage').style.display = 'block';
+      document.getElementById('mpesaCountdownStage').style.display = 'none';
+      document.getElementById('mpesaSuccessStage').style.display = 'none';
+      document.getElementById('mpesaPhoneInput').value = currentSession ? (currentSession.phone || '0712345678') : '0712345678';
+      document.getElementById('mpesaAmountInput').value = currentActiveLoan ? currentActiveLoan.monthlyInstallment : '23750';
+      modal.classList.add('active');
+    }
+
+    function setMpesaAmount(val) {
+      document.getElementById('mpesaAmountInput').value = val;
+    }
+
+    function closeMpesaModal(e) {
+      if (e.target.id === 'mpesaModalBackdrop') {
+        closeMpesaModalDirect();
+      }
+    }
+
+    function closeMpesaModalDirect() {
+      document.getElementById('mpesaModalBackdrop').classList.remove('active');
+    }
+
+    function handleTriggerMpesaStk(e) {
+      e.preventDefault();
+      const phone = document.getElementById('mpesaPhoneInput').value.trim();
+      const amt = Number(document.getElementById('mpesaAmountInput').value);
+
+      document.getElementById('mpesaFormStage').style.display = 'none';
+      document.getElementById('mpesaCountdownStage').style.display = 'block';
+      document.getElementById('mpesaTargetPhoneDisplay').innerText = phone;
+
+      let timer = 3;
+      const countEl = document.getElementById('stkTimerCount');
+      countEl.innerText = timer + 's';
+
+      const interval = setInterval(() => {
+        timer--;
+        if (timer > 0) {
+          countEl.innerText = timer + 's';
+        } else {
+          clearInterval(interval);
+          completeMpesaPayment(amt);
+        }
+      }, 1000);
+    }
+
+    function completeMpesaPayment(amt) {
+      document.getElementById('mpesaCountdownStage').style.display = 'none';
+      document.getElementById('mpesaSuccessStage').style.display = 'block';
+
+      const randomReceipt = 'QK' + Math.floor(10000000 + Math.random() * 90000000);
+      document.getElementById('mpesaReceiptRef').innerText = randomReceipt;
+      document.getElementById('mpesaSuccessAmount').innerText = 'KES ' + amt.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      if (currentActiveLoan) {
+        currentActiveLoan.balance = Math.max(0, currentActiveLoan.balance - amt);
+        if (!currentActiveLoan.repayments) currentActiveLoan.repayments = [];
+        currentActiveLoan.repayments.unshift({
+          id: 'REP-' + Date.now(),
+          date: new Date().toISOString().split('T')[0],
+          amount: amt,
+          ref: randomReceipt,
+          method: 'M-Pesa STK Push'
+        });
+        saveUserActiveLoan(currentSession.userId, currentActiveLoan);
+      }
+
+      const newBal = currentActiveLoan ? currentActiveLoan.balance : 0;
+      document.getElementById('mpesaSuccessNewBal').innerText = 'KES ' + Number(newBal).toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      renderDashboardState();
+    }
+
+    function printStatement() {
+      window.print();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      currentSession = requireBorrowerAuth('index.html');
+      if (!currentSession) return;
+      renderDashboardState();
     });
   </script>
 </body>
