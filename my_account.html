@@ -1003,7 +1003,7 @@ html.dark .moon-icon { display: none; }
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>Reezy</span>
+            <span>Account</span>
           </a>
         </nav>
 
@@ -1020,7 +1020,7 @@ html.dark .moon-icon { display: none; }
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span>Reezy</span>
+          <span>Account</span>
         </a>
         <button type="button" class="oryx-theme-toggle-btn" onclick="toggleOryxTheme()" aria-label="Toggle Theme">
           <svg class="theme-icon sun-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>
@@ -1045,7 +1045,7 @@ html.dark .moon-icon { display: none; }
     <div class="oryx-hero-card">
       <div class="hero-top-row">
         <div class="oryx-badge">MY ACCOUNT</div>
-        <span class="user-greeting" id="heroAccountText">Account: reezyhoops@gmail.com</span>
+        <span class="user-greeting" id="heroAccountText">Account: Loading...</span>
       </div>
       <div class="hero-main-row">
         <div>
@@ -1074,47 +1074,47 @@ html.dark .moon-icon { display: none; }
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">Full Legal Name</label>
-            <input type="text" class="form-control" value="James Mwangi Kariuki" readonly style="opacity:0.85;">
+            <input type="text" id="accFullName" class="form-control" value="Loading...">
           </div>
           <div class="form-group">
             <label class="form-label">National ID Number</label>
-            <input type="text" class="form-control" value="32847592" readonly style="opacity:0.85;">
+            <input type="text" id="accNationalId" class="form-control" value="Loading..." readonly style="opacity:0.85;">
           </div>
         </div>
 
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">KRA PIN</label>
-            <input type="text" class="form-control" value="A009847291Z" readonly style="opacity:0.85;">
+            <input type="text" id="accKraPin" class="form-control" value="A009847291Z" readonly style="opacity:0.85;">
           </div>
           <div class="form-group">
             <label class="form-label">Primary Mobile</label>
-            <input type="text" class="form-control" value="0712345678">
+            <input type="text" id="accPhone" class="form-control" value="0712345678">
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" class="form-control" id="accEmail" value="reezyhoops@gmail.com">
+          <input type="email" id="accEmail" class="form-control" value="loading@example.com">
         </div>
 
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">Residential Address</label>
-            <input type="text" class="form-control" value="Kilimani, Ring Road">
+            <input type="text" id="accAddress" class="form-control" value="Kilimani, Ring Road">
           </div>
           <div class="form-group">
             <label class="form-label">County</label>
-            <input type="text" class="form-control" value="Nairobi">
+            <input type="text" id="accCounty" class="form-control" value="Nairobi">
           </div>
         </div>
 
         <div style="margin-top:16px;">
-          <button type="button" class="oryx-btn oryx-btn-primary" onclick="alert('Profile details updated successfully!')">Save Profile Updates</button>
+          <button type="button" class="oryx-btn oryx-btn-primary" onclick="saveProfileChanges()">Save Profile Updates</button>
         </div>
       </div>
 
-      <!-- Security & Session Card -->
+      <!-- Security & Session Card (Strictly Isolated, No Admin Link) -->
       <div class="oryx-portal-card">
         <div class="card-section-head">
           <div>
@@ -1148,6 +1148,143 @@ html.dark .moon-icon { display: none; }
   </main>
 
   <script>
+
+    // =========================================================================
+    // ORYX FUND SECURE CLIENT AUTHENTICATION & SESSION MANAGER
+    // =========================================================================
+    const ORYX_AUTH_SALT = "oryx_fund_2026_salt_sec_";
+
+    async function hashPassword(password) {
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(ORYX_AUTH_SALT + password));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function initAuthSeeds() {
+      // Seed initial default test accounts with SHA-256 hashes if uninitialized
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+        const seedUsers = [
+          {
+            id: 'usr_reezy_001',
+            name: 'Reezy Kariuki',
+            email: 'reezyhoops@gmail.com',
+            phone: '0712345678',
+            nationalId: '32847592',
+            kraPin: 'A009847291Z',
+            address: 'Kilimani, Ring Road',
+            county: 'Nairobi',
+            role: 'Borrower',
+            passwordHash: 'f8eb476d031f0035a1091eaf6cfaed5efd7f15b31ba6841f21d60dd64adf4e1a', // Secret123
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 'usr_admin_001',
+            name: 'Oryx Fund Admin',
+            email: 'admin@oryxfund.co.ke',
+            phone: '+254700000000',
+            nationalId: 'ADM-001',
+            kraPin: 'A000000000Z',
+            address: 'Upper Hill, Nairobi',
+            county: 'Nairobi',
+            role: 'Admin',
+            passwordHash: '3190a7c246a9c205f2ade1cc48ba235429c186dc7a2662be6403a792b74242ef', // Admin@2026!
+            created_at: new Date().toISOString()
+          }
+        ];
+
+        seedUsers.forEach(u => {
+          localStorage.setItem('oryx_user_' + u.id, JSON.stringify(u));
+          localStorage.setItem('oryx_idx_' + u.email.toLowerCase(), u.id);
+          localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
+        });
+
+        localStorage.setItem('oryx_auth_seeded', 'v3');
+      }
+    }
+    initAuthSeeds();
+
+    function getAuthSession() {
+      try {
+        const raw = localStorage.getItem('oryx_auth_user');
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        // Check session TTL (4 hours)
+        if (session.expires_at && Date.now() > session.expires_at) {
+          clearAuthSession(false);
+          return null;
+        }
+        return session;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function setAuthSession(user) {
+      const session = {
+        userId: user.id || ('usr_' + Date.now()),
+        name: user.name || 'Borrower',
+        email: user.email,
+        phone: user.phone,
+        nationalId: user.nationalId,
+        role: user.role || 'Borrower',
+        expires_at: Date.now() + (4 * 3600 * 1000) // 4 hours
+      };
+      localStorage.setItem('oryx_auth_user', JSON.stringify(session));
+      return session;
+    }
+
+    function clearAuthSession(redirect = true) {
+      localStorage.removeItem('oryx_auth_user');
+      if (redirect) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function requireBorrowerAuth(redirectPage = 'index.html') {
+      const session = getAuthSession();
+      if (!session) {
+        window.location.href = 'login.html?redirect_to=' + encodeURIComponent(redirectPage);
+        return null;
+      }
+      return session;
+    }
+
+    function getUserRecord(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_user_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserRecord(user) {
+      if (!user.id) user.id = 'usr_' + Date.now();
+      localStorage.setItem('oryx_user_' + user.id, JSON.stringify(user));
+      if (user.email) localStorage.setItem('oryx_idx_' + user.email.toLowerCase(), user.id);
+      if (user.phone) localStorage.setItem('oryx_idx_' + user.phone.replace(/\s+/g, ''), user.id);
+      return user;
+    }
+
+    function getUserScopedApplications(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_apps_' + userId) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveUserScopedApplication(userId, appData) {
+      const userApps = getUserScopedApplications(userId);
+      userApps.unshift(appData);
+      localStorage.setItem('oryx_apps_' + userId, JSON.stringify(userApps));
+
+      // Also publish to global underwriting ledger for admin desk
+      try {
+        const globalApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
+        globalApps.unshift(appData);
+        localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
+      } catch(e) {}
+    }
+    
+
+    let currentSession = null;
+
     function toggleOryxTheme() {
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
@@ -1163,20 +1300,42 @@ html.dark .moon-icon { display: none; }
     }
 
     function logout() {
-      localStorage.removeItem('oryx_auth_user');
-      window.location.href = 'login.html';
+      clearAuthSession(true);
+    }
+
+    function saveProfileChanges() {
+      if (!currentSession) return;
+      const user = getUserRecord(currentSession.userId) || currentSession;
+      user.name = document.getElementById('accFullName').value.trim();
+      user.phone = document.getElementById('accPhone').value.trim();
+      user.email = document.getElementById('accEmail').value.trim();
+      user.address = document.getElementById('accAddress').value.trim();
+      user.county = document.getElementById('accCounty').value.trim();
+
+      saveUserRecord(user);
+      setAuthSession(user);
+      alert('✨ Profile details updated successfully!');
+      window.location.reload();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const authUser = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (authUser && authUser.email) {
-          document.getElementById('heroAccountText').innerText = 'Account: ' + authUser.email;
-          document.getElementById('accEmail').value = authUser.email;
-          const uName = authUser.name || authUser.email.split('@')[0];
-          document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = uName);
-        }
-      } catch(e) {}
+      // 1. Enforce Borrower Route Guard
+      currentSession = requireBorrowerAuth('my_account.html');
+      if (!currentSession) return;
+
+      // 2. Load User Profile
+      const userRec = getUserRecord(currentSession.userId) || currentSession;
+      document.getElementById('heroAccountText').innerText = 'Account: ' + (userRec.email || userRec.phone);
+      document.getElementById('accFullName').value = userRec.name || 'Borrower';
+      document.getElementById('accNationalId').value = userRec.nationalId || '32847592';
+      document.getElementById('accKraPin').value = userRec.kraPin || 'A009847291Z';
+      document.getElementById('accPhone').value = userRec.phone || '0712345678';
+      document.getElementById('accEmail').value = userRec.email || 'borrower@example.com';
+      document.getElementById('accAddress').value = userRec.address || 'Kilimani, Ring Road';
+      document.getElementById('accCounty').value = userRec.county || 'Nairobi';
+
+      const displayName = userRec.name || (userRec.email ? userRec.email.split('@')[0] : 'Borrower');
+      document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = displayName);
     });
   </script>
 </body>

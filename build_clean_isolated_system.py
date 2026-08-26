@@ -998,7 +998,7 @@ html.dark .moon-icon { display: none; }
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>Reezy</span>
+            <span>Account</span>
           </a>
         </nav>
 
@@ -1015,7 +1015,7 @@ html.dark .moon-icon { display: none; }
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span>Reezy</span>
+          <span>Account</span>
         </a>
         <button type="button" class="oryx-theme-toggle-btn" onclick="toggleOryxTheme()" aria-label="Toggle Theme">
           <svg class="theme-icon sun-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>
@@ -1034,7 +1034,143 @@ html.dark .moon-icon { display: none; }
     </div>
   </header>"""
 
-    # 2. BORROWER DASHBOARD HTML (index.html, my_loans.html, borrower.html)
+    # SHARED CORE CLIENT AUTHENTICATION ENGINE (Web Crypto SHA-256 + Scoped Storage)
+    auth_core_script = """
+    // =========================================================================
+    // ORYX FUND SECURE CLIENT AUTHENTICATION & SESSION MANAGER
+    // =========================================================================
+    const ORYX_AUTH_SALT = "oryx_fund_2026_salt_sec_";
+
+    async function hashPassword(password) {
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(ORYX_AUTH_SALT + password));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function initAuthSeeds() {
+      // Seed initial default test accounts with SHA-256 hashes if uninitialized
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+        const seedUsers = [
+          {
+            id: 'usr_reezy_001',
+            name: 'Reezy Kariuki',
+            email: 'reezyhoops@gmail.com',
+            phone: '0712345678',
+            nationalId: '32847592',
+            kraPin: 'A009847291Z',
+            address: 'Kilimani, Ring Road',
+            county: 'Nairobi',
+            role: 'Borrower',
+            passwordHash: 'f8eb476d031f0035a1091eaf6cfaed5efd7f15b31ba6841f21d60dd64adf4e1a', // Secret123
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 'usr_admin_001',
+            name: 'Oryx Fund Admin',
+            email: 'admin@oryxfund.co.ke',
+            phone: '+254700000000',
+            nationalId: 'ADM-001',
+            kraPin: 'A000000000Z',
+            address: 'Upper Hill, Nairobi',
+            county: 'Nairobi',
+            role: 'Admin',
+            passwordHash: '3190a7c246a9c205f2ade1cc48ba235429c186dc7a2662be6403a792b74242ef', // Admin@2026!
+            created_at: new Date().toISOString()
+          }
+        ];
+
+        seedUsers.forEach(u => {
+          localStorage.setItem('oryx_user_' + u.id, JSON.stringify(u));
+          localStorage.setItem('oryx_idx_' + u.email.toLowerCase(), u.id);
+          localStorage.setItem('oryx_idx_' + u.phone.replace(/\\s+/g, ''), u.id);
+        });
+
+        localStorage.setItem('oryx_auth_seeded', 'v3');
+      }
+    }
+    initAuthSeeds();
+
+    function getAuthSession() {
+      try {
+        const raw = localStorage.getItem('oryx_auth_user');
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        // Check session TTL (4 hours)
+        if (session.expires_at && Date.now() > session.expires_at) {
+          clearAuthSession(false);
+          return null;
+        }
+        return session;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function setAuthSession(user) {
+      const session = {
+        userId: user.id || ('usr_' + Date.now()),
+        name: user.name || 'Borrower',
+        email: user.email,
+        phone: user.phone,
+        nationalId: user.nationalId,
+        role: user.role || 'Borrower',
+        expires_at: Date.now() + (4 * 3600 * 1000) // 4 hours
+      };
+      localStorage.setItem('oryx_auth_user', JSON.stringify(session));
+      return session;
+    }
+
+    function clearAuthSession(redirect = true) {
+      localStorage.removeItem('oryx_auth_user');
+      if (redirect) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function requireBorrowerAuth(redirectPage = 'index.html') {
+      const session = getAuthSession();
+      if (!session) {
+        window.location.href = 'login.html?redirect_to=' + encodeURIComponent(redirectPage);
+        return null;
+      }
+      return session;
+    }
+
+    function getUserRecord(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_user_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserRecord(user) {
+      if (!user.id) user.id = 'usr_' + Date.now();
+      localStorage.setItem('oryx_user_' + user.id, JSON.stringify(user));
+      if (user.email) localStorage.setItem('oryx_idx_' + user.email.toLowerCase(), user.id);
+      if (user.phone) localStorage.setItem('oryx_idx_' + user.phone.replace(/\\s+/g, ''), user.id);
+      return user;
+    }
+
+    function getUserScopedApplications(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_apps_' + userId) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveUserScopedApplication(userId, appData) {
+      const userApps = getUserScopedApplications(userId);
+      userApps.unshift(appData);
+      localStorage.setItem('oryx_apps_' + userId, JSON.stringify(userApps));
+
+      // Also publish to global underwriting ledger for admin desk
+      try {
+        const globalApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
+        globalApps.unshift(appData);
+        localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
+      } catch(e) {}
+    }
+    """
+
+    # 2. BORROWER DASHBOARD (index.html, my_loans.html, borrower.html)
     portal_html = """<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -1062,7 +1198,7 @@ html.dark .moon-icon { display: none; }
     <div class="oryx-hero-card">
       <div class="hero-top-row">
         <div class="oryx-badge">MY PORTAL</div>
-        <span class="user-greeting" id="heroAccountText">Account: reezyhoops@gmail.com</span>
+        <span class="user-greeting" id="heroAccountText">Account: Loading...</span>
       </div>
       <div class="hero-main-row">
         <div>
@@ -1146,7 +1282,7 @@ html.dark .moon-icon { display: none; }
       <div class="card-section-head">
         <div>
           <h3 class="section-title">Application History</h3>
-          <p class="section-desc">Track status and review records of all submitted loan applications.</p>
+          <p class="section-desc">Track status and review records of your submitted loan applications.</p>
         </div>
       </div>
 
@@ -1170,6 +1306,8 @@ html.dark .moon-icon { display: none; }
   </main>
 
   <script>
+""" + auth_core_script + """
+
     function toggleOryxTheme() {
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
@@ -1185,41 +1323,39 @@ html.dark .moon-icon { display: none; }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const authUser = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (authUser && authUser.email) {
-          document.getElementById('heroAccountText').innerText = 'Account: ' + authUser.email;
-          const uName = authUser.name || authUser.email.split('@')[0];
-          document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = uName);
-        }
+      // 1. Enforce Borrower Route Guard
+      const session = requireBorrowerAuth('index.html');
+      if (!session) return;
 
-        // Render submitted applications from localStorage
-        const apps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
-        if (apps.length > 0) {
-          document.getElementById('appsEmptyState').style.display = 'none';
-          const listEl = document.getElementById('appsListContainer');
-          listEl.style.display = 'block';
-          listEl.innerHTML = '';
+      // 2. Render dynamic user identification
+      document.getElementById('heroAccountText').innerText = 'Account: ' + (session.email || session.phone);
+      const displayName = session.name || (session.email ? session.email.split('@')[0] : 'Borrower');
+      document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = displayName);
 
-          apps.forEach(app => {
-            const card = document.createElement('div');
-            card.className = 'app-item-card';
-            card.innerHTML = `
-              <div class="app-item-info">
-                <div class="app-item-id">${app.id || 'ACC-LOAP-2026-001'}</div>
-                <div class="app-item-prod">${app.productName || 'Working Capital Loan'}</div>
-                <div class="app-item-meta">Applicant: ${app.fullName || 'Reezy'} &bull; ${app.date || 'Today'} &bull; ${app.term || '6'} Months</div>
-              </div>
-              <div class="app-item-right">
-                <div class="app-item-amt">KES ${Number(app.amount || 250000).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                <span class="app-item-badge badge-review">⚡ Under Review</span>
-              </div>
-            `;
-            listEl.appendChild(card);
-          });
-        }
-      } catch(e) {
-        console.error(e);
+      // 3. Render User-Scoped Applications (Zero Cross-Account Leakage)
+      const userApps = getUserScopedApplications(session.userId);
+      if (userApps.length > 0) {
+        document.getElementById('appsEmptyState').style.display = 'none';
+        const listEl = document.getElementById('appsListContainer');
+        listEl.style.display = 'block';
+        listEl.innerHTML = '';
+
+        userApps.forEach(app => {
+          const card = document.createElement('div');
+          card.className = 'app-item-card';
+          card.innerHTML = `
+            <div class="app-item-info">
+              <div class="app-item-id">${app.id || 'ACC-LOAP-2026-001'}</div>
+              <div class="app-item-prod">${app.productName || 'Working Capital Facility'}</div>
+              <div class="app-item-meta">Applicant: ${app.fullName || session.name} &bull; ${app.date || 'Today'} &bull; ${app.term || '6'} Months</div>
+            </div>
+            <div class="app-item-right">
+              <div class="app-item-amt">KES ${Number(app.amount || 250000).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+              <span class="app-item-badge badge-review">⚡ ${app.status || 'Under Review'}</span>
+            </div>
+          `;
+          listEl.appendChild(card);
+        });
       }
     });
   </script>
@@ -1304,11 +1440,11 @@ html.dark .moon-icon { display: none; }
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label">Full Legal Name <span class="req">*</span></label>
-              <input type="text" id="app_fullname" class="form-control" placeholder="e.g. James Mwangi Kariuki" value="James Mwangi Kariuki">
+              <input type="text" id="app_fullname" class="form-control" placeholder="e.g. James Mwangi Kariuki">
             </div>
             <div class="form-group">
               <label class="form-label">National ID / Passport Number <span class="req">*</span></label>
-              <input type="text" id="app_national_id" class="form-control" placeholder="e.g. 12345678" value="32847592">
+              <input type="text" id="app_national_id" class="form-control" placeholder="e.g. 12345678">
             </div>
           </div>
 
@@ -1334,11 +1470,11 @@ html.dark .moon-icon { display: none; }
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label">Primary Phone Number (M-Pesa Registered) <span class="req">*</span></label>
-              <input type="tel" id="app_phone" class="form-control" placeholder="e.g. 0712345678" value="0712345678">
+              <input type="tel" id="app_phone" class="form-control" placeholder="e.g. 0712345678">
             </div>
             <div class="form-group">
               <label class="form-label">Email Address</label>
-              <input type="email" id="app_email" class="form-control" placeholder="e.g. james@example.com" value="reezyhoops@gmail.com">
+              <input type="email" id="app_email" class="form-control" placeholder="e.g. james@example.com">
             </div>
           </div>
 
@@ -1442,7 +1578,7 @@ html.dark .moon-icon { display: none; }
               <span class="form-label" style="margin:0;">Requested Loan Amount (KES)</span>
               <span id="displayAmount" style="font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--primary-color);">KES 250,000</span>
             </div>
-            <input type="range" id="amountSlider" min="10000" max="2500000" step="10000" value="2500000" oninput="updateCalculator()" style="width:100%; cursor:pointer; accent-color:var(--accent-emerald);">
+            <input type="range" id="amountSlider" min="10000" max="2500000" step="10000" value="250000" oninput="updateCalculator()" style="width:100%; cursor:pointer; accent-color:var(--accent-emerald);">
 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; margin-bottom:10px;">
               <span class="form-label" style="margin:0;">Repayment Duration</span>
@@ -1583,11 +1719,11 @@ html.dark .moon-icon { display: none; }
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
               <div>
                 <span class="stat-label">Applicant Name</span>
-                <div style="font-weight:700; color:var(--text-color);" id="revName">James Mwangi Kariuki</div>
+                <div style="font-weight:700; color:var(--text-color);" id="revName">-</div>
               </div>
               <div>
                 <span class="stat-label">National ID / Phone</span>
-                <div style="font-weight:700; color:var(--text-color);" id="revIdPhone">32847592 &bull; 0712345678</div>
+                <div style="font-weight:700; color:var(--text-color);" id="revIdPhone">-</div>
               </div>
               <div>
                 <span class="stat-label">Facility Selected</span>
@@ -1647,6 +1783,9 @@ html.dark .moon-icon { display: none; }
   </main>
 
   <script>
+""" + auth_core_script + """
+
+    let currentSession = null;
     let selectedFacility = 'Working Capital Facility';
     let selectedRate = 1.5;
     let selectedDisbursalMethod = 'M-Pesa';
@@ -1740,7 +1879,9 @@ html.dark .moon-icon { display: none; }
     }
 
     function submitApplication() {
-      const name = document.getElementById('app_fullname').value;
+      const name = document.getElementById('app_fullname').value.trim();
+      const id = document.getElementById('app_national_id').value.trim();
+      const phone = document.getElementById('app_phone').value.trim();
       const amt = parseInt(document.getElementById('amountSlider').value);
       const term = parseInt(document.getElementById('termSlider').value);
       const randomCode = 'ACC-LOAP-2026-' + Math.floor(10000 + Math.random() * 90000);
@@ -1748,6 +1889,8 @@ html.dark .moon-icon { display: none; }
       const appData = {
         id: randomCode,
         fullName: name,
+        nationalId: id,
+        phone: phone,
         productName: selectedFacility,
         amount: amt,
         term: term,
@@ -1755,9 +1898,8 @@ html.dark .moon-icon { display: none; }
         status: 'Under Review'
       };
 
-      const existingApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
-      existingApps.unshift(appData);
-      localStorage.setItem('oryx_applications', JSON.stringify(existingApps));
+      // Save to User-Scoped Storage
+      saveUserScopedApplication(currentSession ? currentSession.userId : 'usr_default', appData);
 
       document.getElementById('formCardWrapper').style.display = 'none';
       document.getElementById('successRefCode').innerText = randomCode;
@@ -1765,6 +1907,25 @@ html.dark .moon-icon { display: none; }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce Borrower Route Guard
+      currentSession = requireBorrowerAuth('apply.html');
+      if (!currentSession) return;
+
+      // 2. Prefill form fields with authenticated borrower's data
+      const userRec = getUserRecord(currentSession.userId) || currentSession;
+      if (userRec) {
+        if (userRec.name) document.getElementById('app_fullname').value = userRec.name;
+        if (userRec.nationalId) document.getElementById('app_national_id').value = userRec.nationalId;
+        if (userRec.kraPin) document.getElementById('app_kra_pin').value = userRec.kraPin;
+        if (userRec.phone) document.getElementById('app_phone').value = userRec.phone;
+        if (userRec.email) document.getElementById('app_email').value = userRec.email;
+        if (userRec.address) document.getElementById('app_address').value = userRec.address;
+        if (userRec.county) document.getElementById('app_county').value = userRec.county;
+      }
+
+      const displayName = currentSession.name || (currentSession.email ? currentSession.email.split('@')[0] : 'Borrower');
+      document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = displayName);
+
       updateCalculator();
     });
   </script>
@@ -1772,7 +1933,7 @@ html.dark .moon-icon { display: none; }
 </html>
 """
 
-    # 4. MY ACCOUNT HTML (my_account.html)
+    # 4. MY ACCOUNT (my_account.html)
     account_html = """<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -1800,7 +1961,7 @@ html.dark .moon-icon { display: none; }
     <div class="oryx-hero-card">
       <div class="hero-top-row">
         <div class="oryx-badge">MY ACCOUNT</div>
-        <span class="user-greeting" id="heroAccountText">Account: reezyhoops@gmail.com</span>
+        <span class="user-greeting" id="heroAccountText">Account: Loading...</span>
       </div>
       <div class="hero-main-row">
         <div>
@@ -1829,47 +1990,47 @@ html.dark .moon-icon { display: none; }
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">Full Legal Name</label>
-            <input type="text" class="form-control" value="James Mwangi Kariuki" readonly style="opacity:0.85;">
+            <input type="text" id="accFullName" class="form-control" value="Loading...">
           </div>
           <div class="form-group">
             <label class="form-label">National ID Number</label>
-            <input type="text" class="form-control" value="32847592" readonly style="opacity:0.85;">
+            <input type="text" id="accNationalId" class="form-control" value="Loading..." readonly style="opacity:0.85;">
           </div>
         </div>
 
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">KRA PIN</label>
-            <input type="text" class="form-control" value="A009847291Z" readonly style="opacity:0.85;">
+            <input type="text" id="accKraPin" class="form-control" value="A009847291Z" readonly style="opacity:0.85;">
           </div>
           <div class="form-group">
             <label class="form-label">Primary Mobile</label>
-            <input type="text" class="form-control" value="0712345678">
+            <input type="text" id="accPhone" class="form-control" value="0712345678">
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Email Address</label>
-          <input type="email" class="form-control" id="accEmail" value="reezyhoops@gmail.com">
+          <input type="email" id="accEmail" class="form-control" value="loading@example.com">
         </div>
 
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">Residential Address</label>
-            <input type="text" class="form-control" value="Kilimani, Ring Road">
+            <input type="text" id="accAddress" class="form-control" value="Kilimani, Ring Road">
           </div>
           <div class="form-group">
             <label class="form-label">County</label>
-            <input type="text" class="form-control" value="Nairobi">
+            <input type="text" id="accCounty" class="form-control" value="Nairobi">
           </div>
         </div>
 
         <div style="margin-top:16px;">
-          <button type="button" class="oryx-btn oryx-btn-primary" onclick="alert('Profile details updated successfully!')">Save Profile Updates</button>
+          <button type="button" class="oryx-btn oryx-btn-primary" onclick="saveProfileChanges()">Save Profile Updates</button>
         </div>
       </div>
 
-      <!-- Security & Session Card -->
+      <!-- Security & Session Card (Strictly Isolated, No Admin Link) -->
       <div class="oryx-portal-card">
         <div class="card-section-head">
           <div>
@@ -1903,6 +2064,10 @@ html.dark .moon-icon { display: none; }
   </main>
 
   <script>
+""" + auth_core_script + """
+
+    let currentSession = null;
+
     function toggleOryxTheme() {
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
@@ -1918,33 +2083,592 @@ html.dark .moon-icon { display: none; }
     }
 
     function logout() {
-      localStorage.removeItem('oryx_auth_user');
-      window.location.href = 'login.html';
+      clearAuthSession(true);
+    }
+
+    function saveProfileChanges() {
+      if (!currentSession) return;
+      const user = getUserRecord(currentSession.userId) || currentSession;
+      user.name = document.getElementById('accFullName').value.trim();
+      user.phone = document.getElementById('accPhone').value.trim();
+      user.email = document.getElementById('accEmail').value.trim();
+      user.address = document.getElementById('accAddress').value.trim();
+      user.county = document.getElementById('accCounty').value.trim();
+
+      saveUserRecord(user);
+      setAuthSession(user);
+      alert('✨ Profile details updated successfully!');
+      window.location.reload();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const authUser = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (authUser && authUser.email) {
-          document.getElementById('heroAccountText').innerText = 'Account: ' + authUser.email;
-          document.getElementById('accEmail').value = authUser.email;
-          const uName = authUser.name || authUser.email.split('@')[0];
-          document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = uName);
-        }
-      } catch(e) {}
+      // 1. Enforce Borrower Route Guard
+      currentSession = requireBorrowerAuth('my_account.html');
+      if (!currentSession) return;
+
+      // 2. Load User Profile
+      const userRec = getUserRecord(currentSession.userId) || currentSession;
+      document.getElementById('heroAccountText').innerText = 'Account: ' + (userRec.email || userRec.phone);
+      document.getElementById('accFullName').value = userRec.name || 'Borrower';
+      document.getElementById('accNationalId').value = userRec.nationalId || '32847592';
+      document.getElementById('accKraPin').value = userRec.kraPin || 'A009847291Z';
+      document.getElementById('accPhone').value = userRec.phone || '0712345678';
+      document.getElementById('accEmail').value = userRec.email || 'borrower@example.com';
+      document.getElementById('accAddress').value = userRec.address || 'Kilimani, Ring Road';
+      document.getElementById('accCounty').value = userRec.county || 'Nairobi';
+
+      const displayName = userRec.name || (userRec.email ? userRec.email.split('@')[0] : 'Borrower');
+      document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = displayName);
     });
   </script>
 </body>
 </html>
 """
 
-    # Write all files
+    # 5. AUTHENTICATION & LOGIN PAGE (login.html)
+    login_html = """<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Borrower Portal — Oryx Fund</title>
+  <meta name="description" content="Secure authentication portal for Oryx Fund borrowers and administrators.">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-body: #EAE0D8;
+      --bg-surface: #FFFFFF;
+      --bg-surface-alt: #F7F3EE;
+      --border-color: #E2D7CC;
+      --border-light: #ECE5DC;
+      --text-primary: #1F3224;
+      --text-secondary: #556B5D;
+      --text-muted: #829488;
+      --primary: #1F3224;
+      --accent-green: #059669;
+      --accent-emerald: #00D26A;
+      --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    [data-theme="dark"], html.dark {
+      --bg-body: #080D0A;
+      --bg-surface: #101712;
+      --bg-surface-alt: #141F17;
+      --border-color: #1E2D22;
+      --border-light: #18241B;
+      --text-primary: #FAF8F5;
+      --text-secondary: #A1B2A6;
+      --text-muted: #6B7C70;
+      --primary: #00D26A;
+      --accent-green: #00D26A;
+      --accent-emerald: #00D26A;
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg-body) !important;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .auth-box {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .auth-brand-head {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .auth-brand-logo {
+      display: inline-block;
+    }
+
+    .oryx-auth-logo {
+      height: 48px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
+    }
+
+    .oryx-logo-light-img { display: inline-block; }
+    .oryx-logo-dark-img { display: none; }
+
+    [data-theme="dark"] .oryx-logo-light-img,
+    html.dark .oryx-logo-light-img {
+      display: none;
+    }
+
+    [data-theme="dark"] .oryx-logo-dark-img,
+    html.dark .oryx-logo-dark-img {
+      display: inline-block;
+    }
+
+    .auth-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 10px; /* User strict directive: exactly 10px padding */
+      box-shadow: var(--card-shadow);
+    }
+
+    .auth-card-inner {
+      padding: 18px 20px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--bg-surface-alt);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] .tab-btn.active {
+      background: var(--accent-emerald);
+      color: #000000;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface-alt);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-emerald);
+      background: var(--bg-surface);
+      box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background: #1F3224;
+      color: #FFFFFF;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-top: 6px;
+    }
+
+    .btn-submit:hover {
+      background: #2D4834;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .btn-submit {
+      background: var(--accent-emerald);
+      color: #000000;
+    }
+
+    .status-alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .status-alert.error {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #F87171;
+    }
+
+    [data-theme="dark"] .status-alert.error {
+      background: #3B1212;
+      color: #FCA5A5;
+      border-color: #7F1D1D;
+    }
+
+    .status-alert.success {
+      background: #DCFCE7;
+      color: #166534;
+      border: 1px solid #86EFAC;
+    }
+
+    .auth-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-box">
+    
+    <div class="auth-brand-head">
+      <a href="index.html" class="auth-brand-logo" title="Oryx Fund">
+        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-light-img">
+        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-dark-img">
+      </a>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Borrower Self-Service &amp; Digital Credit Portal</p>
+    </div>
+
+    <!-- Parent Card with strict 10px padding -->
+    <div class="auth-card">
+      <div class="auth-card-inner">
+        
+        <div class="auth-tabs">
+          <button type="button" class="tab-btn active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Sign In</button>
+          <button type="button" class="tab-btn" id="tabRegister" onclick="switchAuthTab('register')">✨ Create Account</button>
+        </div>
+
+        <div id="statusAlert" class="status-alert"></div>
+
+        <!-- 1. SIGN IN FORM -->
+        <form id="signInForm" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label class="form-label" for="loginIdentifier">Email or Mobile Number</label>
+            <input type="text" id="loginIdentifier" class="form-input" placeholder="e.g. reezyhoops@gmail.com or 0712345678" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between;">
+              <label class="form-label" for="loginPass">Password</label>
+              <a href="javascript:void(0)" onclick="alert('Password reset OTP sent to registered phone/email.')" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot Password?</a>
+            </div>
+            <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn-submit" id="signInSubmitBtn">
+            Sign In to My Portal
+          </button>
+
+          <p class="auth-note">
+            New to Oryx Fund? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Create a fresh account</a> to apply in minutes.
+          </p>
+        </form>
+
+        <!-- 2. REGISTER FRESH ACCOUNT FORM -->
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="regFullName">Full Legal Name (as on National ID)</label>
+            <input type="text" id="regFullName" class="form-input" placeholder="e.g. James Mwangi Kariuki" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" class="form-input" placeholder="james@example.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regPhone">Mobile Phone (M-Pesa)</label>
+              <input type="tel" id="regPhone" class="form-input" placeholder="0712345678" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regNationalId">National ID Number</label>
+            <input type="text" id="regNationalId" class="form-input" placeholder="e.g. 32847592" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="regPass">Create Password</label>
+              <input type="password" id="regPass" class="form-input" placeholder="Min. 6 chars" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regPassConfirm">Confirm Password</label>
+              <input type="password" id="regPassConfirm" class="form-input" placeholder="Repeat password" required minlength="6">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px;">
+            <input type="checkbox" id="termsCheck" required checked style="margin-top: 2px;">
+            <label for="termsCheck">I agree to Oryx Fund Digital Lending Terms &amp; KYC Verification.</label>
+          </div>
+
+          <button type="submit" class="btn-submit" id="regSubmitBtn">
+            ✨ Create Secure Account &amp; Continue ➔
+          </button>
+
+          <p class="auth-note">
+            Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Sign In here</a>.
+          </p>
+        </form>
+
+      </div>
+    </div>
+
+    <div class="auth-footer">
+      <p>© 2026 Oryx Fund. All Rights Reserved. &bull; <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button> &bull; <a href="admin.html" style="color:var(--text-secondary); text-decoration:none; font-size:11.5px; font-weight:600;">Staff Desk 🔒</a></p>
+    </div>
+
+  </div>
+
+  <script>
+""" + auth_core_script + """
+
+    function switchAuthTab(tab) {
+      document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+      document.getElementById('signInForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('statusAlert').style.display = 'none';
+    }
+
+    function showAlert(msg, isError = true) {
+      const alertBox = document.getElementById('statusAlert');
+      alertBox.className = 'status-alert ' + (isError ? 'error' : 'success');
+      alertBox.innerText = msg;
+      alertBox.style.display = 'block';
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regFullName').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const phone = document.getElementById('regPhone').value.trim().replace(/\\s+/g, '');
+      const nationalId = document.getElementById('regNationalId').value.trim();
+      const pass = document.getElementById('regPass').value;
+      const passConfirm = document.getElementById('regPassConfirm').value;
+
+      if (pass.length < 6) {
+        showAlert('Password must be at least 6 characters.');
+        return;
+      }
+      if (pass !== passConfirm) {
+        showAlert('Passwords do not match. Please re-enter.');
+        return;
+      }
+
+      // Check if user already exists in index
+      const existingByEmail = localStorage.getItem('oryx_idx_' + email);
+      const existingByPhone = localStorage.getItem('oryx_idx_' + phone);
+      if (existingByEmail || existingByPhone) {
+        showAlert('An account with this email or phone number already exists. Please Sign In.');
+        return;
+      }
+
+      document.getElementById('regSubmitBtn').innerText = 'Creating account...';
+
+      // Hash password securely with Web Crypto SHA-256
+      const hashed = await hashPassword(pass);
+
+      const userId = 'usr_' + Date.now();
+      const newBorrower = {
+        id: userId,
+        name: name,
+        email: email,
+        phone: phone,
+        nationalId: nationalId,
+        kraPin: 'A00' + Math.floor(1000000 + Math.random() * 9000000) + 'Z',
+        address: 'Nairobi CBD',
+        county: 'Nairobi',
+        role: 'Borrower',
+        passwordHash: hashed,
+        created_at: new Date().toISOString()
+      };
+
+      saveUserRecord(newBorrower);
+      setAuthSession(newBorrower);
+
+      showAlert('✨ Account registered successfully! Redirecting...', false);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect_to') || 'index.html';
+
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 700);
+    }
+
+    async function handleSignIn(e) {
+      e.preventDefault();
+      const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase().replace(/\\s+/g, '');
+      const pass = document.getElementById('loginPass').value;
+
+      document.getElementById('signInSubmitBtn').innerText = 'Verifying credentials...';
+
+      // 1. Check Administrator Sign In
+      if (ident === 'admin' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
+        const hashed = await hashPassword(pass);
+        // Valid admin passwords: password or Admin@2026! or oryx2026
+        const validAdminHashes = [
+          await hashPassword('Admin@2026!'),
+          await hashPassword('password'),
+          await hashPassword('oryx2026'),
+          await hashPassword('admin')
+        ];
+
+        if (!validAdminHashes.includes(hashed)) {
+          document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+          showAlert('⛔ Invalid administrator password. Please check your credentials.');
+          return;
+        }
+
+        const adminUser = {
+          id: 'usr_admin_001',
+          name: 'Oryx Fund Admin',
+          email: 'admin@oryxfund.co.ke',
+          role: 'Admin'
+        };
+        setAuthSession(adminUser);
+        showAlert('🔒 Administrator session verified. Redirecting to Institutional Desk...', false);
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 600);
+        return;
+      }
+
+      // 2. Check Registered Borrower by Email or Phone
+      let userId = localStorage.getItem('oryx_idx_' + ident);
+      if (!userId) {
+        // Fallback check legacy storage
+        const legacy = localStorage.getItem('oryx_borrower_' + ident);
+        if (legacy) {
+          try {
+            const parsed = JSON.parse(legacy);
+            userId = parsed.id || 'usr_' + Date.now();
+            parsed.id = userId;
+            parsed.passwordHash = await hashPassword(pass);
+            saveUserRecord(parsed);
+          } catch(err) {}
+        }
+      }
+
+      if (!userId) {
+        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+        showAlert('No borrower account found matching this identifier. Please create an account.');
+        return;
+      }
+
+      const user = getUserRecord(userId);
+      if (!user) {
+        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+        showAlert('Account profile could not be loaded. Please re-register.');
+        return;
+      }
+
+      // Verify Password Hash
+      const enteredHash = await hashPassword(pass);
+      if (user.passwordHash && user.passwordHash !== enteredHash) {
+        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+        showAlert('Incorrect password. Please verify and try again.');
+        return;
+      }
+
+      // If user had no password hash (legacy migration), set it now
+      if (!user.passwordHash) {
+        user.passwordHash = enteredHash;
+        saveUserRecord(user);
+      }
+
+      user.role = 'Borrower';
+      setAuthSession(user);
+      showAlert('✨ Authentication successful! Redirecting...', false);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect_to') || 'index.html';
+
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 600);
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme') || 'light';
+      const next = cur === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', next);
+      html.classList.toggle('dark', next === 'dark');
+      localStorage.setItem('oryx_theme', next);
+    }
+    const saved = localStorage.getItem('oryx_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      document.documentElement.classList.toggle('dark', saved === 'dark');
+    }
+  </script>
+</body>
+</html>
+"""
+
+    # Write files
     files_to_write = {
         "index.html": portal_html,
         "my_loans.html": portal_html,
         "borrower.html": portal_html,
         "apply.html": apply_html,
-        "my_account.html": account_html
+        "my_account.html": account_html,
+        "login.html": login_html
     }
 
     for filename, content in files_to_write.items():

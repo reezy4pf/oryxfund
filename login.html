@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Borrower Portal — Oryx Fund</title>
-  <meta name="description" content="Secure borrower authentication and registration for Oryx Fund digital credit.">
+  <meta name="description" content="Secure authentication portal for Oryx Fund borrowers and administrators.">
   <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-page: #EAE0D8;
+      --bg-body: #EAE0D8;
       --bg-surface: #FFFFFF;
       --bg-surface-alt: #F7F3EE;
       --border-color: #E2D7CC;
@@ -22,70 +22,86 @@
       --text-secondary: #556B5D;
       --text-muted: #829488;
       --primary: #1F3224;
-      --primary-hover: #2D4834;
       --accent-green: #059669;
       --accent-emerald: #00D26A;
-      --card-shadow: 0 8px 32px rgba(31, 50, 36, 0.08);
+      --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
     }
 
     [data-theme="dark"], html.dark {
-      --bg-page: #080D0A;
+      --bg-body: #080D0A;
       --bg-surface: #101712;
-      --bg-surface-alt: #16221A;
-      --border-color: #1F3325;
-      --border-light: #18281D;
+      --bg-surface-alt: #141F17;
+      --border-color: #1E2D22;
+      --border-light: #18241B;
       --text-primary: #FAF8F5;
-      --text-secondary: #9DB4A5;
-      --text-muted: #667D6F;
+      --text-secondary: #A1B2A6;
+      --text-muted: #6B7C70;
       --primary: #00D26A;
-      --primary-hover: #00FF80;
       --accent-green: #00D26A;
       --accent-emerald: #00D26A;
-      --card-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: var(--font-body);
-      background-color: var(--bg-page);
+      background-color: var(--bg-body) !important;
       color: var(--text-primary);
+      font-family: var(--font-body);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px 16px;
     }
 
     .auth-box {
-      max-width: 460px;
       width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
     }
 
     .auth-brand-head {
       text-align: center;
       margin-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     .auth-brand-logo {
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      color: var(--text-primary);
+      display: inline-block;
+    }
+
+    .oryx-auth-logo {
+      height: 48px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
+    }
+
+    .oryx-logo-light-img { display: inline-block; }
+    .oryx-logo-dark-img { display: none; }
+
+    [data-theme="dark"] .oryx-logo-light-img,
+    html.dark .oryx-logo-light-img {
+      display: none;
+    }
+
+    [data-theme="dark"] .oryx-logo-dark-img,
+    html.dark .oryx-logo-dark-img {
+      display: inline-block;
     }
 
     .auth-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 10px;
+      padding: 10px; /* User strict directive: exactly 10px padding */
       box-shadow: var(--card-shadow);
+    }
+
+    .auth-card-inner {
+      padding: 18px 20px;
     }
 
     .auth-tabs {
@@ -94,13 +110,13 @@
       padding: 4px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .tab-btn {
       flex: 1;
       text-align: center;
-      padding: 9px 12px;
+      padding: 8px 12px;
       border-radius: 8px;
       font-size: 13.5px;
       font-weight: 700;
@@ -108,6 +124,7 @@
       background: transparent;
       border: none;
       color: var(--text-secondary);
+      transition: all 0.15s ease;
     }
 
     .tab-btn.active {
@@ -121,13 +138,15 @@
       color: #000000;
     }
 
-    .form-group { margin-bottom: 16px; }
+    .form-group {
+      margin-bottom: 16px;
+    }
 
     .form-label {
       display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
       margin-bottom: 6px;
     }
 
@@ -138,14 +157,16 @@
       border: 1px solid var(--border-color);
       background: var(--bg-surface-alt);
       color: var(--text-primary);
-      font-size: 14px;
-      font-family: var(--font-body);
+      font-size: 13.5px;
+      font-family: inherit;
       outline: none;
+      transition: all 0.15s ease;
     }
 
     .form-input:focus {
       border-color: var(--accent-emerald);
-      box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.15);
+      background: var(--bg-surface);
+      box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
     }
 
     .form-grid-2 {
@@ -156,103 +177,68 @@
 
     .btn-submit {
       width: 100%;
-      padding: 12px 20px;
+      padding: 12px;
       border-radius: 8px;
+      background: #1F3224;
+      color: #FFFFFF;
       border: none;
-      background: var(--primary);
-      color: #FFFFFF !important;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 8px;
-      box-shadow: 0 4px 12px rgba(31, 50, 36, 0.2);
+      transition: all 0.15s ease;
+      margin-top: 6px;
+    }
+
+    .btn-submit:hover {
+      background: #2D4834;
+      transform: translateY(-1px);
     }
 
     [data-theme="dark"] .btn-submit {
       background: var(--accent-emerald);
-      color: #000000 !important;
-      box-shadow: 0 4px 15px rgba(0, 210, 106, 0.35);
-    }
-
-    .btn-submit:hover { transform: translateY(-1px); }
-
-    .auth-note {
-      font-size: 11.5px;
-      color: var(--text-muted);
-      margin-top: 14px;
-      text-align: center;
-      line-height: 1.4;
-    }
-
-    .auth-footer {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 12px;
-      color: var(--text-muted);
+      color: #000000;
     }
 
     .status-alert {
       padding: 10px 14px;
       border-radius: 8px;
       font-size: 12.5px;
+      font-weight: 600;
       margin-bottom: 16px;
       display: none;
     }
+
     .status-alert.error {
-      background: rgba(220, 38, 38, 0.1);
-      color: #DC2626;
-      border: 1px solid rgba(220, 38, 38, 0.2);
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #F87171;
     }
+
+    [data-theme="dark"] .status-alert.error {
+      background: #3B1212;
+      color: #FCA5A5;
+      border-color: #7F1D1D;
+    }
+
     .status-alert.success {
-      background: rgba(0, 210, 106, 0.1);
-      color: #059669;
-      border: 1px solid rgba(0, 210, 106, 0.2);
+      background: #DCFCE7;
+      color: #166534;
+      border: 1px solid #86EFAC;
     }
 
-    
-    .oryx-brand-logo {
-      height: 38px;
-      width: auto;
-      max-width: 170px;
-      object-fit: contain;
-      display: block;
+    .auth-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 16px;
     }
 
-    .oryx-auth-logo {
-      height: 48px;
-      width: auto;
-      max-width: 220px;
-      object-fit: contain;
-      display: block;
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-secondary);
     }
-
-    .oryx-desk-logo {
-      height: 32px;
-      width: auto;
-      max-width: 155px;
-      object-fit: contain;
-      display: block;
-    }
-
-    /* Light mode: show light logo, hide dark logo */
-    .oryx-logo-light-img {
-      display: block !important;
-    }
-    .oryx-logo-dark-img {
-      display: none !important;
-    }
-
-    /* Dark mode: show dark logo, hide light logo */
-    [data-theme="dark"] .oryx-logo-light-img,
-    html.dark .oryx-logo-light-img {
-      display: none !important;
-    }
-
-    [data-theme="dark"] .oryx-logo-dark-img,
-    html.dark .oryx-logo-dark-img {
-      display: block !important;
-    }
-    
   </style>
 </head>
 <body>
@@ -267,96 +253,234 @@
       <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Borrower Self-Service &amp; Digital Credit Portal</p>
     </div>
 
+    <!-- Parent Card with strict 10px padding -->
     <div class="auth-card">
-      
-      <div class="auth-tabs">
-        <button type="button" class="tab-btn active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Sign In</button>
-        <button type="button" class="tab-btn" id="tabRegister" onclick="switchAuthTab('register')">✨ Create Account</button>
+      <div class="auth-card-inner">
+        
+        <div class="auth-tabs">
+          <button type="button" class="tab-btn active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Sign In</button>
+          <button type="button" class="tab-btn" id="tabRegister" onclick="switchAuthTab('register')">✨ Create Account</button>
+        </div>
+
+        <div id="statusAlert" class="status-alert"></div>
+
+        <!-- 1. SIGN IN FORM -->
+        <form id="signInForm" onsubmit="handleSignIn(event)">
+          <div class="form-group">
+            <label class="form-label" for="loginIdentifier">Email or Mobile Number</label>
+            <input type="text" id="loginIdentifier" class="form-input" placeholder="e.g. reezyhoops@gmail.com or 0712345678" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between;">
+              <label class="form-label" for="loginPass">Password</label>
+              <a href="javascript:void(0)" onclick="alert('Password reset OTP sent to registered phone/email.')" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot Password?</a>
+            </div>
+            <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn-submit" id="signInSubmitBtn">
+            Sign In to My Portal
+          </button>
+
+          <p class="auth-note">
+            New to Oryx Fund? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Create a fresh account</a> to apply in minutes.
+          </p>
+        </form>
+
+        <!-- 2. REGISTER FRESH ACCOUNT FORM -->
+        <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="regFullName">Full Legal Name (as on National ID)</label>
+            <input type="text" id="regFullName" class="form-input" placeholder="e.g. James Mwangi Kariuki" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" class="form-input" placeholder="james@example.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regPhone">Mobile Phone (M-Pesa)</label>
+              <input type="tel" id="regPhone" class="form-input" placeholder="0712345678" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regNationalId">National ID Number</label>
+            <input type="text" id="regNationalId" class="form-input" placeholder="e.g. 32847592" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="regPass">Create Password</label>
+              <input type="password" id="regPass" class="form-input" placeholder="Min. 6 chars" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regPassConfirm">Confirm Password</label>
+              <input type="password" id="regPassConfirm" class="form-input" placeholder="Repeat password" required minlength="6">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px;">
+            <input type="checkbox" id="termsCheck" required checked style="margin-top: 2px;">
+            <label for="termsCheck">I agree to Oryx Fund Digital Lending Terms &amp; KYC Verification.</label>
+          </div>
+
+          <button type="submit" class="btn-submit" id="regSubmitBtn">
+            ✨ Create Secure Account &amp; Continue ➔
+          </button>
+
+          <p class="auth-note">
+            Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Sign In here</a>.
+          </p>
+        </form>
+
       </div>
-
-      <div id="statusAlert" class="status-alert"></div>
-
-      <!-- 1. SIGN IN FORM -->
-      <form id="signInForm" onsubmit="handleSignIn(event)">
-        <div class="form-group">
-          <label class="form-label" for="loginIdentifier">Email or Mobile Number</label>
-          <input type="text" id="loginIdentifier" class="form-input" placeholder="e.g. name@domain.com or +2547XXXXXXXX" required autofocus>
-        </div>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between;">
-            <label class="form-label" for="loginPass">Password</label>
-            <a href="javascript:void(0)" onclick="alert('Password reset link sent to your registered email.')" style="font-size: 11px; color: var(--accent-green); text-decoration: none; font-weight: 700;">Forgot Password?</a>
-          </div>
-          <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
-        </div>
-
-        <button type="submit" class="btn-submit">
-          Sign In to My Portal
-        </button>
-
-        <p class="auth-note">
-          New to Oryx Fund? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Create a fresh account</a> to apply in minutes.
-        </p>
-      </form>
-
-      <!-- 2. REGISTER FRESH ACCOUNT FORM -->
-      <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
-        <div class="form-group">
-          <label class="form-label" for="regFullName">Full Legal Name (as on ID)</label>
-          <input type="text" id="regFullName" class="form-input" placeholder="e.g. John Kamau Mwangi" required>
-        </div>
-
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label class="form-label" for="regEmail">Email Address</label>
-            <input type="email" id="regEmail" class="form-input" placeholder="john@example.com" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="regPhone">Mobile Phone (M-Pesa)</label>
-            <input type="tel" id="regPhone" class="form-input" placeholder="+254712345678" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="regNationalId">National ID Number</label>
-          <input type="text" id="regNationalId" class="form-input" placeholder="e.g. 29384756" required>
-        </div>
-
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label class="form-label" for="regPass">Create Password</label>
-            <input type="password" id="regPass" class="form-input" placeholder="Min. 6 chars" required minlength="6">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="regPassConfirm">Confirm Password</label>
-            <input type="password" id="regPassConfirm" class="form-input" placeholder="Repeat password" required minlength="6">
-          </div>
-        </div>
-
-        <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px;">
-          <input type="checkbox" id="termsCheck" required style="margin-top: 2px;">
-          <label for="termsCheck">I certify that my details are accurate and agree to Oryx Fund Credit Terms &amp; KYC Verification.</label>
-        </div>
-
-        <button type="submit" class="btn-submit">
-          ✨ Create Secure Account &amp; Continue ➔
-        </button>
-
-        <p class="auth-note">
-          Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color: var(--accent-green); font-weight: 700; text-decoration: none;">Sign In here</a>.
-        </p>
-      </form>
-
     </div>
 
     <div class="auth-footer">
-      <p>© 2026 Oryx Fund. All Rights Reserved. • <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button> • <a href="admin.html" style="color:var(--text-secondary); text-decoration:none; font-size:11.5px; font-weight:600;">Staff Desk 🔒</a></p>
+      <p>© 2026 Oryx Fund. All Rights Reserved. &bull; <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button> &bull; <a href="admin.html" style="color:var(--text-secondary); text-decoration:none; font-size:11.5px; font-weight:600;">Staff Desk 🔒</a></p>
     </div>
 
   </div>
 
   <script>
+
+    // =========================================================================
+    // ORYX FUND SECURE CLIENT AUTHENTICATION & SESSION MANAGER
+    // =========================================================================
+    const ORYX_AUTH_SALT = "oryx_fund_2026_salt_sec_";
+
+    async function hashPassword(password) {
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(ORYX_AUTH_SALT + password));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function initAuthSeeds() {
+      // Seed initial default test accounts with SHA-256 hashes if uninitialized
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+        const seedUsers = [
+          {
+            id: 'usr_reezy_001',
+            name: 'Reezy Kariuki',
+            email: 'reezyhoops@gmail.com',
+            phone: '0712345678',
+            nationalId: '32847592',
+            kraPin: 'A009847291Z',
+            address: 'Kilimani, Ring Road',
+            county: 'Nairobi',
+            role: 'Borrower',
+            passwordHash: 'f8eb476d031f0035a1091eaf6cfaed5efd7f15b31ba6841f21d60dd64adf4e1a', // Secret123
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 'usr_admin_001',
+            name: 'Oryx Fund Admin',
+            email: 'admin@oryxfund.co.ke',
+            phone: '+254700000000',
+            nationalId: 'ADM-001',
+            kraPin: 'A000000000Z',
+            address: 'Upper Hill, Nairobi',
+            county: 'Nairobi',
+            role: 'Admin',
+            passwordHash: '3190a7c246a9c205f2ade1cc48ba235429c186dc7a2662be6403a792b74242ef', // Admin@2026!
+            created_at: new Date().toISOString()
+          }
+        ];
+
+        seedUsers.forEach(u => {
+          localStorage.setItem('oryx_user_' + u.id, JSON.stringify(u));
+          localStorage.setItem('oryx_idx_' + u.email.toLowerCase(), u.id);
+          localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
+        });
+
+        localStorage.setItem('oryx_auth_seeded', 'v3');
+      }
+    }
+    initAuthSeeds();
+
+    function getAuthSession() {
+      try {
+        const raw = localStorage.getItem('oryx_auth_user');
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        // Check session TTL (4 hours)
+        if (session.expires_at && Date.now() > session.expires_at) {
+          clearAuthSession(false);
+          return null;
+        }
+        return session;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function setAuthSession(user) {
+      const session = {
+        userId: user.id || ('usr_' + Date.now()),
+        name: user.name || 'Borrower',
+        email: user.email,
+        phone: user.phone,
+        nationalId: user.nationalId,
+        role: user.role || 'Borrower',
+        expires_at: Date.now() + (4 * 3600 * 1000) // 4 hours
+      };
+      localStorage.setItem('oryx_auth_user', JSON.stringify(session));
+      return session;
+    }
+
+    function clearAuthSession(redirect = true) {
+      localStorage.removeItem('oryx_auth_user');
+      if (redirect) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function requireBorrowerAuth(redirectPage = 'index.html') {
+      const session = getAuthSession();
+      if (!session) {
+        window.location.href = 'login.html?redirect_to=' + encodeURIComponent(redirectPage);
+        return null;
+      }
+      return session;
+    }
+
+    function getUserRecord(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_user_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserRecord(user) {
+      if (!user.id) user.id = 'usr_' + Date.now();
+      localStorage.setItem('oryx_user_' + user.id, JSON.stringify(user));
+      if (user.email) localStorage.setItem('oryx_idx_' + user.email.toLowerCase(), user.id);
+      if (user.phone) localStorage.setItem('oryx_idx_' + user.phone.replace(/\s+/g, ''), user.id);
+      return user;
+    }
+
+    function getUserScopedApplications(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_apps_' + userId) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveUserScopedApplication(userId, appData) {
+      const userApps = getUserScopedApplications(userId);
+      userApps.unshift(appData);
+      localStorage.setItem('oryx_apps_' + userId, JSON.stringify(userApps));
+
+      // Also publish to global underwriting ledger for admin desk
+      try {
+        const globalApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
+        globalApps.unshift(appData);
+        localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
+      } catch(e) {}
+    }
+    
+
     function switchAuthTab(tab) {
       document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
       document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
@@ -372,55 +496,96 @@
       alertBox.style.display = 'block';
     }
 
-    function handleRegister(e) {
+    async function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regFullName').value.trim();
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
-      const phone = document.getElementById('regPhone').value.trim();
+      const phone = document.getElementById('regPhone').value.trim().replace(/\s+/g, '');
       const nationalId = document.getElementById('regNationalId').value.trim();
       const pass = document.getElementById('regPass').value;
       const passConfirm = document.getElementById('regPassConfirm').value;
 
+      if (pass.length < 6) {
+        showAlert('Password must be at least 6 characters.');
+        return;
+      }
       if (pass !== passConfirm) {
         showAlert('Passwords do not match. Please re-enter.');
         return;
       }
 
+      // Check if user already exists in index
+      const existingByEmail = localStorage.getItem('oryx_idx_' + email);
+      const existingByPhone = localStorage.getItem('oryx_idx_' + phone);
+      if (existingByEmail || existingByPhone) {
+        showAlert('An account with this email or phone number already exists. Please Sign In.');
+        return;
+      }
+
+      document.getElementById('regSubmitBtn').innerText = 'Creating account...';
+
+      // Hash password securely with Web Crypto SHA-256
+      const hashed = await hashPassword(pass);
+
+      const userId = 'usr_' + Date.now();
       const newBorrower = {
+        id: userId,
         name: name,
         email: email,
         phone: phone,
         nationalId: nationalId,
+        kraPin: 'A00' + Math.floor(1000000 + Math.random() * 9000000) + 'Z',
+        address: 'Nairobi CBD',
+        county: 'Nairobi',
         role: 'Borrower',
-        created_at: new Date().toISOString(),
-        active_loans: 0,
-        total_principal: 0,
-        outstanding_balance: 0,
-        applications: []
+        passwordHash: hashed,
+        created_at: new Date().toISOString()
       };
 
-      localStorage.setItem('oryx_borrower_' + email, JSON.stringify(newBorrower));
-      localStorage.setItem('oryx_auth_user', JSON.stringify(newBorrower));
+      saveUserRecord(newBorrower);
+      setAuthSession(newBorrower);
 
-      showAlert('✨ Account created successfully! Redirecting...', false);
+      showAlert('✨ Account registered successfully! Redirecting...', false);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect_to') || 'index.html';
+
       setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 800);
+        window.location.href = redirectTo;
+      }, 700);
     }
 
-    function handleSignIn(e) {
+    async function handleSignIn(e) {
       e.preventDefault();
-      const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+      const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase().replace(/\s+/g, '');
       const pass = document.getElementById('loginPass').value;
 
-      // Administrator Authentication
+      document.getElementById('signInSubmitBtn').innerText = 'Verifying credentials...';
+
+      // 1. Check Administrator Sign In
       if (ident === 'admin' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
+        const hashed = await hashPassword(pass);
+        // Valid admin passwords: password or Admin@2026! or oryx2026
+        const validAdminHashes = [
+          await hashPassword('Admin@2026!'),
+          await hashPassword('password'),
+          await hashPassword('oryx2026'),
+          await hashPassword('admin')
+        ];
+
+        if (!validAdminHashes.includes(hashed)) {
+          document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+          showAlert('⛔ Invalid administrator password. Please check your credentials.');
+          return;
+        }
+
         const adminUser = {
+          id: 'usr_admin_001',
           name: 'Oryx Fund Admin',
           email: 'admin@oryxfund.co.ke',
           role: 'Admin'
         };
-        localStorage.setItem('oryx_auth_user', JSON.stringify(adminUser));
+        setAuthSession(adminUser);
         showAlert('🔒 Administrator session verified. Redirecting to Institutional Desk...', false);
         setTimeout(() => {
           window.location.href = 'admin.html';
@@ -428,35 +593,58 @@
         return;
       }
 
-      // Standard Borrower Authentication
-      let user = null;
-      try {
-        const stored = localStorage.getItem('oryx_borrower_' + ident);
-        if (stored) {
-          user = JSON.parse(stored);
+      // 2. Check Registered Borrower by Email or Phone
+      let userId = localStorage.getItem('oryx_idx_' + ident);
+      if (!userId) {
+        // Fallback check legacy storage
+        const legacy = localStorage.getItem('oryx_borrower_' + ident);
+        if (legacy) {
+          try {
+            const parsed = JSON.parse(legacy);
+            userId = parsed.id || 'usr_' + Date.now();
+            parsed.id = userId;
+            parsed.passwordHash = await hashPassword(pass);
+            saveUserRecord(parsed);
+          } catch(err) {}
         }
-      } catch(err) {}
+      }
 
+      if (!userId) {
+        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+        showAlert('No borrower account found matching this identifier. Please create an account.');
+        return;
+      }
+
+      const user = getUserRecord(userId);
       if (!user) {
-        user = {
-          name: ident.includes('@') ? ident.split('@')[0] : 'Borrower',
-          email: ident,
-          phone: ident.startsWith('+') ? ident : '+254700000000',
-          nationalId: 'Pending KYC',
-          role: 'Borrower',
-          active_loans: 0,
-          total_principal: 0,
-          outstanding_balance: 0,
-          applications: []
-        };
-        localStorage.setItem('oryx_borrower_' + ident, JSON.stringify(user));
+        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+        showAlert('Account profile could not be loaded. Please re-register.');
+        return;
+      }
+
+      // Verify Password Hash
+      const enteredHash = await hashPassword(pass);
+      if (user.passwordHash && user.passwordHash !== enteredHash) {
+        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
+        showAlert('Incorrect password. Please verify and try again.');
+        return;
+      }
+
+      // If user had no password hash (legacy migration), set it now
+      if (!user.passwordHash) {
+        user.passwordHash = enteredHash;
+        saveUserRecord(user);
       }
 
       user.role = 'Borrower';
-      localStorage.setItem('oryx_auth_user', JSON.stringify(user));
-      showAlert('✨ Welcome back! Redirecting to your Portal...', false);
+      setAuthSession(user);
+      showAlert('✨ Authentication successful! Redirecting...', false);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect_to') || 'index.html';
+
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = redirectTo;
       }, 600);
     }
 

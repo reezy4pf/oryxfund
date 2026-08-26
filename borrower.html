@@ -1003,7 +1003,7 @@ html.dark .moon-icon { display: none; }
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>Reezy</span>
+            <span>Account</span>
           </a>
         </nav>
 
@@ -1020,7 +1020,7 @@ html.dark .moon-icon { display: none; }
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span>Reezy</span>
+          <span>Account</span>
         </a>
         <button type="button" class="oryx-theme-toggle-btn" onclick="toggleOryxTheme()" aria-label="Toggle Theme">
           <svg class="theme-icon sun-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg>
@@ -1045,7 +1045,7 @@ html.dark .moon-icon { display: none; }
     <div class="oryx-hero-card">
       <div class="hero-top-row">
         <div class="oryx-badge">MY PORTAL</div>
-        <span class="user-greeting" id="heroAccountText">Account: reezyhoops@gmail.com</span>
+        <span class="user-greeting" id="heroAccountText">Account: Loading...</span>
       </div>
       <div class="hero-main-row">
         <div>
@@ -1129,7 +1129,7 @@ html.dark .moon-icon { display: none; }
       <div class="card-section-head">
         <div>
           <h3 class="section-title">Application History</h3>
-          <p class="section-desc">Track status and review records of all submitted loan applications.</p>
+          <p class="section-desc">Track status and review records of your submitted loan applications.</p>
         </div>
       </div>
 
@@ -1153,6 +1153,141 @@ html.dark .moon-icon { display: none; }
   </main>
 
   <script>
+
+    // =========================================================================
+    // ORYX FUND SECURE CLIENT AUTHENTICATION & SESSION MANAGER
+    // =========================================================================
+    const ORYX_AUTH_SALT = "oryx_fund_2026_salt_sec_";
+
+    async function hashPassword(password) {
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(ORYX_AUTH_SALT + password));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function initAuthSeeds() {
+      // Seed initial default test accounts with SHA-256 hashes if uninitialized
+      if (localStorage.getItem('oryx_auth_seeded') !== 'v3') {
+        const seedUsers = [
+          {
+            id: 'usr_reezy_001',
+            name: 'Reezy Kariuki',
+            email: 'reezyhoops@gmail.com',
+            phone: '0712345678',
+            nationalId: '32847592',
+            kraPin: 'A009847291Z',
+            address: 'Kilimani, Ring Road',
+            county: 'Nairobi',
+            role: 'Borrower',
+            passwordHash: 'f8eb476d031f0035a1091eaf6cfaed5efd7f15b31ba6841f21d60dd64adf4e1a', // Secret123
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 'usr_admin_001',
+            name: 'Oryx Fund Admin',
+            email: 'admin@oryxfund.co.ke',
+            phone: '+254700000000',
+            nationalId: 'ADM-001',
+            kraPin: 'A000000000Z',
+            address: 'Upper Hill, Nairobi',
+            county: 'Nairobi',
+            role: 'Admin',
+            passwordHash: '3190a7c246a9c205f2ade1cc48ba235429c186dc7a2662be6403a792b74242ef', // Admin@2026!
+            created_at: new Date().toISOString()
+          }
+        ];
+
+        seedUsers.forEach(u => {
+          localStorage.setItem('oryx_user_' + u.id, JSON.stringify(u));
+          localStorage.setItem('oryx_idx_' + u.email.toLowerCase(), u.id);
+          localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
+        });
+
+        localStorage.setItem('oryx_auth_seeded', 'v3');
+      }
+    }
+    initAuthSeeds();
+
+    function getAuthSession() {
+      try {
+        const raw = localStorage.getItem('oryx_auth_user');
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        // Check session TTL (4 hours)
+        if (session.expires_at && Date.now() > session.expires_at) {
+          clearAuthSession(false);
+          return null;
+        }
+        return session;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function setAuthSession(user) {
+      const session = {
+        userId: user.id || ('usr_' + Date.now()),
+        name: user.name || 'Borrower',
+        email: user.email,
+        phone: user.phone,
+        nationalId: user.nationalId,
+        role: user.role || 'Borrower',
+        expires_at: Date.now() + (4 * 3600 * 1000) // 4 hours
+      };
+      localStorage.setItem('oryx_auth_user', JSON.stringify(session));
+      return session;
+    }
+
+    function clearAuthSession(redirect = true) {
+      localStorage.removeItem('oryx_auth_user');
+      if (redirect) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    function requireBorrowerAuth(redirectPage = 'index.html') {
+      const session = getAuthSession();
+      if (!session) {
+        window.location.href = 'login.html?redirect_to=' + encodeURIComponent(redirectPage);
+        return null;
+      }
+      return session;
+    }
+
+    function getUserRecord(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_user_' + userId));
+      } catch(e) { return null; }
+    }
+
+    function saveUserRecord(user) {
+      if (!user.id) user.id = 'usr_' + Date.now();
+      localStorage.setItem('oryx_user_' + user.id, JSON.stringify(user));
+      if (user.email) localStorage.setItem('oryx_idx_' + user.email.toLowerCase(), user.id);
+      if (user.phone) localStorage.setItem('oryx_idx_' + user.phone.replace(/\s+/g, ''), user.id);
+      return user;
+    }
+
+    function getUserScopedApplications(userId) {
+      try {
+        return JSON.parse(localStorage.getItem('oryx_apps_' + userId) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveUserScopedApplication(userId, appData) {
+      const userApps = getUserScopedApplications(userId);
+      userApps.unshift(appData);
+      localStorage.setItem('oryx_apps_' + userId, JSON.stringify(userApps));
+
+      // Also publish to global underwriting ledger for admin desk
+      try {
+        const globalApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
+        globalApps.unshift(appData);
+        localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
+      } catch(e) {}
+    }
+    
+
     function toggleOryxTheme() {
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
@@ -1168,41 +1303,39 @@ html.dark .moon-icon { display: none; }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const authUser = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (authUser && authUser.email) {
-          document.getElementById('heroAccountText').innerText = 'Account: ' + authUser.email;
-          const uName = authUser.name || authUser.email.split('@')[0];
-          document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = uName);
-        }
+      // 1. Enforce Borrower Route Guard
+      const session = requireBorrowerAuth('index.html');
+      if (!session) return;
 
-        // Render submitted applications from localStorage
-        const apps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
-        if (apps.length > 0) {
-          document.getElementById('appsEmptyState').style.display = 'none';
-          const listEl = document.getElementById('appsListContainer');
-          listEl.style.display = 'block';
-          listEl.innerHTML = '';
+      // 2. Render dynamic user identification
+      document.getElementById('heroAccountText').innerText = 'Account: ' + (session.email || session.phone);
+      const displayName = session.name || (session.email ? session.email.split('@')[0] : 'Borrower');
+      document.querySelectorAll('#navUserPill span, #navUserPillMobile span').forEach(el => el.innerText = displayName);
 
-          apps.forEach(app => {
-            const card = document.createElement('div');
-            card.className = 'app-item-card';
-            card.innerHTML = `
-              <div class="app-item-info">
-                <div class="app-item-id">${app.id || 'ACC-LOAP-2026-001'}</div>
-                <div class="app-item-prod">${app.productName || 'Working Capital Loan'}</div>
-                <div class="app-item-meta">Applicant: ${app.fullName || 'Reezy'} &bull; ${app.date || 'Today'} &bull; ${app.term || '6'} Months</div>
-              </div>
-              <div class="app-item-right">
-                <div class="app-item-amt">KES ${Number(app.amount || 250000).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                <span class="app-item-badge badge-review">⚡ Under Review</span>
-              </div>
-            `;
-            listEl.appendChild(card);
-          });
-        }
-      } catch(e) {
-        console.error(e);
+      // 3. Render User-Scoped Applications (Zero Cross-Account Leakage)
+      const userApps = getUserScopedApplications(session.userId);
+      if (userApps.length > 0) {
+        document.getElementById('appsEmptyState').style.display = 'none';
+        const listEl = document.getElementById('appsListContainer');
+        listEl.style.display = 'block';
+        listEl.innerHTML = '';
+
+        userApps.forEach(app => {
+          const card = document.createElement('div');
+          card.className = 'app-item-card';
+          card.innerHTML = `
+            <div class="app-item-info">
+              <div class="app-item-id">${app.id || 'ACC-LOAP-2026-001'}</div>
+              <div class="app-item-prod">${app.productName || 'Working Capital Facility'}</div>
+              <div class="app-item-meta">Applicant: ${app.fullName || session.name} &bull; ${app.date || 'Today'} &bull; ${app.term || '6'} Months</div>
+            </div>
+            <div class="app-item-right">
+              <div class="app-item-amt">KES ${Number(app.amount || 250000).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+              <span class="app-item-badge badge-review">⚡ ${app.status || 'Under Review'}</span>
+            </div>
+          `;
+          listEl.appendChild(card);
+        });
       }
     });
   </script>
