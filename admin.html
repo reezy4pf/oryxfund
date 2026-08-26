@@ -1053,6 +1053,36 @@
       ]
     };
 
+    // Sync dynamically submitted applications from apply.html
+    try {
+      const localApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
+      localApps.forEach(a => {
+        if (!DB.loan_application.some(x => x.id === a.id)) {
+          DB.loan_application.unshift({
+            id: a.id,
+            applicant: a.fullName || 'Registered Applicant',
+            product: a.productName || 'Working Capital Facility',
+            amount: 'KES ' + Number(a.amount || 250000).toLocaleString('en-US', {minimumFractionDigits: 2}),
+            income: 'KES 180,000.00',
+            decision: '⚡ Under Review',
+            date: a.date || new Date().toISOString().split('T')[0]
+          });
+          if (!DB.customer.some(c => c.name === (a.fullName || 'Registered Applicant'))) {
+            DB.customer.unshift({
+              id: 'CUST-' + a.id.replace('ACC-LOAP-', ''),
+              name: a.fullName || 'Registered Applicant',
+              email: 'applicant@example.com',
+              phone: '+254700000000',
+              national_id: '32847592',
+              score: '720 (Verified)',
+              kyc: 'Verified',
+              date: a.date || new Date().toISOString().split('T')[0]
+            });
+          }
+        }
+      });
+    } catch(e) {}
+
     // Meta definition for views
     const VIEWS = {
       dashboard: { title: "Loan Dashboard", category: "Dashboard" },
