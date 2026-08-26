@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Borrower Portal — Oryx Fund</title>
   <meta name="description" content="Secure borrower authentication and registration for Oryx Fund digital credit.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,13 +68,14 @@
     .auth-brand-head {
       text-align: center;
       margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .auth-brand-logo {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
       text-decoration: none;
       color: var(--text-primary);
     }
@@ -207,6 +208,51 @@
       color: #059669;
       border: 1px solid rgba(0, 210, 106, 0.2);
     }
+
+    
+    .oryx-brand-logo {
+      height: 38px;
+      width: auto;
+      max-width: 170px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .oryx-auth-logo {
+      height: 48px;
+      width: auto;
+      max-width: 220px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .oryx-desk-logo {
+      height: 32px;
+      width: auto;
+      max-width: 155px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Light mode: show light logo, hide dark logo */
+    .oryx-logo-light-img {
+      display: block !important;
+    }
+    .oryx-logo-dark-img {
+      display: none !important;
+    }
+
+    /* Dark mode: show dark logo, hide light logo */
+    [data-theme="dark"] .oryx-logo-light-img,
+    html.dark .oryx-logo-light-img {
+      display: none !important;
+    }
+
+    [data-theme="dark"] .oryx-logo-dark-img,
+    html.dark .oryx-logo-dark-img {
+      display: block !important;
+    }
+    
   </style>
 </head>
 <body>
@@ -214,14 +260,11 @@
   <div class="auth-box">
     
     <div class="auth-brand-head">
-      <a href="index.html" class="auth-brand-logo">
-        <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="#1F3224"/>
-          <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
-        </svg>
-        <span style="font-size: 20px; font-weight: 800;">Oryx <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+      <a href="index.html" class="auth-brand-logo" title="Oryx Fund">
+        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-light-img">
+        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-dark-img">
       </a>
-      <p style="font-size: 13px; color: var(--text-secondary);">Borrower Self-Service &amp; Digital Credit Portal</p>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Borrower Self-Service &amp; Digital Credit Portal</p>
     </div>
 
     <div class="auth-card">
@@ -343,7 +386,6 @@
         return;
       }
 
-      // Fresh Isolated Borrower Account
       const newBorrower = {
         name: name,
         email: email,
@@ -357,9 +399,7 @@
         applications: []
       };
 
-      // Save to isolated account key
       localStorage.setItem('oryx_borrower_' + email, JSON.stringify(newBorrower));
-      // Set as active session
       localStorage.setItem('oryx_auth_user', JSON.stringify(newBorrower));
 
       showAlert('✨ Account created successfully! Redirecting...', false);
@@ -372,7 +412,6 @@
       e.preventDefault();
       const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       
-      // Check if this borrower account exists locally
       let user = null;
       try {
         const stored = localStorage.getItem('oryx_borrower_' + ident);
@@ -382,7 +421,6 @@
       } catch(err) {}
 
       if (!user) {
-        // Create an on-demand clean borrower session for this email
         user = {
           name: ident.includes('@') ? ident.split('@')[0] : 'Borrower',
           email: ident,

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Dashboard — Oryx Fund Admin</title>
   <meta name="description" content="Institutional credit and loan portfolio analytics dashboard for Oryx Fund.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,12 +44,7 @@
       --accent-red: #DC2626;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
 
     body {
       font-family: var(--font-body);
@@ -84,9 +79,6 @@
       text-decoration: none;
       color: var(--text-main);
     }
-
-    .brand-title { font-size: 13px; font-weight: 700; }
-    .brand-sub { font-size: 10px; color: var(--text-sub); }
 
     .sidebar-search-box {
       display: flex;
@@ -207,17 +199,6 @@
       display: flex;
       align-items: center;
       gap: 12px;
-    }
-
-    .borrower-switch-link {
-      background: rgba(0, 210, 106, 0.1);
-      border: 1px solid var(--accent-emerald);
-      color: var(--accent-emerald);
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 11px;
-      font-weight: 800;
-      text-decoration: none;
     }
 
     .desk-canvas {
@@ -342,6 +323,51 @@
       .number-cards-grid, .highlight-cards-row { grid-template-columns: repeat(3, 1fr); }
       .charts-grid-row { grid-template-columns: 1fr; }
     }
+
+    
+    .oryx-brand-logo {
+      height: 38px;
+      width: auto;
+      max-width: 170px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .oryx-auth-logo {
+      height: 48px;
+      width: auto;
+      max-width: 220px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .oryx-desk-logo {
+      height: 32px;
+      width: auto;
+      max-width: 155px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Light mode: show light logo, hide dark logo */
+    .oryx-logo-light-img {
+      display: block !important;
+    }
+    .oryx-logo-dark-img {
+      display: none !important;
+    }
+
+    /* Dark mode: show dark logo, hide light logo */
+    [data-theme="dark"] .oryx-logo-light-img,
+    html.dark .oryx-logo-light-img {
+      display: none !important;
+    }
+
+    [data-theme="dark"] .oryx-logo-dark-img,
+    html.dark .oryx-logo-dark-img {
+      display: block !important;
+    }
+    
   </style>
 </head>
 <body>
@@ -350,11 +376,8 @@
   <aside class="desk-sidebar">
     <a href="#" class="desk-brand-header">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="#1F3224"/><path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7Z" fill="#00D26A"/></svg>
-        <div>
-          <div class="brand-title">Oryx Fund</div>
-          <div class="brand-sub">Lending Platform</div>
-        </div>
+        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-desk-logo oryx-logo-light-img">
+        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-desk-logo oryx-logo-dark-img">
       </div>
       <span style="font-size: 11px; color: var(--text-dim);">▼</span>
     </a>
@@ -444,7 +467,6 @@
 
       <div class="topbar-right">
         <button class="theme-icon-btn" onclick="toggleAdminTheme()" id="adminThemeBtn" style="width: 32px; height: 32px; font-size: 14px; background: transparent; border: 1px solid var(--desk-border); color: var(--text-main); cursor: pointer; border-radius: 6px;" title="Toggle Light / Dark Mode">☀️</button>
-        <a href="index.html" class="borrower-switch-link">➔ Open Borrower Portal</a>
         <span style="font-size: 14px; color: var(--text-dim); cursor: pointer;">•••</span>
       </div>
     </header>

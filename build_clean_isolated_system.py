@@ -3,24 +3,70 @@ import os
 def generate_clean_isolated_system():
     base_dir = "/home/reezy/.gemini/antigravity-ide/scratch/oryx_fund"
 
+    # Common Logo CSS snippet
+    logo_css = """
+    .oryx-brand-logo {
+      height: 38px;
+      width: auto;
+      max-width: 170px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .oryx-auth-logo {
+      height: 48px;
+      width: auto;
+      max-width: 220px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .oryx-desk-logo {
+      height: 32px;
+      width: auto;
+      max-width: 155px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Light mode: show light logo, hide dark logo */
+    .oryx-logo-light-img {
+      display: block !important;
+    }
+    .oryx-logo-dark-img {
+      display: none !important;
+    }
+
+    /* Dark mode: show dark logo, hide light logo */
+    [data-theme="dark"] .oryx-logo-light-img,
+    html.dark .oryx-logo-light-img {
+      display: none !important;
+    }
+
+    [data-theme="dark"] .oryx-logo-dark-img,
+    html.dark .oryx-logo-dark-img {
+      display: block !important;
+    }
+    """
+
     # =========================================================================
     # 1. LOGIN & REGISTRATION (login.html)
     # =========================================================================
-    login_html = """<!DOCTYPE html>
+    login_html = f"""<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Borrower Portal — Oryx Fund</title>
   <meta name="description" content="Secure borrower authentication and registration for Oryx Fund digital credit.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
+    :root {{
       --bg-page: #EAE0D8;
       --bg-surface: #FFFFFF;
       --bg-surface-alt: #F7F3EE;
@@ -36,9 +82,9 @@ def generate_clean_isolated_system():
       --card-shadow: 0 8px 32px rgba(31, 50, 36, 0.08);
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
-    }
+    }}
 
-    [data-theme="dark"], html.dark {
+    [data-theme="dark"], html.dark {{
       --bg-page: #080D0A;
       --bg-surface: #101712;
       --bg-surface-alt: #16221A;
@@ -52,11 +98,11 @@ def generate_clean_isolated_system():
       --accent-green: #00D26A;
       --accent-emerald: #00D26A;
       --card-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-    }
+    }}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+    * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }}
 
-    body {
+    body {{
       font-family: var(--font-body);
       background-color: var(--bg-page);
       color: var(--text-primary);
@@ -66,45 +112,46 @@ def generate_clean_isolated_system():
       align-items: center;
       justify-content: center;
       padding: 24px 16px;
-    }
+    }}
 
-    .auth-box {
+    .auth-box {{
       max-width: 460px;
       width: 100%;
-    }
+    }}
 
-    .auth-brand-head {
+    .auth-brand-head {{
       text-align: center;
       margin-bottom: 24px;
-    }
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }}
 
-    .auth-brand-logo {
+    .auth-brand-logo {{
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
       text-decoration: none;
       color: var(--text-primary);
-    }
+    }}
 
-    .auth-card {
+    .auth-card {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 18px;
       padding: 32px 30px;
       box-shadow: var(--card-shadow);
-    }
+    }}
 
-    .auth-tabs {
+    .auth-tabs {{
       display: flex;
       background: var(--bg-surface-alt);
       padding: 4px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
       margin-bottom: 24px;
-    }
+    }}
 
-    .tab-btn {
+    .tab-btn {{
       flex: 1;
       text-align: center;
       padding: 9px 12px;
@@ -115,30 +162,30 @@ def generate_clean_isolated_system():
       background: transparent;
       border: none;
       color: var(--text-secondary);
-    }
+    }}
 
-    .tab-btn.active {
+    .tab-btn.active {{
       background: var(--bg-surface);
       color: var(--text-primary);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
+    }}
 
-    [data-theme="dark"] .tab-btn.active {
+    [data-theme="dark"] .tab-btn.active {{
       background: var(--accent-emerald);
       color: #000000;
-    }
+    }}
 
-    .form-group { margin-bottom: 16px; }
+    .form-group {{ margin-bottom: 16px; }}
 
-    .form-label {
+    .form-label {{
       display: block;
       font-size: 12px;
       font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 6px;
-    }
+    }}
 
-    .form-input {
+    .form-input {{
       width: 100%;
       padding: 11px 14px;
       border-radius: 8px;
@@ -148,20 +195,20 @@ def generate_clean_isolated_system():
       font-size: 14px;
       font-family: var(--font-body);
       outline: none;
-    }
+    }}
 
-    .form-input:focus {
+    .form-input:focus {{
       border-color: var(--accent-emerald);
       box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.15);
-    }
+    }}
 
-    .form-grid-2 {
+    .form-grid-2 {{
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-    }
+    }}
 
-    .btn-submit {
+    .btn-submit {{
       width: 100%;
       padding: 12px 20px;
       border-radius: 8px;
@@ -173,48 +220,50 @@ def generate_clean_isolated_system():
       cursor: pointer;
       margin-top: 8px;
       box-shadow: 0 4px 12px rgba(31, 50, 36, 0.2);
-    }
+    }}
 
-    [data-theme="dark"] .btn-submit {
+    [data-theme="dark"] .btn-submit {{
       background: var(--accent-emerald);
       color: #000000 !important;
       box-shadow: 0 4px 15px rgba(0, 210, 106, 0.35);
-    }
+    }}
 
-    .btn-submit:hover { transform: translateY(-1px); }
+    .btn-submit:hover {{ transform: translateY(-1px); }}
 
-    .auth-note {
+    .auth-note {{
       font-size: 11.5px;
       color: var(--text-muted);
       margin-top: 14px;
       text-align: center;
       line-height: 1.4;
-    }
+    }}
 
-    .auth-footer {
+    .auth-footer {{
       text-align: center;
       margin-top: 24px;
       font-size: 12px;
       color: var(--text-muted);
-    }
+    }}
 
-    .status-alert {
+    .status-alert {{
       padding: 10px 14px;
       border-radius: 8px;
       font-size: 12.5px;
       margin-bottom: 16px;
       display: none;
-    }
-    .status-alert.error {
+    }}
+    .status-alert.error {{
       background: rgba(220, 38, 38, 0.1);
       color: #DC2626;
       border: 1px solid rgba(220, 38, 38, 0.2);
-    }
-    .status-alert.success {
+    }}
+    .status-alert.success {{
       background: rgba(0, 210, 106, 0.1);
       color: #059669;
       border: 1px solid rgba(0, 210, 106, 0.2);
-    }
+    }}
+
+    {logo_css}
   </style>
 </head>
 <body>
@@ -222,14 +271,11 @@ def generate_clean_isolated_system():
   <div class="auth-box">
     
     <div class="auth-brand-head">
-      <a href="index.html" class="auth-brand-logo">
-        <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="#1F3224"/>
-          <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
-        </svg>
-        <span style="font-size: 20px; font-weight: 800;">Oryx <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+      <a href="index.html" class="auth-brand-logo" title="Oryx Fund">
+        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-light-img">
+        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-dark-img">
       </a>
-      <p style="font-size: 13px; color: var(--text-secondary);">Borrower Self-Service &amp; Digital Credit Portal</p>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Borrower Self-Service &amp; Digital Credit Portal</p>
     </div>
 
     <div class="auth-card">
@@ -322,22 +368,22 @@ def generate_clean_isolated_system():
   </div>
 
   <script>
-    function switchAuthTab(tab) {
+    function switchAuthTab(tab) {{
       document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
       document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
       document.getElementById('signInForm').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
       document.getElementById('statusAlert').style.display = 'none';
-    }
+    }}
 
-    function showAlert(msg, isError = true) {
+    function showAlert(msg, isError = true) {{
       const alertBox = document.getElementById('statusAlert');
       alertBox.className = 'status-alert ' + (isError ? 'error' : 'success');
       alertBox.innerText = msg;
       alertBox.style.display = 'block';
-    }
+    }}
 
-    function handleRegister(e) {
+    function handleRegister(e) {{
       e.preventDefault();
       const name = document.getElementById('regFullName').value.trim();
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
@@ -346,13 +392,12 @@ def generate_clean_isolated_system():
       const pass = document.getElementById('regPass').value;
       const passConfirm = document.getElementById('regPassConfirm').value;
 
-      if (pass !== passConfirm) {
+      if (pass !== passConfirm) {{
         showAlert('Passwords do not match. Please re-enter.');
         return;
-      }
+      }}
 
-      // Fresh Isolated Borrower Account
-      const newBorrower = {
+      const newBorrower = {{
         name: name,
         email: email,
         phone: phone,
@@ -363,35 +408,31 @@ def generate_clean_isolated_system():
         total_principal: 0,
         outstanding_balance: 0,
         applications: []
-      };
+      }};
 
-      // Save to isolated account key
       localStorage.setItem('oryx_borrower_' + email, JSON.stringify(newBorrower));
-      // Set as active session
       localStorage.setItem('oryx_auth_user', JSON.stringify(newBorrower));
 
       showAlert('✨ Account created successfully! Redirecting...', false);
-      setTimeout(() => {
+      setTimeout(() => {{
         window.location.href = 'index.html';
-      }, 800);
-    }
+      }}, 800);
+    }}
 
-    function handleSignIn(e) {
+    function handleSignIn(e) {{
       e.preventDefault();
       const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       
-      // Check if this borrower account exists locally
       let user = null;
-      try {
+      try {{
         const stored = localStorage.getItem('oryx_borrower_' + ident);
-        if (stored) {
+        if (stored) {{
           user = JSON.parse(stored);
-        }
-      } catch(err) {}
+        }}
+      }} catch(err) {{}}
 
-      if (!user) {
-        // Create an on-demand clean borrower session for this email
-        user = {
+      if (!user) {{
+        user = {{
           name: ident.includes('@') ? ident.split('@')[0] : 'Borrower',
           email: ident,
           phone: ident.startsWith('+') ? ident : '+254700000000',
@@ -401,21 +442,21 @@ def generate_clean_isolated_system():
           total_principal: 0,
           outstanding_balance: 0,
           applications: []
-        };
+        }};
         localStorage.setItem('oryx_borrower_' + ident, JSON.stringify(user));
-      }
+      }}
 
       localStorage.setItem('oryx_auth_user', JSON.stringify(user));
       window.location.href = 'index.html';
-    }
+    }}
 
-    function toggleTheme() {
+    function toggleTheme() {{
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
       const next = cur === 'light' ? 'dark' : 'light';
       html.setAttribute('data-theme', next);
       localStorage.setItem('oryx_theme', next);
-    }
+    }}
     const saved = localStorage.getItem('oryx_theme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
   </script>
@@ -425,23 +466,22 @@ def generate_clean_isolated_system():
 
     # =========================================================================
     # 2. BORROWER PORTAL (index.html, my_loans.html, borrower.html)
-    # (Completely Clean, NO Admin Desk Links, Dynamic Isolated Session)
     # =========================================================================
-    borrower_html = """<!DOCTYPE html>
+    borrower_html = f"""<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Loans — Oryx Fund</title>
   <meta name="description" content="View your active loans, outstanding balances, and official M-Pesa Paybill payment instructions.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
+    :root {{
       --bg-page: #EAE0D8;
       --bg-surface: #FFFFFF;
       --bg-surface-alt: #F7F3EE;
@@ -459,9 +499,9 @@ def generate_clean_isolated_system():
       --card-shadow: 0 2px 12px rgba(31, 50, 36, 0.05);
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
-    }
+    }}
 
-    [data-theme="dark"], html.dark {
+    [data-theme="dark"], html.dark {{
       --bg-page: #080D0A;
       --bg-surface: #101712;
       --bg-surface-alt: #152019;
@@ -477,42 +517,41 @@ def generate_clean_isolated_system():
       --hero-bg: #101712;
       --hero-text: #FAF8F5;
       --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
+    }}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+    * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }}
 
-    body {
+    body {{
       font-family: var(--font-body);
       background-color: var(--bg-page);
       color: var(--text-primary);
       min-height: 100vh;
       line-height: 1.5;
       padding: 0 20px 60px;
-    }
+    }}
 
-    .portal-nav-wrap {
+    .portal-nav-wrap {{
       max-width: 1060px;
       margin: 20px auto 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
+    }}
 
-    .brand-logo-cluster {
+    .brand-logo-cluster {{
       display: flex;
       align-items: center;
-      gap: 8px;
       text-decoration: none;
       color: var(--text-primary);
-    }
+    }}
 
-    .nav-actions-cluster {
+    .nav-actions-cluster {{
       display: flex;
       align-items: center;
       gap: 10px;
-    }
+    }}
 
-    .nav-pill-btn {
+    .nav-pill-btn {{
       padding: 8px 18px;
       border-radius: 24px;
       font-size: 13px;
@@ -523,34 +562,34 @@ def generate_clean_isolated_system():
       gap: 6px;
       transition: all 0.15s ease;
       cursor: pointer;
-    }
+    }}
 
-    .nav-pill-active {
+    .nav-pill-active {{
       background: var(--primary);
       color: #FFFFFF !important;
       border: 1px solid var(--primary);
       box-shadow: 0 2px 8px rgba(31, 50, 36, 0.15);
-    }
+    }}
 
-    [data-theme="dark"] .nav-pill-active {
+    [data-theme="dark"] .nav-pill-active {{
       background: var(--accent-emerald);
       color: #000000 !important;
       border-color: var(--accent-emerald);
-    }
+    }}
 
-    .nav-pill-light {
+    .nav-pill-light {{
       background: var(--bg-surface);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
       box-shadow: var(--card-shadow);
-    }
+    }}
 
-    .nav-pill-light:hover {
+    .nav-pill-light:hover {{
       border-color: var(--accent-emerald);
       transform: translateY(-1px);
-    }
+    }}
 
-    .theme-icon-btn {
+    .theme-icon-btn {{
       width: 38px;
       height: 38px;
       border-radius: 50%;
@@ -563,9 +602,9 @@ def generate_clean_isolated_system():
       cursor: pointer;
       font-size: 15px;
       box-shadow: var(--card-shadow);
-    }
+    }}
 
-    .signout-btn {
+    .signout-btn {{
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-muted);
@@ -574,21 +613,21 @@ def generate_clean_isolated_system():
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-    }
-    .signout-btn:hover {
+    }}
+    .signout-btn:hover {{
       color: #DC2626;
       border-color: #DC2626;
-    }
+    }}
 
-    .portal-container {
+    .portal-container {{
       max-width: 1060px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 20px;
-    }
+    }}
 
-    .portal-hero-card {
+    .portal-hero-card {{
       background: var(--hero-bg);
       color: var(--hero-text);
       border-radius: 18px;
@@ -600,9 +639,9 @@ def generate_clean_isolated_system():
       gap: 20px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+    }}
 
-    .hero-pill-tag {
+    .hero-pill-tag {{
       background: rgba(255, 255, 255, 0.12);
       color: #FAF8F5;
       font-size: 11px;
@@ -612,13 +651,13 @@ def generate_clean_isolated_system():
       display: inline-block;
       letter-spacing: 0.5px;
       margin-bottom: 12px;
-    }
+    }}
 
-    .hero-title { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px; }
-    .hero-desc { font-size: 13.5px; color: #B4C6BA; max-width: 520px; line-height: 1.45; }
-    .hero-account-badge { font-size: 12px; color: #9DB4A5; margin-bottom: 12px; text-align: right; }
+    .hero-title {{ font-size: 24px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px; }}
+    .hero-desc {{ font-size: 13.5px; color: #B4C6BA; max-width: 520px; line-height: 1.45; }}
+    .hero-account-badge {{ font-size: 12px; color: #9DB4A5; margin-bottom: 12px; text-align: right; }}
 
-    .hero-apply-btn {
+    .hero-apply-btn {{
       background: #FFFFFF !important;
       color: #1F3224 !important;
       font-size: 13.5px;
@@ -630,15 +669,15 @@ def generate_clean_isolated_system():
       align-items: center;
       gap: 6px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    }
+    }}
 
-    .stats-kpi-row {
+    .stats-kpi-row {{
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
-    }
+    }}
 
-    .stat-kpi-card {
+    .stat-kpi-card {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 14px;
@@ -647,9 +686,9 @@ def generate_clean_isolated_system():
       align-items: center;
       gap: 16px;
       box-shadow: var(--card-shadow);
-    }
+    }}
 
-    .stat-icon-capsule {
+    .stat-icon-capsule {{
       width: 44px;
       height: 44px;
       border-radius: 10px;
@@ -660,32 +699,32 @@ def generate_clean_isolated_system():
       justify-content: center;
       color: var(--text-primary);
       font-size: 18px;
-    }
+    }}
 
-    .stat-label { font-size: 10.5px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; }
-    .stat-number { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+    .stat-label {{ font-size: 10.5px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.6px; text-transform: uppercase; }}
+    .stat-number {{ font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }}
 
-    .portal-section-card {
+    .portal-section-card {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 24px 28px;
       box-shadow: var(--card-shadow);
-    }
+    }}
 
-    .card-head-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
-    .card-head-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .card-head-title {{ font-size: 17px; font-weight: 700; color: var(--text-primary); }}
+    .card-head-desc {{ font-size: 13px; color: var(--text-secondary); margin-top: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }}
 
-    .empty-state-wrap {
+    .empty-state-wrap {{
       padding: 48px 20px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-    }
+    }}
 
-    .empty-icon-circle {
+    .empty-icon-circle {{
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -697,12 +736,12 @@ def generate_clean_isolated_system():
       margin-bottom: 14px;
       color: var(--text-muted);
       font-size: 22px;
-    }
+    }}
 
-    .empty-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
-    .empty-desc { font-size: 13px; color: var(--text-secondary); max-width: 440px; margin-bottom: 18px; line-height: 1.45; }
+    .empty-title {{ font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }}
+    .empty-desc {{ font-size: 13px; color: var(--text-secondary); max-width: 440px; margin-bottom: 18px; line-height: 1.45; }}
 
-    .btn-apply-green {
+    .btn-apply-green {{
       background: var(--primary) !important;
       color: #FFFFFF !important;
       font-size: 13px;
@@ -714,29 +753,28 @@ def generate_clean_isolated_system():
       align-items: center;
       gap: 6px;
       box-shadow: 0 2px 8px rgba(31, 50, 36, 0.15);
-    }
-    [data-theme="dark"] .btn-apply-green {
+    }}
+    [data-theme="dark"] .btn-apply-green {{
       background: var(--accent-emerald) !important;
       color: #000000 !important;
-    }
+    }}
 
-    @media (max-width: 768px) {
-      .stats-kpi-row { grid-template-columns: 1fr; }
-      .portal-hero-card { padding: 24px; }
-      .hero-account-badge { text-align: left; }
-    }
+    @media (max-width: 768px) {{
+      .stats-kpi-row {{ grid-template-columns: 1fr; }}
+      .portal-hero-card {{ padding: 24px; }}
+      .hero-account-badge {{ text-align: left; }}
+    }}
+
+    {logo_css}
   </style>
 </head>
 <body>
 
-  <!-- Borrower Navbar: ZERO Admin Links -->
+  <!-- Borrower Navbar: Real Logo Images for Light and Dark Modes -->
   <header class="portal-nav-wrap">
-    <a href="index.html" class="brand-logo-cluster">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="7" fill="#1F3224"/>
-        <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
-      </svg>
-      <span style="font-weight: 800; font-size: 17px; letter-spacing: -0.3px;">Oryx <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+    <a href="index.html" class="brand-logo-cluster" title="Oryx Fund">
+      <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-brand-logo oryx-logo-light-img">
+      <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-brand-logo oryx-logo-dark-img">
     </a>
 
     <div class="nav-actions-cluster">
@@ -816,41 +854,40 @@ def generate_clean_isolated_system():
   </main>
 
   <script>
-    function toggleTheme() {
+    function toggleTheme() {{
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
       const next = cur === 'light' ? 'dark' : 'light';
       html.setAttribute('data-theme', next);
       document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('oryx_theme', next);
-    }
+    }}
     const saved = localStorage.getItem('oryx_theme');
-    if (saved) {
+    if (saved) {{
       document.documentElement.setAttribute('data-theme', saved);
       document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
-    }
+    }}
 
-    function logoutBorrower() {
+    function logoutBorrower() {{
       localStorage.removeItem('oryx_auth_user');
       window.location.href = 'login.html';
-    }
+    }}
 
-    // Load active session
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
+    document.addEventListener('DOMContentLoaded', () => {{
+      try {{
         const user = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (user && user.email) {
+        if (user && user.email) {{
           document.getElementById('heroAccountText').innerText = 'Account: ' + user.email;
           document.getElementById('navUserPill').innerText = '👤 ' + (user.name || user.email.split('@')[0]);
           document.getElementById('signOutBtn').style.display = 'inline-block';
-        } else {
+        }} else {{
           document.getElementById('heroAccountText').innerText = 'Account: Not Signed In';
           document.getElementById('navUserPill').innerHTML = '🔑 Sign In';
           document.getElementById('navUserPill').href = 'login.html';
           document.getElementById('signOutBtn').style.display = 'none';
-        }
-      } catch(e) {}
-    });
+        }}
+      }} catch(e) {{}}
+    }});
   </script>
 </body>
 </html>
@@ -858,23 +895,22 @@ def generate_clean_isolated_system():
 
     # =========================================================================
     # 3. LOAN APPLICATION (apply.html)
-    # (Clean Borrower KYC, Dynamic Pre-fill, NO Admin Desk Links)
     # =========================================================================
-    apply_html = """<!DOCTYPE html>
+    apply_html = f"""<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loan Application — Oryx Fund</title>
   <meta name="description" content="Instant digital loan application portal for Oryx Fund.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
+    :root {{
       --bg-page: #EAE0D8;
       --bg-surface: #FFFFFF;
       --bg-surface-alt: #F7F3EE;
@@ -889,9 +925,9 @@ def generate_clean_isolated_system():
       --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
-    }
+    }}
 
-    [data-theme="dark"], html.dark {
+    [data-theme="dark"], html.dark {{
       --bg-page: #080D0A;
       --bg-surface: #101712;
       --bg-surface-alt: #16221A;
@@ -904,41 +940,40 @@ def generate_clean_isolated_system():
       --accent-green: #00D26A;
       --accent-emerald: #00D26A;
       --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-    }
+    }}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+    * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }}
 
-    body {
+    body {{
       font-family: var(--font-body);
       background-color: var(--bg-page);
       color: var(--text-primary);
       min-height: 100vh;
       padding: 0 20px 60px;
-    }
+    }}
 
-    .portal-nav-wrap {
+    .portal-nav-wrap {{
       max-width: 1060px;
       margin: 20px auto 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
+    }}
 
-    .brand-logo-cluster {
+    .brand-logo-cluster {{
       display: flex;
       align-items: center;
-      gap: 8px;
       text-decoration: none;
       color: var(--text-primary);
-    }
+    }}
 
-    .nav-actions-cluster {
+    .nav-actions-cluster {{
       display: flex;
       align-items: center;
       gap: 10px;
-    }
+    }}
 
-    .nav-pill-btn {
+    .nav-pill-btn {{
       padding: 8px 18px;
       border-radius: 24px;
       font-size: 13px;
@@ -947,25 +982,25 @@ def generate_clean_isolated_system():
       display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
+    }}
 
-    .nav-pill-active {
+    .nav-pill-active {{
       background: var(--primary);
       color: #FFFFFF !important;
       box-shadow: 0 2px 8px rgba(31, 50, 36, 0.15);
-    }
-    [data-theme="dark"] .nav-pill-active {
+    }}
+    [data-theme="dark"] .nav-pill-active {{
       background: var(--accent-emerald);
       color: #000000 !important;
-    }
+    }}
 
-    .nav-pill-light {
+    .nav-pill-light {{
       background: var(--bg-surface);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
-    }
+    }}
 
-    .theme-icon-btn {
+    .theme-icon-btn {{
       width: 38px;
       height: 38px;
       border-radius: 50%;
@@ -977,17 +1012,17 @@ def generate_clean_isolated_system():
       justify-content: center;
       cursor: pointer;
       font-size: 15px;
-    }
+    }}
 
-    .apply-container {
+    .apply-container {{
       max-width: 1060px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 20px;
-    }
+    }}
 
-    .apply-hero-bar {
+    .apply-hero-bar {{
       background: linear-gradient(135deg, #1F3224 0%, #101B13 100%);
       color: #FAF8F5;
       padding: 28px 32px;
@@ -996,29 +1031,29 @@ def generate_clean_isolated_system():
       justify-content: space-between;
       align-items: center;
       box-shadow: var(--card-shadow);
-    }
-    [data-theme="dark"] .apply-hero-bar {
+    }}
+    [data-theme="dark"] .apply-hero-bar {{
       background: linear-gradient(135deg, #101712 0%, #080D0A 100%);
       border: 1px solid var(--border-color);
-    }
+    }}
 
-    .oryx-card {
+    .oryx-card {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 28px 32px;
       box-shadow: var(--card-shadow);
-    }
+    }}
 
-    .calc-box {
+    .calc-box {{
       background: var(--bg-surface-alt);
       border: 1px solid var(--border-color);
       border-radius: 14px;
       padding: 24px;
       margin-top: 14px;
-    }
+    }}
 
-    .amount-slider {
+    .amount-slider {{
       width: 100%;
       height: 8px;
       border-radius: 4px;
@@ -1027,9 +1062,9 @@ def generate_clean_isolated_system():
       -webkit-appearance: none;
       cursor: pointer;
       margin: 14px 0;
-    }
+    }}
 
-    .amount-slider::-webkit-slider-thumb {
+    .amount-slider::-webkit-slider-thumb {{
       -webkit-appearance: none;
       width: 24px;
       height: 24px;
@@ -1038,16 +1073,16 @@ def generate_clean_isolated_system():
       cursor: pointer;
       border: 3px solid #FFFFFF;
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    }
+    }}
 
-    .preset-pills {
+    .preset-pills {{
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       margin-bottom: 20px;
-    }
+    }}
 
-    .pill-btn {
+    .pill-btn {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
@@ -1056,15 +1091,15 @@ def generate_clean_isolated_system():
       padding: 6px 14px;
       border-radius: 20px;
       cursor: pointer;
-    }
+    }}
 
-    .pill-btn.active {
+    .pill-btn.active {{
       border-color: var(--accent-emerald);
       color: var(--text-primary);
       background: rgba(0, 210, 106, 0.1);
-    }
+    }}
 
-    .metrics-live-hud {
+    .metrics-live-hud {{
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
@@ -1072,14 +1107,14 @@ def generate_clean_isolated_system():
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 16px 20px;
-    }
+    }}
 
-    .hud-title { font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
-    .hud-number { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--text-primary); margin-top: 4px; }
+    .hud-title {{ font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }}
+    .hud-number {{ font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--text-primary); margin-top: 4px; }}
 
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
-    .form-control {
+    .form-group {{ margin-bottom: 16px; }}
+    .form-label {{ display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }}
+    .form-control {{
       width: 100%;
       padding: 10px 14px;
       border-radius: 8px;
@@ -1089,15 +1124,15 @@ def generate_clean_isolated_system():
       font-size: 13.5px;
       font-family: var(--font-body);
       outline: none;
-    }
+    }}
 
-    .form-grid-3 {
+    .form-grid-3 {{
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
-    }
+    }}
 
-    .btn-submit-app {
+    .btn-submit-app {{
       background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
       color: #000000 !important;
       font-weight: 800 !important;
@@ -1111,23 +1146,22 @@ def generate_clean_isolated_system():
       box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
       cursor: pointer;
       border: none;
-    }
+    }}
 
-    @media (max-width: 768px) {
-      .metrics-live-hud, .form-grid-3 { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) {{
+      .metrics-live-hud, .form-grid-3 {{ grid-template-columns: 1fr; }}
+    }}
+
+    {logo_css}
   </style>
 </head>
 <body>
 
-  <!-- Borrower Navbar: ZERO Admin Links -->
+  <!-- Borrower Navbar: Real Logo Images for Light and Dark Modes -->
   <header class="portal-nav-wrap">
-    <a href="index.html" class="brand-logo-cluster">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="7" fill="#1F3224"/>
-        <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
-      </svg>
-      <span style="font-weight: 800; font-size: 17px; letter-spacing: -0.3px;">Oryx <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+    <a href="index.html" class="brand-logo-cluster" title="Oryx Fund">
+      <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-brand-logo oryx-logo-light-img">
+      <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-brand-logo oryx-logo-dark-img">
     </a>
 
     <div class="nav-actions-cluster">
@@ -1259,26 +1293,26 @@ def generate_clean_isolated_system():
   </main>
 
   <script>
-    function toggleTheme() {
+    function toggleTheme() {{
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
       const next = cur === 'light' ? 'dark' : 'light';
       html.setAttribute('data-theme', next);
       document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('oryx_theme', next);
-    }
+    }}
     const saved = localStorage.getItem('oryx_theme');
-    if (saved) {
+    if (saved) {{
       document.documentElement.setAttribute('data-theme', saved);
       document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
-    }
+    }}
 
-    function setVal(amt) {
+    function setVal(amt) {{
       document.getElementById('loanSlider').value = amt;
       calcLoan(amt);
-    }
+    }}
 
-    function calcLoan(val) {
+    function calcLoan(val) {{
       const amount = parseInt(val, 10);
       document.getElementById('amountDisplay').innerText = 'KES ' + amount.toLocaleString('en-US');
       const interest = Math.round(amount * 0.14 * (6 / 12));
@@ -1288,42 +1322,41 @@ def generate_clean_isolated_system():
       document.getElementById('hudInterest').innerText = 'KES ' + interest.toLocaleString('en-US');
       document.getElementById('hudMonthly').innerText = 'KES ' + monthly.toLocaleString('en-US') + ' / mo';
       document.getElementById('hudTotal').innerText = 'KES ' + total.toLocaleString('en-US');
-    }
+    }}
 
-    // Populate user from active session if logged in
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
+    document.addEventListener('DOMContentLoaded', () => {{
+      try {{
         const user = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (user) {
+        if (user) {{
           if (user.name && user.name !== 'Borrower') document.getElementById('appFullName').value = user.name;
-          if (user.email) {
+          if (user.email) {{
             document.getElementById('appEmail').value = user.email;
             document.getElementById('navUserPill').innerText = '👤 ' + (user.name || user.email.split('@')[0]);
-          }
-          if (user.phone) {
+          }}
+          if (user.phone) {{
             document.getElementById('appPhone').value = user.phone;
             document.getElementById('appDisbursalAccount').value = user.phone;
-          }
-          if (user.nationalId && user.nationalId !== 'Pending KYC') {
+          }}
+          if (user.nationalId && user.nationalId !== 'Pending KYC') {{
             document.getElementById('appNationalId').value = user.nationalId;
-          }
-        }
-      } catch(e) {}
-    });
+          }}
+        }}
+      }} catch(e) {{}}
+    }});
 
-    function submitLoanApplication() {
+    function submitLoanApplication() {{
       const amount = document.getElementById('hudPrincipal').innerText;
       const name = document.getElementById('appFullName').value.trim();
       const email = document.getElementById('appEmail').value.trim();
 
-      if (!name || !email) {
+      if (!name || !email) {{
         alert('Please provide your Full Legal Name and Email to submit.');
         return;
-      }
+      }}
 
       alert('🎉 Application for ' + amount + ' submitted successfully! Our credit team is reviewing your file.');
       window.location.href = 'index.html';
-    }
+    }}
   </script>
 </body>
 </html>
@@ -1331,23 +1364,22 @@ def generate_clean_isolated_system():
 
     # =========================================================================
     # 4. BORROWER PROFILE & ACCOUNT (my_account.html)
-    # (Completely Clean, NO Admin Desk Links)
     # =========================================================================
-    account_html = """<!DOCTYPE html>
+    account_html = f"""<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Account — Oryx Fund</title>
   <meta name="description" content="Manage your personal KYC, disbursement preferences, and security settings.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
+    :root {{
       --bg-page: #EAE0D8;
       --bg-surface: #FFFFFF;
       --bg-surface-alt: #F7F3EE;
@@ -1362,9 +1394,9 @@ def generate_clean_isolated_system():
       --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
       --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
-    }
+    }}
 
-    [data-theme="dark"], html.dark {
+    [data-theme="dark"], html.dark {{
       --bg-page: #080D0A;
       --bg-surface: #101712;
       --bg-surface-alt: #16221A;
@@ -1377,41 +1409,40 @@ def generate_clean_isolated_system():
       --accent-green: #00D26A;
       --accent-emerald: #00D26A;
       --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-    }
+    }}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
+    * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }}
 
-    body {
+    body {{
       font-family: var(--font-body);
       background-color: var(--bg-page);
       color: var(--text-primary);
       min-height: 100vh;
       padding: 0 20px 60px;
-    }
+    }}
 
-    .portal-nav-wrap {
+    .portal-nav-wrap {{
       max-width: 1060px;
       margin: 20px auto 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
+    }}
 
-    .brand-logo-cluster {
+    .brand-logo-cluster {{
       display: flex;
       align-items: center;
-      gap: 8px;
       text-decoration: none;
       color: var(--text-primary);
-    }
+    }}
 
-    .nav-actions-cluster {
+    .nav-actions-cluster {{
       display: flex;
       align-items: center;
       gap: 10px;
-    }
+    }}
 
-    .nav-pill-btn {
+    .nav-pill-btn {{
       padding: 8px 18px;
       border-radius: 24px;
       font-size: 13px;
@@ -1420,24 +1451,24 @@ def generate_clean_isolated_system():
       display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
+    }}
 
-    .nav-pill-active {
+    .nav-pill-active {{
       background: var(--primary);
       color: #FFFFFF !important;
-    }
-    [data-theme="dark"] .nav-pill-active {
+    }}
+    [data-theme="dark"] .nav-pill-active {{
       background: var(--accent-emerald);
       color: #000000 !important;
-    }
+    }}
 
-    .nav-pill-light {
+    .nav-pill-light {{
       background: var(--bg-surface);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
-    }
+    }}
 
-    .theme-icon-btn {
+    .theme-icon-btn {{
       width: 38px;
       height: 38px;
       border-radius: 50%;
@@ -1449,28 +1480,28 @@ def generate_clean_isolated_system():
       justify-content: center;
       cursor: pointer;
       font-size: 15px;
-    }
+    }}
 
-    .account-layout {
+    .account-layout {{
       max-width: 1060px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 20px;
-    }
+    }}
 
-    .oryx-card {
+    .oryx-card {{
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 28px;
       box-shadow: var(--card-shadow);
       margin-bottom: 20px;
-    }
+    }}
 
-    .form-group { margin-bottom: 16px; }
-    .form-label { font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; }
-    .form-control {
+    .form-group {{ margin-bottom: 16px; }}
+    .form-label {{ font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; }}
+    .form-control {{
       width: 100%;
       padding: 10px 14px;
       border-radius: 8px;
@@ -1480,9 +1511,9 @@ def generate_clean_isolated_system():
       font-size: 13.5px;
       font-family: var(--font-body);
       outline: none;
-    }
+    }}
 
-    .btn-save {
+    .btn-save {{
       background: var(--primary);
       color: #FFF !important;
       font-weight: 700;
@@ -1491,27 +1522,26 @@ def generate_clean_isolated_system():
       border-radius: 8px;
       border: none;
       cursor: pointer;
-    }
-    [data-theme="dark"] .btn-save {
+    }}
+    [data-theme="dark"] .btn-save {{
       background: var(--accent-emerald);
       color: #000 !important;
-    }
+    }}
 
-    @media (max-width: 768px) {
-      .account-layout { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) {{
+      .account-layout {{ grid-template-columns: 1fr; }}
+    }}
+
+    {logo_css}
   </style>
 </head>
 <body>
 
-  <!-- Borrower Navbar: ZERO Admin Links -->
+  <!-- Borrower Navbar: Real Logo Images for Light and Dark Modes -->
   <header class="portal-nav-wrap">
-    <a href="index.html" class="brand-logo-cluster">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="7" fill="#1F3224"/>
-        <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
-      </svg>
-      <span style="font-weight: 800; font-size: 17px; letter-spacing: -0.3px;">Oryx <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+    <a href="index.html" class="brand-logo-cluster" title="Oryx Fund">
+      <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-brand-logo oryx-logo-light-img">
+      <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-brand-logo oryx-logo-dark-img">
     </a>
 
     <div class="nav-actions-cluster">
@@ -1587,69 +1617,695 @@ def generate_clean_isolated_system():
   </main>
 
   <script>
-    function toggleTheme() {
+    function toggleTheme() {{
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'light';
       const next = cur === 'light' ? 'dark' : 'light';
       html.setAttribute('data-theme', next);
       document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('oryx_theme', next);
-    }
+    }}
     const saved = localStorage.getItem('oryx_theme');
-    if (saved) {
+    if (saved) {{
       document.documentElement.setAttribute('data-theme', saved);
       document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
-    }
+    }}
 
-    function logoutBorrower() {
+    function logoutBorrower() {{
       localStorage.removeItem('oryx_auth_user');
       window.location.href = 'login.html';
-    }
+    }}
 
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
+    document.addEventListener('DOMContentLoaded', () => {{
+      try {{
         const user = JSON.parse(localStorage.getItem('oryx_auth_user'));
-        if (user) {
+        if (user) {{
           if (user.name) document.getElementById('accName').value = user.name;
-          if (user.email) {
+          if (user.email) {{
             document.getElementById('accEmail').value = user.email;
             document.getElementById('navUserPill').innerText = '👤 ' + (user.name || user.email.split('@')[0]);
-          }
-          if (user.phone) {
+          }}
+          if (user.phone) {{
             document.getElementById('accPhone').value = user.phone;
             document.getElementById('accMpesa').value = user.phone;
-          }
+          }}
           if (user.nationalId) document.getElementById('accNationalId').value = user.nationalId;
-        } else {
+        }} else {{
           window.location.href = 'login.html';
-        }
-      } catch(e) {}
-    });
+        }}
+      }} catch(e) {{}}
+    }});
 
-    function saveProfile() {
-      try {
-        const user = JSON.parse(localStorage.getItem('oryx_auth_user')) || {};
+    function saveProfile() {{
+      try {{
+        const user = JSON.parse(localStorage.getItem('oryx_auth_user')) || {{}};
         user.name = document.getElementById('accName').value.trim();
         user.phone = document.getElementById('accPhone').value.trim();
         user.nationalId = document.getElementById('accNationalId').value.trim();
         localStorage.setItem('oryx_auth_user', JSON.stringify(user));
-        if (user.email) {
+        if (user.email) {{
           localStorage.setItem('oryx_borrower_' + user.email, JSON.stringify(user));
-        }
+        }}
         alert('Profile saved successfully!');
-      } catch(e) {}
-    }
+      }} catch(e) {{}}
+    }}
   </script>
 </body>
 </html>
 """
 
-    # 5. ADMIN DESK HTML (admin.html & desk.html) - Keep isolated
-    # Read existing admin.html
-    with open(f"{base_dir}/admin.html", "r") as f:
-        admin_html = f.read()
+    # =========================================================================
+    # 5. ADMIN DESK (admin.html & desk.html)
+    # =========================================================================
+    admin_html = f"""<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Dashboard — Oryx Fund Admin</title>
+  <meta name="description" content="Institutional credit and loan portfolio analytics dashboard for Oryx Fund.">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
 
-    # Write all clean files
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {{
+      --desk-bg: #090909;
+      --desk-sidebar-bg: #0D0D0D;
+      --desk-card-bg: #121212;
+      --desk-card-hover: #171717;
+      --desk-border: #1F1F1F;
+      --desk-border-light: #181818;
+      --text-main: #FAF8F5;
+      --text-sub: #9E9E9E;
+      --text-dim: #666666;
+      --accent-green: #34D399;
+      --accent-emerald: #00D26A;
+      --accent-red: #F87171;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }}
+
+    [data-theme="light"] {{
+      --desk-bg: #F4EFEB;
+      --desk-sidebar-bg: #EAE3DC;
+      --desk-card-bg: #FFFFFF;
+      --desk-card-hover: #F9F7F5;
+      --desk-border: #DFD5CB;
+      --desk-border-light: #E8E0D7;
+      --text-main: #1F3224;
+      --text-sub: #556B5D;
+      --text-dim: #829488;
+      --accent-green: #059669;
+      --accent-emerald: #059669;
+      --accent-red: #DC2626;
+    }}
+
+    * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }}
+
+    body {{
+      font-family: var(--font-body);
+      background-color: var(--desk-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }}
+
+    .desk-sidebar {{
+      width: 230px;
+      min-width: 230px;
+      background: var(--desk-sidebar-bg);
+      border-right: 1px solid var(--desk-border);
+      display: flex;
+      flex-direction: column;
+      padding: 14px 10px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+    }}
+
+    .desk-brand-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }}
+
+    .sidebar-search-box {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--desk-border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      cursor: pointer;
+    }}
+
+    .kbd-shortcut {{
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }}
+
+    .sidebar-item {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-sub);
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: 2px;
+    }}
+
+    .sidebar-item:hover {{
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }}
+
+    .sidebar-item.active {{
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-weight: 700;
+    }}
+
+    [data-theme="light"] .sidebar-item.active {{
+      background: rgba(0, 0, 0, 0.06);
+    }}
+
+    .sidebar-sub-item {{
+      padding: 5px 10px 5px 28px;
+      font-size: 12px;
+      color: var(--text-sub);
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+    }}
+    .sidebar-sub-item:hover {{ color: var(--text-main); }}
+
+    .sidebar-user-footer {{
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid var(--desk-border);
+      border-radius: 6px;
+    }}
+
+    .user-avatar-circle {{
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #E0561B;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }}
+
+    .desk-main {{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }}
+
+    .desk-topbar {{
+      height: 48px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--desk-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--desk-bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }}
+
+    .breadcrumb-wrap {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }}
+
+    .breadcrumb-current {{ font-weight: 700; color: var(--text-main); }}
+
+    .topbar-right {{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }}
+
+    .desk-canvas {{
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }}
+
+    .number-cards-grid {{
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }}
+
+    .number-card {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      position: relative;
+      transition: all 0.15s ease;
+    }}
+
+    .number-card:hover {{
+      background: var(--desk-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }}
+
+    .card-title {{
+      font-size: 11.5px;
+      color: var(--text-sub);
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }}
+
+    .card-val {{
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 6px;
+    }}
+
+    .card-val.green {{ color: var(--accent-green); }}
+    .card-val.red {{ color: var(--accent-red); }}
+
+    .highlight-cards-row {{
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }}
+
+    .charts-grid-row {{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }}
+
+    .chart-card {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }}
+
+    .chart-header {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }}
+
+    .chart-title-text {{ font-size: 13.5px; font-weight: 700; color: var(--text-main); }}
+    .chart-meta-filter {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }}
+
+    .chart-canvas-mock {{
+      height: 180px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 24px;
+    }}
+
+    .chart-grid-line {{
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.04);
+    }}
+
+    .chart-axis-labels {{
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }}
+
+    .chart-svg-line {{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }}
+
+    @media (max-width: 1200px) {{
+      .number-cards-grid, .highlight-cards-row {{ grid-template-columns: repeat(3, 1fr); }}
+      .charts-grid-row {{ grid-template-columns: 1fr; }}
+    }}
+
+    {logo_css}
+  </style>
+</head>
+<body>
+
+  <!-- Left Sidebar -->
+  <aside class="desk-sidebar">
+    <a href="#" class="desk-brand-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-desk-logo oryx-logo-light-img">
+        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-desk-logo oryx-logo-dark-img">
+      </div>
+      <span style="font-size: 11px; color: var(--text-dim);">▼</span>
+    </a>
+
+    <div class="sidebar-search-box">
+      <span>🔍 Search</span>
+      <span class="kbd-shortcut">Ctrl+K</span>
+    </div>
+
+    <div class="sidebar-item">
+      <span>🔔 Notification</span>
+    </div>
+
+    <div class="sidebar-item active">
+      <span>📊 Dashboard</span>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <div class="sidebar-item">
+        <span>⚙️ Setup</span>
+        <span style="font-size: 10px;">▼</span>
+      </div>
+      <a class="sidebar-sub-item">Company</a>
+      <a class="sidebar-sub-item">Loan Product</a>
+      <a class="sidebar-sub-item">Charges</a>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <div class="sidebar-item">
+        <span>📂 Loan Management</span>
+        <span style="font-size: 10px;">▼</span>
+      </div>
+      <a class="sidebar-sub-item">Loan</a>
+      <a class="sidebar-sub-item">Loan Disbursement</a>
+      <a class="sidebar-sub-item">Loan Repayment Schedule</a>
+      <a class="sidebar-sub-item">Loan Transfer</a>
+      <a class="sidebar-sub-item">Loan Restructure</a>
+      <a class="sidebar-sub-item">Loan Repayment</a>
+      <a class="sidebar-sub-item">Loan Demand</a>
+      <a class="sidebar-sub-item">Loan Interest Accrual</a>
+      <a class="sidebar-sub-item">Loan Write Off</a>
+      <a class="sidebar-sub-item">DPD Log</a>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <div class="sidebar-item">
+        <span>👥 Loan Origination</span>
+        <span style="font-size: 10px;">▼</span>
+      </div>
+      <a class="sidebar-sub-item">Customer</a>
+      <a class="sidebar-sub-item">Loan Application</a>
+    </div>
+
+    <div style="margin-top: 6px;">
+      <div class="sidebar-item">
+        <span>🔒 Security Management</span>
+        <span style="font-size: 10px;">▼</span>
+      </div>
+      <a class="sidebar-sub-item">Loan Security Type</a>
+      <a class="sidebar-sub-item">Loan Security</a>
+      <a class="sidebar-sub-item">Loan Security Price</a>
+      <a class="sidebar-sub-item">Loan Security Assignment</a>
+      <a class="sidebar-sub-item">Loan Security Release</a>
+      <a class="sidebar-sub-item">Sanctioned Loan Amount</a>
+    </div>
+
+    <div class="sidebar-user-footer">
+      <div class="user-avatar-circle">OF</div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700;">Oryx Fund Admin</div>
+        <div style="font-size: 9px; color: var(--text-sub);">admin@oryxfund.co.ke</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Desk View -->
+  <main class="desk-main">
+    
+    <header class="desk-topbar">
+      <div class="breadcrumb-wrap">
+        <span>🏠</span>
+        <span>/</span>
+        <span>Dashboard</span>
+        <span>/</span>
+        <span class="breadcrumb-current">Loan Dashboard</span>
+      </div>
+
+      <div class="topbar-right">
+        <button class="theme-icon-btn" onclick="toggleAdminTheme()" id="adminThemeBtn" style="width: 32px; height: 32px; font-size: 14px; background: transparent; border: 1px solid var(--desk-border); color: var(--text-main); cursor: pointer; border-radius: 6px;" title="Toggle Light / Dark Mode">☀️</button>
+        <span style="font-size: 14px; color: var(--text-dim); cursor: pointer;">•••</span>
+      </div>
+    </header>
+
+    <div class="desk-canvas">
+      
+      <div class="number-cards-grid">
+        <div class="number-card">
+          <div class="card-title"><span>New Loans</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Active Loans</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Closed Loans</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Total Disbursed</span> <span>•••</span></div>
+          <div class="card-val">Sh 0.00</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Open Loan Applications</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+      </div>
+
+      <div class="number-cards-grid">
+        <div class="number-card">
+          <div class="card-title"><span>New Loan Applications</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Total Sanctioned Amount</span> <span>•••</span></div>
+          <div class="card-val">Sh 0.00</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Active Securities</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Applicants With Unpaid Shortfall</span> <span>•••</span></div>
+          <div class="card-val">0</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Total Shortfall Amount</span> <span>•••</span></div>
+          <div class="card-val">Sh 0.00</div>
+        </div>
+      </div>
+
+      <div class="highlight-cards-row">
+        <div class="number-card">
+          <div class="card-title"><span>Total Repayment</span> <span>•••</span></div>
+          <div class="card-val green">Sh 0.00</div>
+        </div>
+        <div class="number-card">
+          <div class="card-title"><span>Total Write Off</span> <span>•••</span></div>
+          <div class="card-val red">Sh 0.00</div>
+        </div>
+      </div>
+
+      <div class="charts-grid-row">
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title-text">New Loans</div>
+              <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Last synced just now</div>
+            </div>
+            <div class="chart-meta-filter">
+              <span>📅 Last Month</span>
+              <span>:</span>
+              <span>Daily</span>
+              <span>:</span>
+              <span>•••</span>
+            </div>
+          </div>
+          <div class="chart-canvas-mock">
+            <div class="chart-grid-line" style="top: 20%;"></div>
+            <div class="chart-grid-line" style="top: 50%;"></div>
+            <div class="chart-grid-line" style="top: 80%;"></div>
+            <svg class="chart-svg-line" viewBox="0 0 500 150">
+              <path d="M 0 130 L 500 130" stroke="#00D26A" stroke-width="2" fill="none" opacity="0.6"/>
+            </svg>
+            <div class="chart-axis-labels">
+              <span>26-07-2026</span>
+              <span>30-07-2026</span>
+              <span>07-08-2026</span>
+              <span>15-08-2026</span>
+              <span>23-08-2026</span>
+              <span>26-08-2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title-text">Loan Disbursements</div>
+              <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Last synced just now</div>
+            </div>
+            <div class="chart-meta-filter">
+              <span>📅 Last Month</span>
+              <span>:</span>
+              <span>Daily</span>
+              <span>:</span>
+              <span>•••</span>
+            </div>
+          </div>
+          <div class="chart-canvas-mock">
+            <div class="chart-grid-line" style="top: 20%;"></div>
+            <div class="chart-grid-line" style="top: 50%;"></div>
+            <div class="chart-grid-line" style="top: 80%;"></div>
+            <svg class="chart-svg-line" viewBox="0 0 500 150">
+              <path d="M 0 130 L 500 130" stroke="#00D26A" stroke-width="2" fill="none" opacity="0.6"/>
+            </svg>
+            <div class="chart-axis-labels">
+              <span>26-07-2026</span>
+              <span>30-07-2026</span>
+              <span>07-08-2026</span>
+              <span>15-08-2026</span>
+              <span>23-08-2026</span>
+              <span>26-08-2026</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="charts-grid-row">
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title-text">Top 10 Pledged Loan Securities</div>
+              <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Last synced just now</div>
+            </div>
+            <div class="chart-meta-filter">
+              <span>Filter</span>
+              <span>•••</span>
+            </div>
+          </div>
+          <div class="chart-canvas-mock">
+            <div style="margin: auto; font-size: 12px; color: var(--text-dim);">No pledged securities recorded</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title-text">Loan Interest Accrual</div>
+              <div style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">Last synced just now</div>
+            </div>
+            <div class="chart-meta-filter">
+              <span>📅 Last Year</span>
+              <span>:</span>
+              <span>Monthly</span>
+              <span>:</span>
+              <span>•••</span>
+            </div>
+          </div>
+          <div class="chart-canvas-mock">
+            <div class="chart-grid-line" style="top: 20%;"></div>
+            <div class="chart-grid-line" style="top: 50%;"></div>
+            <div class="chart-grid-line" style="top: 80%;"></div>
+            <svg class="chart-svg-line" viewBox="0 0 500 150">
+              <path d="M 0 130 L 500 130" stroke="#00D26A" stroke-width="2.5" fill="none"/>
+            </svg>
+            <div class="chart-axis-labels">
+              <span>Aug 2025</span>
+              <span>Oct 2025</span>
+              <span>Dec 2025</span>
+              <span>Feb 2026</span>
+              <span>Apr 2026</span>
+              <span>Jun 2026</span>
+              <span>Aug 2026</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function toggleAdminTheme() {{
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      html.classList.toggle('dark', next === 'dark');
+      document.getElementById('adminThemeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('oryx_admin_theme', next);
+    }}
+  </script>
+</body>
+</html>
+"""
+
+    # Write all files
     with open(f"{base_dir}/login.html", "w") as f:
         f.write(login_html)
     with open(f"{base_dir}/index.html", "w") as f:
@@ -1662,8 +2318,12 @@ def generate_clean_isolated_system():
         f.write(apply_html)
     with open(f"{base_dir}/my_account.html", "w") as f:
         f.write(account_html)
+    with open(f"{base_dir}/admin.html", "w") as f:
+        f.write(admin_html)
+    with open(f"{base_dir}/desk.html", "w") as f:
+        f.write(admin_html)
 
-    print("Clean isolated borrower & auth system generated successfully!")
+    print("All pages updated with correct light and dark mode logo images!")
 
 if __name__ == '__main__':
     generate_clean_isolated_system()
