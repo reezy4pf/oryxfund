@@ -6,17 +6,23 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "applicant_contact_info_section",
-  "applicant_email_address",
-  "column_break_dxiv",
-  "applicant_phone_number",
   "applicant_details_section",
   "applicant_type",
   "applicant",
   "applicant_name",
+  "national_id_or_passport",
+  "kra_pin",
   "column_break_2",
   "company",
   "posting_date",
+  "date_of_birth",
+  "gender",
+  "residence_status",
+  "applicant_contact_info_section",
+  "applicant_email_address",
+  "applicant_phone_number",
+  "column_break_dxiv",
+  "alternative_phone_number",
   "applicant_address_details_section",
   "address_line_1",
   "address_line_2",
@@ -25,10 +31,42 @@
   "city",
   "state",
   "country",
-  "co_applicants_section",
-  "co_applicants",
+  "next_of_kin_section",
+  "next_of_kin_name",
+  "next_of_kin_relation",
+  "column_break_nok",
+  "next_of_kin_phone",
+  "disbursal_details_section",
+  "disbursal_method",
+  "disbursal_mpesa_number",
+  "column_break_disb",
+  "disbursal_bank_name",
+  "disbursal_bank_branch",
+  "disbursal_account_number",
+  "disbursal_account_name",
+  "employment_details_section",
+  "employment_status",
+  "employer_or_business_name",
+  "job_title_or_nature_of_business",
+  "work_physical_address",
+  "work_phone",
+  "column_break_cashflow",
+  "monthly_net_income",
+  "monthly_debt_obligations",
+  "monthly_fixed_expenses",
+  "net_disposable_income",
+  "guarantor_section",
+  "guarantor_full_name",
+  "guarantor_national_id",
+  "guarantor_kra_pin",
+  "column_break_guar",
+  "guarantor_phone",
+  "guarantor_employer_or_business",
+  "guarantor_monthly_income",
   "section_break_4",
   "status",
+  "is_subsequent_loan",
+  "previous_loan_application",
   "loan_product",
   "loan_amount",
   "rate_of_interest",
@@ -46,9 +84,17 @@
   "repayment_periods",
   "repayment_amount",
   "total_payable_interest",
+  "appraisal_section",
+  "crb_status",
+  "crb_score_notes",
+  "column_break_consent",
+  "data_protection_consent",
+  "crb_authorization_consent",
   "amended_from",
   "documents_tab",
   "documents",
+  "co_applicants_section",
+  "co_applicants",
   "connections_tab"
  ],
  "fields": [
@@ -71,23 +117,31 @@
    "read_only_depends_on": "eval: doc.applicant_type === \"Customer\""
   },
   {
-   "fieldname": "column_break_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Today",
-   "fieldname": "posting_date",
-   "fieldtype": "Date",
-   "label": "Application Date",
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "applicant_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "label": "Full Name",
    "reqd": 1
   },
   {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "no_copy": 1,
-   "options": "Open\nApproved\nRejected",
-   "permlevel": 1
+   "fieldname": "national_id_or_passport",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "National ID / Passport No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "kra_pin",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "KRA PIN",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "company",
@@ -98,14 +152,310 @@
    "reqd": 1
   },
   {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Application Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale"
+  },
+  {
+   "fieldname": "residence_status",
+   "fieldtype": "Select",
+   "label": "Residence Status",
+   "options": "\nOwned\nRented\nFamily Owned\nMortgaged"
+  },
+  {
+   "fieldname": "applicant_contact_info_section",
+   "fieldtype": "Section Break",
+   "label": "Primary Applicant Contact Info"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "applicant_email_address",
+   "fieldtype": "Data",
+   "label": "Applicant Email Address",
+   "options": "Email"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "applicant_phone_number",
+   "fieldtype": "Phone",
+   "in_list_view": 1,
+   "label": "Applicant Phone Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_dxiv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "alternative_phone_number",
+   "fieldtype": "Phone",
+   "label": "Alternative Phone Number"
+  },
+  {
+   "fieldname": "applicant_address_details_section",
+   "fieldtype": "Section Break",
+   "label": "Primary Applicant Address Details"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "address_line_1",
+   "fieldtype": "Data",
+   "label": "Residential Physical Address"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "address_line_2",
+   "fieldtype": "Data",
+   "label": "Estate / House No / Landmark"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "zip_code",
+   "fieldtype": "Data",
+   "label": "Postal Code"
+  },
+  {
+   "fieldname": "column_break_axte",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City / Town"
+  },
+  {
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "County"
+  },
+  {
+   "default": "Kenya",
+   "depends_on": "eval: doc.applicant_type == \"Customer\"",
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "next_of_kin_section",
+   "fieldtype": "Section Break",
+   "label": "Next of Kin Details"
+  },
+  {
+   "fieldname": "next_of_kin_name",
+   "fieldtype": "Data",
+   "label": "Next of Kin Name"
+  },
+  {
+   "fieldname": "next_of_kin_relation",
+   "fieldtype": "Data",
+   "label": "Relationship"
+  },
+  {
+   "fieldname": "column_break_nok",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "next_of_kin_phone",
+   "fieldtype": "Phone",
+   "label": "Next of Kin Phone"
+  },
+  {
+   "fieldname": "disbursal_details_section",
+   "fieldtype": "Section Break",
+   "label": "Disbursal Account Destination"
+  },
+  {
+   "default": "M-Pesa",
+   "fieldname": "disbursal_method",
+   "fieldtype": "Select",
+   "label": "Disbursal Method",
+   "options": "M-Pesa\nBank Transfer"
+  },
+  {
+   "depends_on": "eval: doc.disbursal_method == 'M-Pesa'",
+   "fieldname": "disbursal_mpesa_number",
+   "fieldtype": "Phone",
+   "label": "M-Pesa Disbursal Phone Number"
+  },
+  {
+   "fieldname": "column_break_disb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.disbursal_method == 'Bank Transfer'",
+   "fieldname": "disbursal_bank_name",
+   "fieldtype": "Data",
+   "label": "Bank Name"
+  },
+  {
+   "depends_on": "eval: doc.disbursal_method == 'Bank Transfer'",
+   "fieldname": "disbursal_bank_branch",
+   "fieldtype": "Data",
+   "label": "Bank Branch"
+  },
+  {
+   "depends_on": "eval: doc.disbursal_method == 'Bank Transfer'",
+   "fieldname": "disbursal_account_number",
+   "fieldtype": "Data",
+   "label": "Bank Account Number"
+  },
+  {
+   "depends_on": "eval: doc.disbursal_method == 'Bank Transfer'",
+   "fieldname": "disbursal_account_name",
+   "fieldtype": "Data",
+   "label": "Account Holder Name"
+  },
+  {
+   "fieldname": "employment_details_section",
+   "fieldtype": "Section Break",
+   "label": "Employment & Monthly Cashflow"
+  },
+  {
+   "fieldname": "employment_status",
+   "fieldtype": "Select",
+   "label": "Employment Status",
+   "options": "\nPermanent / Salaried\nContract\nSelf-Employed / Business Owner\nOther"
+  },
+  {
+   "fieldname": "employer_or_business_name",
+   "fieldtype": "Data",
+   "label": "Employer / Business Name"
+  },
+  {
+   "fieldname": "job_title_or_nature_of_business",
+   "fieldtype": "Data",
+   "label": "Job Title / Business Nature"
+  },
+  {
+   "fieldname": "work_physical_address",
+   "fieldtype": "Data",
+   "label": "Workplace Physical Address"
+  },
+  {
+   "fieldname": "work_phone",
+   "fieldtype": "Phone",
+   "label": "Workplace Phone"
+  },
+  {
+   "fieldname": "column_break_cashflow",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "monthly_net_income",
+   "fieldtype": "Currency",
+   "label": "Monthly Net Income (KES)",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "monthly_debt_obligations",
+   "fieldtype": "Currency",
+   "label": "Monthly Debt Obligations (KES)",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "monthly_fixed_expenses",
+   "fieldtype": "Currency",
+   "label": "Monthly Living Expenses (KES)",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "fieldname": "net_disposable_income",
+   "fieldtype": "Currency",
+   "label": "Net Disposable Income (KES)",
+   "options": "Company:company:default_currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "guarantor_section",
+   "fieldtype": "Section Break",
+   "label": "Guarantor Details"
+  },
+  {
+   "fieldname": "guarantor_full_name",
+   "fieldtype": "Data",
+   "label": "Guarantor Full Name"
+  },
+  {
+   "fieldname": "guarantor_national_id",
+   "fieldtype": "Data",
+   "label": "Guarantor National ID"
+  },
+  {
+   "fieldname": "guarantor_kra_pin",
+   "fieldtype": "Data",
+   "label": "Guarantor KRA PIN"
+  },
+  {
+   "fieldname": "column_break_guar",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "guarantor_phone",
+   "fieldtype": "Phone",
+   "label": "Guarantor Phone Number"
+  },
+  {
+   "fieldname": "guarantor_employer_or_business",
+   "fieldtype": "Data",
+   "label": "Guarantor Employer / Business"
+  },
+  {
+   "fieldname": "guarantor_monthly_income",
+   "fieldtype": "Currency",
+   "label": "Guarantor Monthly Income (KES)",
+   "options": "Company:company:default_currency"
+  },
+  {
    "fieldname": "section_break_4",
    "fieldtype": "Section Break",
-   "label": "Loan Info"
+   "label": "Loan Terms & Specifications"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "Open\nApproved\nRejected",
+   "permlevel": 0
+  },
+  {
+   "default": "0",
+   "fieldname": "is_subsequent_loan",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Is Subsequent / Repeat Loan"
+  },
+  {
+   "depends_on": "eval:doc.is_subsequent_loan == 1",
+   "fieldname": "previous_loan_application",
+   "fieldtype": "Link",
+   "label": "Previous Loan Application",
+   "options": "Loan Application"
   },
   {
    "fieldname": "loan_product",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Loan Product",
    "options": "Loan Product",
    "reqd": 1
@@ -115,74 +465,33 @@
    "fieldname": "loan_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Loan Amount",
-   "options": "Company:company:default_currency"
+   "label": "Loan Amount (KES)",
+   "options": "Company:company:default_currency",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "loan_product.rate_of_interest",
+   "fieldname": "rate_of_interest",
+   "fieldtype": "Percent",
+   "label": "Rate of Interest (% per annum)",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_7",
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.is_term_loan == 1",
-   "fieldname": "repayment_info",
-   "fieldtype": "Section Break",
-   "label": "Repayment Info"
-  },
-  {
-   "default": "Repay Over Number of Periods",
-   "depends_on": "eval: doc.is_term_loan == 1",
-   "fetch_if_empty": 1,
-   "fieldname": "repayment_method",
-   "fieldtype": "Select",
-   "label": "Repayment Method",
-   "options": "\nRepay Fixed Amount per Period\nRepay Over Number of Periods"
-  },
-  {
-   "fetch_from": "loan_product.rate_of_interest",
-   "fieldname": "rate_of_interest",
-   "fieldtype": "Percent",
-   "label": "Rate of Interest",
-   "read_only": 1
-  },
-  {
-   "depends_on": "is_term_loan",
-   "fieldname": "total_payable_interest",
-   "fieldtype": "Currency",
-   "label": "Total Payable Interest",
-   "options": "Company:company:default_currency",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_11",
-   "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "repayment_method",
-   "fieldname": "repayment_amount",
-   "fieldtype": "Currency",
-   "label": "Monthly Repayment Amount",
-   "options": "Company:company:default_currency"
-  },
-  {
-   "depends_on": "repayment_method",
-   "fieldname": "repayment_periods",
-   "fieldtype": "Int",
-   "label": "Repayment Period in Months"
-  },
-  {
-   "fieldname": "total_payable_amount",
-   "fieldtype": "Currency",
-   "label": "Total Payable Amount",
-   "options": "Company:company:default_currency",
-   "read_only": 1
-  },
-  {
-   "fieldname": "amended_from",
+   "fieldname": "loan_purpose",
    "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Loan Application",
-   "print_hide": 1,
+   "label": "Loan Purpose",
+   "options": "Loan Purpose"
+  },
+  {
+   "default": "0",
+   "fetch_from": "loan_product.is_term_loan",
+   "fieldname": "is_term_loan",
+   "fieldtype": "Check",
+   "label": "Is Term Loan",
    "read_only": 1
   },
   {
@@ -212,87 +521,95 @@
    "read_only": 1
   },
   {
-   "default": "0",
-   "fetch_from": "loan_product.is_term_loan",
-   "fieldname": "is_term_loan",
-   "fieldtype": "Check",
-   "label": "Is Term Loan",
+   "depends_on": "eval: doc.is_term_loan == 1",
+   "fieldname": "repayment_info",
+   "fieldtype": "Section Break",
+   "label": "Repayment Calculation Info"
+  },
+  {
+   "default": "Repay Over Number of Periods",
+   "depends_on": "eval: doc.is_term_loan == 1",
+   "fetch_if_empty": 1,
+   "fieldname": "repayment_method",
+   "fieldtype": "Select",
+   "label": "Repayment Method",
+   "options": "\nRepay Fixed Amount per Period\nRepay Over Number of Periods"
+  },
+  {
+   "fieldname": "total_payable_amount",
+   "fieldtype": "Currency",
+   "label": "Total Payable Amount",
+   "options": "Company:company:default_currency",
    "read_only": 1
   },
   {
-   "fieldname": "applicant_details_section",
-   "fieldtype": "Section Break",
-   "label": "Primary Applicant Details"
-  },
-  {
-   "fieldname": "applicant_contact_info_section",
-   "fieldtype": "Section Break",
-   "label": "Primary Applicant Contact Info"
-  },
-  {
-   "fieldname": "column_break_dxiv",
+   "fieldname": "column_break_11",
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "applicant_email_address",
-   "fieldtype": "Data",
-   "label": "Applicant Email Address",
-   "mandatory_depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "options": "Email"
-  },
-  {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "applicant_phone_number",
-   "fieldtype": "Phone",
-   "label": "Applicant Phone Number",
-   "mandatory_depends_on": "eval: doc.applicant_type == \"Customer\""
-  },
-  {
-   "fieldname": "applicant_address_details_section",
-   "fieldtype": "Section Break",
-   "label": "Primary Applicant Address Details"
-  },
-  {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "address_line_1",
-   "fieldtype": "Data",
-   "label": "Address Line 1"
-  },
-  {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "address_line_2",
-   "fieldtype": "Data",
-   "label": "Address Line 2"
-  },
-  {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "zip_code",
+   "depends_on": "repayment_method",
+   "fieldname": "repayment_periods",
    "fieldtype": "Int",
-   "label": "ZIP Code"
+   "label": "Repayment Period in Months"
   },
   {
-   "fieldname": "column_break_axte",
+   "depends_on": "repayment_method",
+   "fieldname": "repayment_amount",
+   "fieldtype": "Currency",
+   "label": "Monthly Repayment Amount",
+   "options": "Company:company:default_currency"
+  },
+  {
+   "depends_on": "is_term_loan",
+   "fieldname": "total_payable_interest",
+   "fieldtype": "Currency",
+   "label": "Total Payable Interest",
+   "options": "Company:company:default_currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "appraisal_section",
+   "fieldtype": "Section Break",
+   "label": "Official Credit Appraisal & Bureau (CRB)"
+  },
+  {
+   "default": "Not Checked",
+   "fieldname": "crb_status",
+   "fieldtype": "Select",
+   "label": "CRB Listing Status",
+   "options": "Not Checked\nClean / High Score\nListed / Delinquent\nNo Record"
+  },
+  {
+   "fieldname": "crb_score_notes",
+   "fieldtype": "Small Text",
+   "label": "Underwriter Appraisal Notes"
+  },
+  {
+   "fieldname": "column_break_consent",
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "city",
-   "fieldtype": "Data",
-   "label": "City"
+   "default": "1",
+   "fieldname": "data_protection_consent",
+   "fieldtype": "Check",
+   "label": "Data Protection Act 2019 Consent Granted",
+   "read_only": 0
   },
   {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "state",
-   "fieldtype": "Data",
-   "label": "State"
+   "default": "1",
+   "fieldname": "crb_authorization_consent",
+   "fieldtype": "Check",
+   "label": "CRB Check Authorization Granted",
+   "read_only": 0
   },
   {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "country",
+   "fieldname": "amended_from",
    "fieldtype": "Link",
-   "label": "Country",
-   "options": "Country"
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Loan Application",
+   "print_hide": 1,
+   "read_only": 1
   },
   {
    "fieldname": "documents_tab",
@@ -316,29 +633,16 @@
    "options": "Loan Co-Applicants"
   },
   {
-   "depends_on": "eval: doc.applicant_type == \"Customer\"",
-   "fieldname": "applicant_name",
-   "fieldtype": "Data",
-   "in_global_search": 1,
-   "label": "First Name"
-  },
-  {
    "fieldname": "connections_tab",
    "fieldtype": "Tab Break",
    "label": "Connections",
    "show_dashboard": 1
-  },
-  {
-   "fieldname": "loan_purpose",
-   "fieldtype": "Link",
-   "label": "Loan Purpose",
-   "options": "Loan Purpose"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-02 16:03:38.065821",
+ "modified": "2026-08-25 14:25:00.000000",
  "modified_by": "Administrator",
  "module": "Loan Management",
  "name": "Loan Application",
@@ -383,37 +687,6 @@
    "write": 1
   },
   {
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Loan Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Loan Reporter"
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Employee",
-   "share": 1
-  },
-  {
    "cancel": 1,
    "create": 1,
    "delete": 1,
@@ -426,14 +699,26 @@
    "share": 1,
    "submit": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Customer",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Guest",
+   "write": 1
   }
  ],
  "row_format": "Dynamic",
- "search_fields": "applicant_type, applicant, loan_product, loan_amount",
+ "search_fields": "applicant_type, applicant, applicant_name, national_id_or_passport, kra_pin, loan_product, loan_amount",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
  "timeline_field": "applicant",
- "title_field": "applicant",
+ "title_field": "applicant_name",
  "track_changes": 1
 }

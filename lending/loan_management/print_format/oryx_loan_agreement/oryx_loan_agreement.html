@@ -1,0 +1,486 @@
+{% set customer = frappe.get_doc("Customer", doc.applicant) if doc.applicant else None %}
+{% set loan_app = frappe.db.get_value("Loan Application", {"applicant": doc.applicant, "loan_product": doc.loan_product}, ["name", "national_id_or_passport", "kra_pin", "guarantor_full_name", "guarantor_national_id", "guarantor_phone", "next_of_kin_name", "next_of_kin_phone", "disbursal_method", "disbursal_mpesa_number", "disbursal_bank_name", "disbursal_account_number"], as_dict=1) or {} %}
+
+<div class="contract-doc">
+  <!-- Contract Header -->
+  <div class="contract-header">
+    <div class="header-left">
+      <img src="/files/oryx_logo_light.png" alt="Oryx Fund" style="height: 42px; max-width: 180px; object-fit: contain; margin-bottom: 6px;">
+      <div class="brand-tagline">Credit & Micro-Finance Solutions</div>
+      <div class="brand-address">Nairobi, Kenya | info@oryxfund.co.ke</div>
+    </div>
+    <div class="header-right">
+      <div class="doc-badge">FACILITY AGREEMENT</div>
+      <div class="meta-item"><span class="m-k">Agreement Ref:</span> <span class="m-v">{{ doc.name }}</span></div>
+      <div class="meta-item"><span class="m-k">Offer Date:</span> <span class="m-v">{{ frappe.utils.format_date(doc.posting_date or doc.creation) }}</span></div>
+      {% if loan_app.name %}
+      <div class="meta-item"><span class="m-k">Application Ref:</span> <span class="m-v">{{ loan_app.name }}</span></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="contract-title-bar">
+    <h2>LOAN FACILITY AGREEMENT & TERMS OF BORROWING</h2>
+    <p>Governed under the Laws of Kenya and the Data Protection Act (2019)</p>
+  </div>
+
+  <!-- Parties -->
+  <div class="clause-section">
+    <div class="clause-heading">1. THE PARTIES</div>
+    <p class="clause-text">This Loan Agreement is made and entered into on this <b>{{ frappe.utils.format_date(doc.posting_date or doc.creation) }}</b> between:</p>
+    
+    <div class="parties-grid">
+      <div class="party-box">
+        <div class="party-role">THE LENDER</div>
+        <div class="party-name">ORYX FUND LIMITED</div>
+        <div class="party-detail">A micro-lending financial company incorporated under the Companies Act of Kenya, having its principal place of business in Nairobi, Kenya (hereinafter referred to as the <i>"Lender"</i>).</div>
+      </div>
+      <div class="party-box">
+        <div class="party-role">THE BORROWER</div>
+        <div class="party-name">{{ customer.customer_name if customer else doc.applicant_name or "Valued Borrower" }}</div>
+        <div class="party-detail">
+          <b>National ID / Passport:</b> {{ loan_app.national_id_or_passport or "Provided on File" }}<br>
+          <b>KRA PIN:</b> {{ customer.tax_id if customer else loan_app.kra_pin or "Provided on File" }}<br>
+          <b>Mobile Phone:</b> {{ customer.mobile_no if customer else "Provided on File" }}<br>
+          <b>Email:</b> {{ customer.email_id if customer else "N/A" }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facility Particulars -->
+  <div class="clause-section">
+    <div class="clause-heading">2. FACILITY PARTICULARS</div>
+    <table class="particulars-table">
+      <tbody>
+        <tr>
+          <td class="lbl-cell">Sanctioned Principal Amount</td>
+          <td class="val-cell bold">KES {{ "{:,.2f}".format(doc.loan_amount) }}</td>
+          <td class="lbl-cell">Loan Facility Type</td>
+          <td class="val-cell">{{ doc.loan_product }}</td>
+        </tr>
+        <tr>
+          <td class="lbl-cell">Agreed Interest Rate</td>
+          <td class="val-cell">{{ doc.rate_of_interest }}% per annum</td>
+          <td class="lbl-cell">Repayment Frequency</td>
+          <td class="val-cell">{{ doc.repayment_frequency or "Monthly" }}</td>
+        </tr>
+        <tr>
+          <td class="lbl-cell">Repayment Tenure</td>
+          <td class="val-cell">{{ doc.repayment_periods or 1 }} Months</td>
+          <td class="lbl-cell">Monthly Instalment (EMI)</td>
+          <td class="val-cell bold">KES {{ "{:,.2f}".format(doc.monthly_repayment_amount or (doc.total_payment / (doc.repayment_periods or 1)) if doc.total_payment else doc.loan_amount) }}</td>
+        </tr>
+        <tr>
+          <td class="lbl-cell">Total Payable Sum</td>
+          <td class="val-cell bold">KES {{ "{:,.2f}".format(doc.total_payment or (doc.loan_amount + (doc.total_interest_payable or 0))) }}</td>
+          <td class="lbl-cell">Disbursal Destination</td>
+          <td class="val-cell">
+            {% if loan_app.disbursal_method == 'Bank Transfer' %}
+              Bank: {{ loan_app.disbursal_bank_name }} (Acc: {{ loan_app.disbursal_account_number }})
+            {% else %}
+              M-Pesa Mobile: {{ loan_app.disbursal_mpesa_number or customer.mobile_no or 'Registered Mobile' }}
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Repayment & Paybill Instructions -->
+  <div class="clause-section">
+    <div class="clause-heading">3. REPAYMENT & PAYMENT CHANNEL INSTRUCTIONS</div>
+    <p class="clause-text">
+      The Borrower covenants to pay each scheduled instalment on or before the due date. Payments shall be made exclusively via the Lender's official channels:
+    </p>
+    <div class="pay-instr-box">
+      <div class="instr-col">
+        <span class="ik">M-PESA PAYBILL NUMBER</span>
+        <span class="iv">400200</span>
+      </div>
+      <div class="instr-col">
+        <span class="ik">ACCOUNT NUMBER</span>
+        <span class="iv">{{ doc.name }}</span>
+      </div>
+      <div class="instr-col">
+        <span class="ik">REPAYMENT DUE DAY</span>
+        <span class="iv">Monthly as per schedule</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legal Clauses -->
+  <div class="clause-section">
+    <div class="clause-heading">4. TERMS, PENALTIES & DEFAULT</div>
+    <ol class="legal-list">
+      <li><b>Late Payment Charges:</b> Any overdue instalments not paid within the grace period shall accrue a default surcharge of <b>1.0% per day</b> on the outstanding overdue amount until settled in full.</li>
+      <li><b>Events of Default & Acceleration:</b> Failure to remit any instalment within 30 days of the due date constitutes an Event of Default. Upon default, the Lender reserves the right to declare the entire outstanding loan balance, accrued interest, and penalty charges immediately due and payable.</li>
+      <li><b>Credit Reference Bureau (CRB) Reporting:</b> The Borrower explicitly acknowledges and consents that in the event of persistent default exceeding 60 days, the Lender shall register the default with licensed Credit Reference Bureaus (CRBs) in Kenya in compliance with the Banking Act and CBK regulations.</li>
+      <li><b>Data Protection Act 2019:</b> Both parties agree to handle personal data in strict compliance with the Data Protection Act (Kenya). The Lender is authorized to process KYC details for credit underwriting, administration, and debt recovery.</li>
+    </ol>
+  </div>
+
+  <!-- Guarantor / Co-Signer Section -->
+  {% if loan_app.guarantor_full_name %}
+  <div class="clause-section">
+    <div class="clause-heading">5. GUARANTEE & INDEMNITY</div>
+    <p class="clause-text">
+      The Guarantor, <b>{{ loan_app.guarantor_full_name }}</b> (ID: {{ loan_app.guarantor_national_id }}, Phone: {{ loan_app.guarantor_phone }}), hereby unconditionally and irrevocably guarantees the due and punctual performance of all obligations and repayment liabilities of the Borrower under this Agreement.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- Signatures Block -->
+  <div class="clause-section signatures-section">
+    <div class="clause-heading">6. EXECUTION & ACCEPTANCE</div>
+    <p class="clause-text">IN WITNESS WHEREOF the Parties have executed this Facility Agreement as of the date first above written:</p>
+
+    <div class="signatures-grid">
+      <div class="sig-card">
+        <div class="sig-line"></div>
+        <div class="sig-title">SIGNED by the BORROWER</div>
+        <div class="sig-name">{{ customer.customer_name if customer else doc.applicant_name or "Borrower" }}</div>
+        <div class="sig-meta">National ID: {{ loan_app.national_id_or_passport or "On Record" }}</div>
+        <div class="sig-meta">Date: ________________________</div>
+      </div>
+
+      {% if loan_app.guarantor_full_name %}
+      <div class="sig-card">
+        <div class="sig-line"></div>
+        <div class="sig-title">SIGNED by the GUARANTOR</div>
+        <div class="sig-name">{{ loan_app.guarantor_full_name }}</div>
+        <div class="sig-meta">National ID: {{ loan_app.guarantor_national_id }}</div>
+        <div class="sig-meta">Date: ________________________</div>
+      </div>
+      {% endif %}
+
+      <div class="sig-card">
+        <div class="sig-line"></div>
+        <div class="sig-title">FOR & ON BEHALF OF ORYX FUND</div>
+        <div class="sig-name">Authorized Credit Officer</div>
+        <div class="sig-meta">Oryx Fund Underwriting Desk</div>
+        <div class="sig-meta">Official Stamp & Signature</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule 1: Amortization Schedule -->
+  <div class="page-break"></div>
+  <div class="clause-section">
+    <div class="clause-heading">SCHEDULE 1: REPAYMENT AMORTIZATION SCHEDULE</div>
+    <p class="clause-text">Facility: <b>{{ doc.name }}</b> | Principal: <b>KES {{ "{:,.2f}".format(doc.loan_amount) }}</b> | Interest Rate: <b>{{ doc.rate_of_interest }}% p.a.</b></p>
+    
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>Inst #</th>
+          <th>Due Date</th>
+          <th>Principal (KES)</th>
+          <th>Interest (KES)</th>
+          <th>Total Instalment (KES)</th>
+          <th>Remaining Balance (KES)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set schedule_rows = doc.get("repayment_schedule") or [] %}
+        {% if not schedule_rows %}
+          {% set rs_parent = frappe.db.get_value("Loan Repayment Schedule", {"loan": doc.name, "docstatus": ["!=", 2]}, "name") %}
+          {% if rs_parent %}
+            {% set schedule_rows = frappe.get_all("Repayment Schedule", filters={"parent": rs_parent}, fields=["payment_date", "principal_amount", "interest_amount", "total_payment", "balance_loan_amount"], order_by="idx asc") %}
+          {% endif %}
+        {% endif %}
+        {% if schedule_rows and schedule_rows|length > 0 %}
+          {% for row in schedule_rows %}
+          <tr>
+            <td class="center">{{ loop.index }}</td>
+            <td>{{ frappe.utils.format_date(row.payment_date) }}</td>
+            <td class="right">{{ "{:,.2f}".format(row.principal_amount or 0) }}</td>
+            <td class="right">{{ "{:,.2f}".format(row.interest_amount or 0) }}</td>
+            <td class="right bold">{{ "{:,.2f}".format(row.total_payment or 0) }}</td>
+            <td class="right">{{ "{:,.2f}".format(row.balance_loan_amount or 0) }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td class="center">1</td>
+            <td>{{ frappe.utils.format_date(doc.posting_date or doc.creation) }}</td>
+            <td class="right">{{ "{:,.2f}".format(doc.loan_amount or 0) }}</td>
+            <td class="right">{{ "{:,.2f}".format(doc.total_interest_payable or 0) }}</td>
+            <td class="right bold">{{ "{:,.2f}".format(doc.total_payment or doc.loan_amount or 0) }}</td>
+            <td class="right">0.00</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<style>
+.contract-doc {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #1A261D;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.contract-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #1F3224;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.brand-logo-text {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1F3224;
+  letter-spacing: 0.08em;
+}
+
+.brand-tagline {
+  font-size: 11px;
+  color: #4D6452;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.brand-address {
+  font-size: 10px;
+  color: #728476;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.doc-badge {
+  display: inline-block;
+  background: #1F3224;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.meta-item {
+  font-size: 11px;
+}
+
+.m-k { color: #5D7061; font-weight: 600; }
+.m-v { color: #1F3224; font-weight: bold; }
+
+.contract-title-bar {
+  text-align: center;
+  background: #F4EFEB;
+  border: 1px solid #D8CCC1;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 18px;
+}
+
+.contract-title-bar h2 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1F3224;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.04em;
+}
+
+.contract-title-bar p {
+  font-size: 10px;
+  color: #6E7E71;
+  margin: 0;
+}
+
+.clause-section {
+  margin-bottom: 16px;
+}
+
+.clause-heading {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1F3224;
+  border-bottom: 1px solid #D8CCC1;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.clause-text {
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.parties-grid {
+  display: flex;
+  gap: 14px;
+}
+
+.party-box {
+  flex: 1;
+  border: 1px solid #D8CCC1;
+  background: #FAF8F5;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.party-role {
+  font-size: 9px;
+  font-weight: 800;
+  color: #6E9B78;
+  letter-spacing: 0.08em;
+}
+
+.party-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: #1F3224;
+  margin: 2px 0 4px 0;
+}
+
+.party-detail {
+  font-size: 10.5px;
+  color: #384C3D;
+  line-height: 1.4;
+}
+
+.particulars-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.particulars-table td {
+  border: 1px solid #D8CCC1;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.lbl-cell {
+  background: #F4EFEB;
+  color: #4D6452;
+  font-weight: 600;
+  width: 25%;
+}
+
+.val-cell {
+  width: 25%;
+  color: #1A261D;
+}
+
+.bold { font-weight: bold; color: #1F3224; }
+
+.pay-instr-box {
+  display: flex;
+  background: #1F3224;
+  color: #FFFFFF;
+  border-radius: 6px;
+  padding: 8px 14px;
+  justify-content: space-around;
+  margin-top: 6px;
+}
+
+.instr-col {
+  text-align: center;
+}
+
+.ik {
+  display: block;
+  font-size: 9px;
+  color: #A3B5A7;
+  letter-spacing: 0.05em;
+}
+
+.iv {
+  font-size: 13px;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.legal-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: #2F4233;
+}
+
+.legal-list li {
+  margin-bottom: 4px;
+}
+
+.signatures-grid {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.sig-card {
+  flex: 1;
+  border: 1px solid #D8CCC1;
+  border-radius: 6px;
+  padding: 12px;
+  background: #FAF8F5;
+  text-align: center;
+}
+
+.sig-line {
+  border-bottom: 1px dashed #728476;
+  margin: 20px 10px 10px 10px;
+}
+
+.sig-title {
+  font-size: 9px;
+  font-weight: 800;
+  color: #6E9B78;
+  letter-spacing: 0.05em;
+}
+
+.sig-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #1F3224;
+  margin-top: 2px;
+}
+
+.sig-meta {
+  font-size: 9.5px;
+  color: #5D7061;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.schedule-table th {
+  background: #1F3224;
+  color: #FFFFFF;
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  border: 1px solid #1F3224;
+  text-align: left;
+}
+
+.schedule-table td {
+  border: 1px solid #D8CCC1;
+  padding: 5px 8px;
+  font-size: 10.5px;
+}
+
+.schedule-table tr:nth-child(even) { background: #FAF8F5; }
+.center { text-align: center; }
+.right { text-align: right; }
+
+.page-break {
+  page-break-before: always;
+  margin-top: 20px;
+}
+</style>

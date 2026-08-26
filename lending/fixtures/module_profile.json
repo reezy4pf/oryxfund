@@ -1,0 +1,59 @@
+[
+ {
+  "block_modules": [
+   {
+    "module": "Stock"
+   },
+   {
+    "module": "Manufacturing"
+   },
+   {
+    "module": "Buying"
+   },
+   {
+    "module": "Selling"
+   },
+   {
+    "module": "CRM"
+   },
+   {
+    "module": "Support"
+   },
+   {
+    "module": "Projects"
+   },
+   {
+    "module": "Quality Management"
+   },
+   {
+    "module": "Assets"
+   },
+   {
+    "module": "Subcontracting"
+   },
+   {
+    "module": "Maintenance"
+   },
+   {
+    "module": "Telephony"
+   },
+   {
+    "module": "EDI"
+   },
+   {
+    "module": "Bulk Transaction"
+   },
+   {
+    "module": "Regional"
+   },
+   {
+    "module": "Portal"
+   }
+  ],
+  "docstatus": 0,
+  "doctype": "Module Profile",
+  "modified": "2026-08-26 00:56:00.954134",
+  "module_profile_name": "Oryx Lending Management",
+  "name": "Oryx Lending Management"
+ }
+]

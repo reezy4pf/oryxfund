@@ -30,6 +30,12 @@ frappe.ui.form.on('Loan Application', {
 	refresh: function (frm) {
 		frm.trigger("toggle_fields");
 		frm.trigger("add_toolbar_buttons");
+		if (frm.doc.is_subsequent_loan) {
+			frm.dashboard.add_indicator(__('Subsequent / Repeat Loan'), 'green');
+			if (frm.doc.previous_loan_application) {
+				frm.dashboard.set_headline(__('Returning Borrower: Linked to historical application <a href="/app/loan-application/{0}"><b>{0}</b></a>', [frm.doc.previous_loan_application]), 'blue');
+			}
+		}
 		frm.set_query('loan_product', () => {
 			return {
 				filters: {

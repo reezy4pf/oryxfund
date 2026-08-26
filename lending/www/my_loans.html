@@ -1,0 +1,1949 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head_include %}
+<script>
+(function() {
+  try {
+    var savedTheme = localStorage.getItem('theme') || localStorage.getItem('frappe_theme') || localStorage.getItem('oryx_theme');
+    if (!savedTheme) {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        savedTheme = 'dark';
+      }
+    }
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+    }
+  } catch (e) {}
+})();
+</script>
+{% endblock %}
+
+{% block banner %}{% endblock %}
+
+{% block navbar %}
+<header class="oryx-navbar">
+  <div id="oryx-page-progress" class="oryx-page-progress"></div>
+  <div class="oryx-nav-inner">
+    <!-- Brand Logo -->
+    <a href="/my_loans" class="oryx-brand">
+      <img src="/files/oryx_logo_light.png" alt="Oryx Fund" class="oryx-logo-img oryx-logo-light" style="height: 38px; width: auto; max-height: 42px;">
+      <img src="/files/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-logo-img oryx-logo-dark" style="display: none; height: 38px; width: auto; max-height: 42px;">
+    </a>
+
+    <!-- Desktop Capsule Tabs & Right Controls -->
+    <div class="oryx-nav-desktop-capsules">
+      <nav class="oryx-capsules-nav">
+        <a href="/my_loans" class="oryx-capsule-tab {% if active_page == 'portal' %}active{% endif %}">My Portal</a>
+        <a href="/apply" class="oryx-capsule-tab {% if active_page == 'apply' %}active{% endif %}">Loan Application</a>
+        {% if is_logged_in %}
+        <a href="/my_account" class="oryx-capsule-tab {% if active_page == 'account' %}active{% endif %}">
+          <svg class="capsule-user-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>{{ first_name }}</span>
+        </a>
+        {% else %}
+        <a href="/login" class="oryx-capsule-tab oryx-tab-login">
+          <svg class="capsule-login-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span>Login / Sign up</span>
+        </a>
+        {% endif %}
+      </nav>
+
+      <!-- Dark/Light Theme Toggle -->
+      <button type="button" class="oryx-theme-toggle-btn" id="oryxThemeToggle" onclick="toggleOryxTheme()" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+        <svg class="theme-icon sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="theme-icon moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Top Right Inside Header: Account Button + Theme Toggle -->
+    <div class="oryx-nav-mobile-right">
+      {% if is_logged_in %}
+      <a href="/my_account" class="oryx-mobile-account-btn {% if active_page == 'account' %}active{% endif %}">
+        <svg class="capsule-user-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>{{ first_name }}</span>
+      </a>
+      {% else %}
+      <a href="/login" class="oryx-mobile-account-btn oryx-mobile-login-btn">
+        <svg class="capsule-login-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        <span>Login / Sign up</span>
+      </a>
+      {% endif %}
+
+      <button type="button" class="oryx-theme-toggle-btn" id="oryxThemeToggleMobile" onclick="toggleOryxTheme()" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+        <svg class="theme-icon sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="theme-icon moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Sub-Header Capsule Tabs Bar (Navigation only) -->
+  <div class="oryx-mobile-capsules-bar">
+    <nav class="oryx-mobile-capsules-track">
+      <a href="/my_loans" class="oryx-capsule-tab {% if active_page == 'portal' %}active{% endif %}">My Portal</a>
+      <a href="/apply" class="oryx-capsule-tab {% if active_page == 'apply' %}active{% endif %}">Loan Application</a>
+    </nav>
+  </div>
+</header>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block page_content %}
+<div id="oryx-app-root">
+<div class="oryx-portal-wrapper">
+  <!-- Top Hero Header -->
+  <div class="oryx-hero-card">
+    <div class="hero-top-row">
+      <div class="oryx-badge">MY PORTAL</div>
+      <span class="user-greeting">Account: {{ user_email }}</span>
+    </div>
+    <div class="hero-main-row">
+      <div>
+        <h1 class="oryx-title">My Loans & Repayments</h1>
+        <p class="oryx-subtitle">View your active loans, outstanding balances, and official M-Pesa Paybill payment instructions.</p>
+      </div>
+      <div class="hero-cta-box">
+        {% if applications|length > 0 or loans|length > 0 %}
+        <a href="/apply?flow=express" class="oryx-hero-btn oryx-hero-btn-express">⚡ Apply for Subsequent Loan</a>
+        {% else %}
+        <a href="/apply" class="oryx-hero-btn">+ Apply for a New Loan</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Fast-Track Subsequent Loan Card -->
+  {% if applications|length > 0 or loans|length > 0 %}
+  <div class="oryx-subsequent-cta-card">
+    <div class="s-cta-left">
+      <div class="s-cta-badge">⚡ ELIGIBLE FOR EXPRESS FINANCING</div>
+      <h3 class="s-cta-title">Need a Subsequent Loan?</h3>
+      <p class="s-cta-desc">Because your identity &amp; KYC are already verified, returning borrowers bypass standard documentation with priority same-day underwriting.</p>
+    </div>
+    <div class="s-cta-right">
+      <a href="/apply?flow=express" class="oryx-btn oryx-btn-primary oryx-btn-pulse">
+        <span>Apply for Subsequent Loan &rarr;</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Summary KPI Stats Grid -->
+  <div class="oryx-stats-grid">
+    <div class="oryx-stat-card">
+      <div class="stat-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Active Loans</span>
+        <span class="stat-val">{{ loans|length }}</span>
+      </div>
+    </div>
+
+    <div class="oryx-stat-card">
+      <div class="stat-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Principal Borrowed</span>
+        <span class="stat-val">KES {{ "{:,.2f}".format(total_principal) }}</span>
+      </div>
+    </div>
+
+    <div class="oryx-stat-card">
+      <div class="stat-icon-wrap highlight">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Outstanding Balance</span>
+        <span class="stat-val stat-val-outstanding">KES {{ "{:,.2f}".format(total_outstanding) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Loans Section -->
+  <div class="oryx-portal-card">
+    <div class="card-section-head">
+      <div>
+        <h3 class="section-title">Active Loans</h3>
+        <p class="section-desc">Manage existing loan terms, disbursals, and repayments.</p>
+      </div>
+    </div>
+
+    {% if loans and loans|length > 0 %}
+      <div class="loans-grid">
+        {% for loan in loans %}
+        <div class="loan-item-card">
+          <div class="loan-item-top">
+            <div>
+              <span class="loan-status-pill status-{{ loan.status|lower }}">{{ loan.status }}</span>
+              <h4 class="loan-id">{{ loan.name }}</h4>
+              <span class="loan-prod-name">{{ loan.loan_product }}</span>
+            </div>
+            <div class="loan-principal-box">
+              <span class="p-lbl">Principal Loan Amount</span>
+              <span class="p-val">KES {{ "{:,.2f}".format(loan.loan_amount) }}</span>
+            </div>
+          </div>
+
+          <div class="loan-metrics-row">
+            <div class="metric-block">
+              <span class="m-lbl">Outstanding Balance</span>
+              <span class="m-val text-alert">KES {{ "{:,.2f}".format(loan.outstanding_principal) }}</span>
+            </div>
+            <div class="metric-block">
+              <span class="m-lbl">Disbursement Date</span>
+              <span class="m-val">{{ loan.disbursement_date or "Approved / In Processing" }}</span>
+            </div>
+          </div>
+
+          <!-- M-Pesa Repayment Instructions Banner -->
+          <div class="paybill-box">
+            <div class="paybill-header">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+              <span>Repay via M-Pesa Paybill</span>
+            </div>
+            <div class="paybill-details">
+              <div class="pb-item">
+                <span class="pb-lbl">BUSINESS NO (PAYBILL)</span>
+                <span class="pb-val">400200</span>
+              </div>
+              <div class="pb-item">
+                <span class="pb-lbl">ACCOUNT NO</span>
+                <span class="pb-val highlight-acc">{{ loan.name }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="loan-actions-row">
+            <a href="/api/method/frappe.utils.print_format.download_pdf?doctype=Loan&name={{ loan.name }}&format=Oryx%20Loan%20Agreement&no_letterhead=0" target="_blank" class="oryx-action-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              Download Agreement PDF
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="oryx-empty-state">
+        <div class="empty-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+        <h4 class="empty-title">No Active Loans</h4>
+        <p class="empty-desc">You do not currently have any active loans. You can submit a new loan application in under 2 minutes.</p>
+        <a href="/apply" class="oryx-btn-empty">+ Apply for a Loan</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Loan Applications History Section -->
+  <div class="oryx-portal-card" style="margin-top: 24px;">
+    <div class="card-section-head">
+      <div>
+        <h3 class="section-title">Application History</h3>
+        <p class="section-desc">Track status and review records of all submitted loan applications.</p>
+      </div>
+    </div>
+
+    {% if applications and applications|length > 0 %}
+      <div class="oryx-table-wrap">
+        <table class="oryx-data-table">
+          <thead>
+            <tr>
+              <th>Application Ref</th>
+              <th>Applicant</th>
+              <th>Loan Product</th>
+              <th>Amount (KES)</th>
+              <th>Tenure</th>
+              <th>Submission Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+            <tr>
+              <td><span class="app-ref-tag">{{ app.name }}</span></td>
+              <td><b>{{ app.applicant_name or user_fullname }}</b></td>
+              <td>{{ app.loan_product }}</td>
+              <td><b>KES {{ "{:,.2f}".format(app.loan_amount) }}</b></td>
+              <td>{{ app.repayment_periods }} Months</td>
+              <td>{{ app.posting_date }}</td>
+              <td>
+                <span class="app-status-badge status-{{ (app.status or 'open')|lower|replace(' ', '-') }}">
+                  {{ app.status or "Open" }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="oryx-empty-state">
+        <div class="empty-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <h4 class="empty-title">No Applications Found</h4>
+        <p class="empty-desc">Your submitted applications will appear here with real-time status updates.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+</div>
+
+<style>
+/* Scoped Authentic Oryx Fund Portal Design System */
+body, html {
+  background-color: #EAE0D8 !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  color: #1F3224;
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] html,
+html.dark body {
+  background-color: #0A0A0A !important;
+  color: #FAF8F5 !important;
+}
+
+.web-footer,
+footer,
+.footer,
+.page-footer {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.container,
+.page-container,
+.page-content-wrapper,
+.page_content,
+main {
+  padding: 0 !important;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+}
+
+/* Navbar Component */
+.oryx-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(234, 224, 216, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #D8CCC1;
+  padding: 8px 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .oryx-navbar,
+body[data-theme="dark"] .oryx-navbar {
+  background: rgba(10, 10, 10, 0.94);
+  border-bottom-color: #1A221C;
+}
+
+.oryx-nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.oryx-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.oryx-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+}
+
+[data-theme="dark"] .oryx-logo-light,
+body[data-theme="dark"] .oryx-logo-light {
+  display: none !important;
+}
+
+[data-theme="dark"] .oryx-logo-dark,
+body[data-theme="dark"] .oryx-logo-dark {
+  display: block !important;
+}
+
+/* Capsule Navigation System */
+.oryx-nav-desktop-capsules {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.oryx-capsules-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(31, 50, 36, 0.04);
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid #D8CCC1;
+}
+
+[data-theme="dark"] .oryx-capsules-nav {
+  background: #111412;
+  border-color: #1C261F;
+}
+
+.oryx-capsule-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #557262;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .oryx-capsule-tab {
+  color: #8BA291;
+}
+
+.oryx-capsule-tab:hover {
+  color: #1F3224;
+  background: rgba(31, 50, 36, 0.06);
+}
+
+[data-theme="dark"] .oryx-capsule-tab:hover {
+  color: #FAF8F5;
+  background: #162219;
+}
+
+.oryx-capsule-tab.active {
+  background: #1F3224 !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(31, 50, 36, 0.2);
+}
+
+[data-theme="dark"] .oryx-capsule-tab.active {
+  background: #1D3D27 !important;
+  color: #FAF8F5 !important;
+  border: 1px solid #316440;
+}
+
+.oryx-capsule-tab.oryx-tab-signout {
+  color: #8C5D3B;
+  font-size: 12.5px;
+}
+
+[data-theme="dark"] .oryx-capsule-tab.oryx-tab-signout {
+  color: #D4A373;
+}
+
+.oryx-capsule-tab.oryx-tab-login {
+  background: #FAF8F5;
+  border: 1px solid #D8CCC1;
+  font-weight: 600;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .oryx-capsule-tab.oryx-tab-login {
+  background: #131A15;
+  border-color: #223226;
+  color: #FAF8F5;
+}
+
+.oryx-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #FAF8F5;
+  border: 1px solid #D8CCC1;
+  color: #1F3224;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+[data-theme="dark"] .oryx-theme-toggle-btn {
+  background: #16241B !important;
+  border-color: #2D4C35 !important;
+  color: #FBBF24 !important;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.15) !important;
+}
+
+.oryx-theme-toggle-btn:hover {
+  background: #FFFFFF;
+  border-color: #1F3224;
+}
+
+[data-theme="dark"] .oryx-theme-toggle-btn:hover {
+  background: #1F3626 !important;
+  border-color: #6EE7B7 !important;
+  color: #FDE68A !important;
+  box-shadow: 0 0 14px rgba(110, 231, 183, 0.25) !important;
+}
+
+.oryx-nav-mobile-right,
+.oryx-mobile-capsules-bar {
+  display: none;
+}
+
+.oryx-mobile-account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1F3224;
+  background: #FAF8F5;
+  border: 1px solid #D8CCC1;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .oryx-mobile-account-btn {
+  background: #131A15;
+  border-color: #223226;
+  color: #FAF8F5;
+}
+
+.oryx-mobile-account-btn.active {
+  background: #1F3224 !important;
+  color: #FFFFFF !important;
+  border-color: #1F3224 !important;
+}
+
+[data-theme="dark"] .oryx-mobile-account-btn.active {
+  background: #1D3D27 !important;
+  color: #FAF8F5 !important;
+  border-color: #316440 !important;
+}
+
+/* Main Layout Wrapper */
+.oryx-portal-wrapper {
+  max-width: 1080px;
+  margin: 20px auto 60px auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* Hero Header Card */
+.oryx-hero-card {
+  background: #1F3224;
+  color: #FFFFFF;
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(31, 50, 36, 0.12);
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .oryx-hero-card {
+  background: linear-gradient(145deg, #132218, #0E1812);
+  border: 1px solid #1D2E22;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.hero-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.oryx-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FAF8F5;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.user-greeting {
+  font-size: 12.5px;
+  color: #D6DFD8;
+  font-weight: 500;
+}
+
+.hero-main-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.oryx-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #FAF8F5;
+  letter-spacing: -0.01em;
+}
+
+.oryx-subtitle {
+  font-size: 13.5px;
+  color: #D6DFD8;
+  margin: 0;
+  max-width: 620px;
+  line-height: 1.45;
+}
+
+.oryx-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF !important;
+  color: #1F3224 !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.oryx-hero-btn:hover {
+.oryx-hero-btn-express {
+  background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 15px rgba(0, 210, 106, 0.4) !important;
+}
+
+[data-theme="dark"] .oryx-hero-btn-express {
+  background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+  color: #000000 !important;
+}
+
+/* Fast-Track Subsequent Loan Card */
+.oryx-subsequent-cta-card {
+  background: linear-gradient(135deg, #FAF8F5 0%, rgba(0, 210, 106, 0.08) 100%);
+  border: 1.5px solid #00D26A;
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 4px 16px rgba(0, 210, 106, 0.1);
+}
+
+[data-theme="dark"] .oryx-subsequent-cta-card {
+  background: linear-gradient(135deg, #101712 0%, rgba(0, 210, 106, 0.1) 100%);
+  border-color: #00D26A;
+  box-shadow: 0 4px 20px rgba(0, 210, 106, 0.15);
+}
+
+.s-cta-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #059669;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .s-cta-badge {
+  color: #00D26A;
+}
+
+.s-cta-title {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .s-cta-title {
+  color: #FAF8F5;
+}
+
+.s-cta-desc {
+  margin: 0;
+  font-size: 13px;
+  color: #556B5D;
+  max-width: 580px;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .s-cta-desc {
+  color: #9CA3AF;
+}
+
+.oryx-btn-express,
+a.oryx-btn-express,
+button.oryx-btn-express,
+.oryx-btn-pulse,
+a.oryx-btn-pulse,
+button.oryx-btn-pulse {
+  background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  padding: 10px 18px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 15px rgba(0, 210, 106, 0.35) !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.oryx-btn-express:visited,
+a.oryx-btn-express:visited,
+.oryx-btn-express:hover,
+a.oryx-btn-express:hover,
+.oryx-btn-express:focus,
+a.oryx-btn-express:focus,
+.oryx-btn-express:active,
+a.oryx-btn-express:active,
+.oryx-btn-pulse:visited,
+a.oryx-btn-pulse:visited,
+.oryx-btn-pulse:hover,
+a.oryx-btn-pulse:hover,
+.oryx-btn-pulse:focus,
+a.oryx-btn-pulse:focus,
+.oryx-btn-pulse:active,
+a.oryx-btn-pulse:active {
+  color: #000000 !important;
+  text-decoration: none !important;
+}
+
+.oryx-btn-express:hover,
+a.oryx-btn-express:hover,
+.oryx-btn-pulse:hover,
+a.oryx-btn-pulse:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 210, 106, 0.45) !important;
+}
+
+/* KPI Stats Grid */
+.oryx-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.oryx-stat-card {
+  background: #FFFFFF;
+  border: 1px solid #D8CCC1;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(31, 50, 36, 0.04);
+}
+
+[data-theme="dark"] .oryx-stat-card {
+  background: #111412;
+  border-color: #1C261F;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.stat-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(31, 50, 36, 0.08);
+  color: #1F3224;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .stat-icon-wrap {
+  background: #16241B;
+  border: 1px solid #233829;
+  color: #6E9B78;
+}
+
+.stat-icon-wrap.highlight {
+  background: rgba(193, 68, 14, 0.1);
+  color: #C1440E;
+}
+
+[data-theme="dark"] .stat-icon-wrap.highlight {
+  background: rgba(226, 173, 100, 0.14);
+  border: 1px solid rgba(226, 173, 100, 0.28);
+  color: #E2AD64;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6B7C6E;
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+[data-theme="dark"] .stat-label {
+  color: #8BA291;
+}
+
+.stat-val {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .stat-val {
+  color: #FAF8F5;
+}
+
+.stat-val-outstanding {
+  color: #1F3224;
+}
+
+[data-theme="dark"] .stat-val-outstanding {
+  color: #FAF8F5;
+}
+
+/* Card Section Containers */
+.oryx-portal-card {
+  background: #FFFFFF;
+  border: 1px solid #D8CCC1;
+  border-radius: 14px;
+  padding: 24px 24px;
+  box-shadow: 0 4px 14px rgba(31, 50, 36, 0.04);
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .oryx-portal-card {
+  background: #111412;
+  border-color: #1C261F;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.card-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #EAE0D8;
+}
+
+[data-theme="dark"] .card-section-head {
+  border-bottom-color: #1C261F;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1F3224;
+  margin: 0 0 3px 0;
+}
+
+[data-theme="dark"] .section-title {
+  color: #FAF8F5;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: #6B7C6E;
+  margin: 0;
+}
+
+[data-theme="dark"] .section-desc {
+  color: #8BA291;
+}
+
+/* Loan Cards Grid */
+.loans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.loan-item-card {
+  background: #FAF8F5;
+  border: 1px solid #D8CCC1;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .loan-item-card {
+  background: #0E1210;
+  border-color: #202D24;
+}
+
+.loan-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.loan-id {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F3224;
+  margin: 6px 0 2px 0;
+}
+
+[data-theme="dark"] .loan-id {
+  color: #FAF8F5;
+}
+
+.loan-prod-name {
+  font-size: 12.5px;
+  color: #557262;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .loan-prod-name {
+  color: #8BA291;
+}
+
+.loan-principal-box {
+  text-align: right;
+}
+
+.p-lbl {
+  font-size: 11.5px;
+  color: #6B7C6E;
+  display: block;
+}
+
+[data-theme="dark"] .p-lbl {
+  color: #8BA291;
+}
+
+.p-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .p-val {
+  color: #FAF8F5;
+}
+
+.loan-status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #E1F8EB;
+  color: #0F5132;
+}
+
+.loan-status-pill.status-active,
+.loan-status-pill.status-disbursed {
+  background: #E1F8EB;
+  color: #0F5132;
+}
+
+.loan-status-pill.status-closed {
+  background: #E9ECEF;
+  color: #495057;
+}
+
+.loan-metrics-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px dashed #D8CCC1;
+  border-bottom: 1px dashed #D8CCC1;
+  margin-bottom: 14px;
+}
+
+[data-theme="dark"] .loan-metrics-row {
+  border-top-color: #202D24;
+  border-bottom-color: #202D24;
+}
+
+.metric-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.m-lbl {
+  font-size: 11.5px;
+  color: #6B7C6E;
+  margin-bottom: 2px;
+}
+
+[data-theme="dark"] .m-lbl {
+  color: #8BA291;
+}
+
+.m-val {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .m-val {
+  color: #FAF8F5;
+}
+
+.text-alert {
+  color: #C1440E;
+}
+
+[data-theme="dark"] .text-alert {
+  color: #E2AD64;
+}
+
+/* M-Pesa Paybill Banner */
+.paybill-box {
+  background: #1F3224;
+  color: #FFFFFF;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+[data-theme="dark"] .paybill-box {
+  background: #132218;
+  border: 1px solid #1F3626;
+}
+
+.paybill-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8EB495;
+  margin-bottom: 8px;
+}
+
+.paybill-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pb-lbl {
+  font-size: 10.5px;
+  color: #D6DFD8;
+  display: block;
+}
+
+.pb-val {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+}
+
+.highlight-acc {
+  color: #FFD60A;
+}
+
+.loan-actions-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.oryx-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1F3224;
+  background: #FFFFFF;
+  border: 1px solid #D8CCC1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+[data-theme="dark"] .oryx-action-btn {
+  background: #141E17;
+  border-color: #243528;
+  color: #FAF8F5;
+}
+
+.oryx-action-btn:hover {
+  background: #EAE0D8;
+}
+
+[data-theme="dark"] .oryx-action-btn:hover {
+  background: #1B2A20;
+  border-color: #36553E;
+}
+
+/* Empty States */
+.oryx-empty-state {
+  text-align: center;
+  padding: 36px 16px;
+}
+
+.empty-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(31, 50, 36, 0.06);
+  color: #557262;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px auto;
+}
+
+[data-theme="dark"] .empty-icon-wrap {
+  background: #16241B;
+  border: 1px solid #233829;
+  color: #6E9B78;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F3224;
+  margin: 0 0 6px 0;
+}
+
+[data-theme="dark"] .empty-title {
+  color: #FAF8F5;
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: #6B7C6E;
+  max-width: 420px;
+  margin: 0 auto 16px auto;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .empty-desc {
+  color: #8BA291;
+}
+
+.oryx-btn-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1F3224 !important;
+  color: #FFFFFF !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(31, 50, 36, 0.15);
+}
+
+[data-theme="dark"] .oryx-btn-empty {
+  background: #1D3D27 !important;
+  border: 1px solid #316440 !important;
+  color: #FFFFFF !important;
+}
+
+.oryx-btn-empty:hover {
+  background: #2D4834 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .oryx-btn-empty:hover {
+  background: #254F33 !important;
+  border-color: #3E7C50 !important;
+}
+
+/* Data Table */
+.oryx-table-wrap {
+  overflow-x: auto;
+}
+
+.oryx-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.oryx-data-table th {
+  background: #FAF8F5;
+  color: #557262;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-bottom: 1px solid #D8CCC1;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+[data-theme="dark"] .oryx-data-table th {
+  background: #141A16;
+  color: #8BA291;
+  border-bottom-color: #202D24;
+}
+
+.oryx-data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #EAE0D8;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .oryx-data-table td {
+  border-bottom-color: #18201B;
+  color: #FAF8F5;
+}
+
+.oryx-data-table tbody tr:hover {
+  background: rgba(31, 50, 36, 0.02);
+}
+
+[data-theme="dark"] .oryx-data-table tbody tr:hover {
+  background: #141A16;
+}
+
+.app-ref-tag {
+  font-family: monospace;
+  font-weight: 700;
+  color: #1F3224;
+}
+
+[data-theme="dark"] .app-ref-tag {
+  background: #16241B;
+  border: 1px solid #233829;
+  color: #A3D9B1;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.app-status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-open,
+.status-pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-under-review {
+  background: #E0E7FF;
+  color: #3730A3;
+}
+
+.status-approved,
+.status-disbursed {
+  background: #E1F8EB;
+  color: #0F5132;
+}
+
+.status-rejected {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+@media(max-width: 768px) {
+  .oryx-nav-desktop-capsules {
+    display: none !important;
+  }
+  .oryx-nav-mobile-right {
+    display: flex !important;
+    align-items: center;
+    gap: 8px !important;
+  }
+  .oryx-mobile-capsules-bar {
+    display: block !important;
+    padding: 6px 0px 4px 0px !important;
+    margin-top: 4px;
+    border-top: 1px solid rgba(216, 204, 193, 0.4);
+  }
+  [data-theme="dark"] .oryx-mobile-capsules-bar {
+    border-top-color: #1A221C;
+  }
+  .oryx-mobile-capsules-track {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 !important;
+  }
+  .oryx-mobile-capsules-track::-webkit-scrollbar {
+    display: none;
+  }
+  .oryx-mobile-capsules-track .oryx-capsule-tab {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1px solid #D8CCC1;
+    background: #FAF8F5;
+  }
+  [data-theme="dark"] .oryx-mobile-capsules-track .oryx-capsule-tab {
+    background: #131A15;
+    border-color: #223226;
+    color: #8BA291;
+  }
+  .oryx-mobile-capsules-track .oryx-capsule-tab.active {
+    background: #1F3224 !important;
+    border-color: #1F3224 !important;
+    color: #FFFFFF !important;
+  }
+  [data-theme="dark"] .oryx-mobile-capsules-track .oryx-capsule-tab.active {
+    background: #1D3D27 !important;
+    border-color: #316440 !important;
+    color: #FAF8F5 !important;
+  }
+  .oryx-portal-wrapper {
+    padding: 0 10px !important;
+    margin: 10px auto 40px auto !important;
+  }
+  .oryx-hero-card {
+    padding: 18px 16px !important;
+  }
+  .hero-top-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+  .user-greeting {
+    font-size: 11px !important;
+    word-break: break-all !important;
+  }
+  .hero-main-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+  .oryx-title {
+    font-size: 20px !important;
+  }
+  .oryx-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .oryx-portal-card {
+    padding: 18px 14px !important;
+  }
+  .loans-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+/* Top Nano Progress Bar */
+.oryx-page-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  width: 0%;
+  background: linear-gradient(90deg, #2D4C35 0%, #6EE7B7 50%, #FAF8F5 100%);
+  box-shadow: 0 0 8px rgba(110, 231, 183, 0.7);
+  z-index: 9999;
+  opacity: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  pointer-events: none;
+}
+.oryx-page-progress.active {
+  opacity: 1;
+}
+
+/* Shimmer Keyframes & Skeleton Preloader Styles */
+@keyframes oryxShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes oryxFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.oryx-fade-in {
+  animation: oryxFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.oryx-skeleton-wrapper {
+  max-width: 1080px;
+  margin: 20px auto 60px auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+  animation: oryxFadeIn 0.15s ease-out;
+}
+
+.oryx-skeleton-card {
+  background: #FFFFFF;
+  border: 1px solid #D8CCC1;
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .oryx-skeleton-card {
+  background: #111412;
+  border-color: #1C261F;
+}
+
+.oryx-skeleton-hero {
+  background: #1F3224;
+  border: none;
+}
+
+[data-theme="dark"] .oryx-skeleton-hero {
+  background: linear-gradient(145deg, #132218, #0E1812);
+  border: 1px solid #1D2E22;
+}
+
+.oryx-shimmer-bar {
+  background: linear-gradient(90deg, #E6DDD5 0%, #F5EFEA 50%, #E6DDD5 100%);
+  background-size: 200% 100%;
+  animation: oryxShimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+[data-theme="dark"] .oryx-shimmer-bar {
+  background: linear-gradient(90deg, #141A16 0%, #202D24 50%, #141A16 100%);
+  background-size: 200% 100%;
+  animation: oryxShimmer 1.5s infinite linear;
+}
+
+.oryx-skeleton-hero .oryx-shimmer-bar {
+  background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.08) 100%);
+  background-size: 200% 100%;
+  animation: oryxShimmer 1.5s infinite linear;
+}
+
+[data-theme="dark"] .oryx-skeleton-hero .oryx-shimmer-bar {
+  background: linear-gradient(90deg, rgba(110,155,120,0.1) 0%, rgba(110,231,183,0.2) 50%, rgba(110,155,120,0.1) 100%);
+  background-size: 200% 100%;
+  animation: oryxShimmer 1.5s infinite linear;
+}
+
+.oryx-skeleton-row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.oryx-shimmer-badge {
+  width: 120px;
+  height: 20px;
+  border-radius: 20px;
+}
+
+.oryx-shimmer-user {
+  width: 180px;
+  height: 14px;
+  border-radius: 8px;
+}
+
+.oryx-shimmer-title {
+  width: 280px;
+  height: 28px;
+  margin-bottom: 10px;
+}
+
+.oryx-shimmer-subtitle {
+  width: 70%;
+  max-width: 500px;
+  height: 16px;
+  margin-bottom: 20px;
+}
+
+.oryx-shimmer-stepper {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.oryx-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.oryx-skeleton-stat {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  margin-bottom: 0;
+}
+
+.oryx-shimmer-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.oryx-skeleton-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.oryx-skeleton-main {
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .oryx-skeleton-wrapper {
+    padding: 0 10px !important;
+    margin: 10px auto 40px auto !important;
+  }
+  .oryx-skeleton-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .oryx-skeleton-hero, .oryx-skeleton-main {
+    padding: 18px 16px !important;
+  }
+}
+</style>
+
+<script>
+function initOryxTheme() {
+  try {
+    var savedTheme = localStorage.getItem('theme') || localStorage.getItem('frappe_theme') || localStorage.getItem('oryx_theme');
+    if (!savedTheme) {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        savedTheme = 'dark';
+      }
+    }
+    var themeToApply = savedTheme === 'dark' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', themeToApply);
+    document.body.setAttribute('data-theme', themeToApply);
+    
+    if (themeToApply === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    }
+
+    const sunIcons = document.querySelectorAll('.sun-icon');
+    const moonIcons = document.querySelectorAll('.moon-icon');
+    const lightLogos = document.querySelectorAll('.oryx-logo-light');
+    const darkLogos = document.querySelectorAll('.oryx-logo-dark');
+
+    if (themeToApply === 'dark') {
+      sunIcons.forEach(el => el.style.display = 'inline-block');
+      moonIcons.forEach(el => el.style.display = 'none');
+      lightLogos.forEach(el => el.style.display = 'none');
+      darkLogos.forEach(el => el.style.display = 'block');
+    } else {
+      sunIcons.forEach(el => el.style.display = 'none');
+      moonIcons.forEach(el => el.style.display = 'inline-block');
+      lightLogos.forEach(el => el.style.display = 'block');
+      darkLogos.forEach(el => el.style.display = 'none');
+    }
+  } catch (e) {}
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initOryxTheme);
+} else {
+  initOryxTheme();
+}
+
+function toggleOryxTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  
+  document.documentElement.setAttribute('data-theme', newTheme);
+  document.body.setAttribute('data-theme', newTheme);
+  
+  if (newTheme === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark');
+  }
+  
+  try {
+    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('frappe_theme', newTheme);
+    localStorage.setItem('oryx_theme', newTheme);
+    document.cookie = "theme=" + newTheme + "; path=/; max-age=31536000";
+    document.cookie = "frappe_theme=" + newTheme + "; path=/; max-age=31536000";
+  } catch(e) {}
+
+  const sunIcons = document.querySelectorAll('.sun-icon');
+  const moonIcons = document.querySelectorAll('.moon-icon');
+  const lightLogos = document.querySelectorAll('.oryx-logo-light');
+  const darkLogos = document.querySelectorAll('.oryx-logo-dark');
+
+  if (newTheme === 'dark') {
+    sunIcons.forEach(el => el.style.display = 'inline-block');
+    moonIcons.forEach(el => el.style.display = 'none');
+    lightLogos.forEach(el => el.style.display = 'none');
+    darkLogos.forEach(el => el.style.display = 'block');
+  } else {
+    sunIcons.forEach(el => el.style.display = 'none');
+    moonIcons.forEach(el => el.style.display = 'inline-block');
+    lightLogos.forEach(el => el.style.display = 'block');
+    darkLogos.forEach(el => el.style.display = 'none');
+  }
+}
+
+function toggleOryxMobileMenu() {
+  const drawer = document.getElementById('oryxMobileNav');
+  if (drawer) {
+    drawer.classList.toggle('open');
+  }
+}
+
+// Persistent Global Header & Instant Page Transition Router
+function initOryxSpaNav() {
+  if (window._oryxSpaInitialized) return;
+  window._oryxSpaInitialized = true;
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
+    if (link.target || link.hasAttribute('download') || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.includes('cmd=logout') || href.includes('/files/')) return;
+    
+    try {
+      const url = new URL(link.href, window.location.origin);
+      if (url.origin !== window.location.origin) return;
+      
+      const appRoutes = ['/my_loans', '/apply', '/my_account', '/'];
+      if (appRoutes.includes(url.pathname)) {
+        e.preventDefault();
+        navigateToOryxRoute(url.href, true);
+      }
+    } catch(err) {}
+  });
+
+  window.addEventListener('popstate', function() {
+    navigateToOryxRoute(window.location.href, false);
+  });
+}
+
+function updateActiveCapsuleTabs(path) {
+  let activePage = 'portal';
+  if (path.includes('/apply')) activePage = 'apply';
+  else if (path.includes('/my_account')) activePage = 'account';
+  else if (path.includes('/my_loans') || path === '/') activePage = 'portal';
+
+  document.querySelectorAll('.oryx-capsule-tab, .oryx-mobile-account-btn').forEach(tab => {
+    const href = tab.getAttribute('href');
+    if (!href) return;
+    tab.classList.remove('active');
+    if (activePage === 'portal' && (href === '/my_loans' || href === '/')) {
+      tab.classList.add('active');
+    } else if (activePage === 'apply' && href === '/apply') {
+      tab.classList.add('active');
+    } else if (activePage === 'account' && href === '/my_account') {
+      tab.classList.add('active');
+    }
+  });
+}
+
+function showOryxPageLoader() {
+  const bar = document.getElementById('oryx-page-progress');
+  if (bar) {
+    bar.style.width = '0%';
+    bar.classList.add('active');
+    setTimeout(() => { bar.style.width = '65%'; }, 20);
+    setTimeout(() => { if (bar.classList.contains('active')) bar.style.width = '85%'; }, 250);
+  }
+}
+
+function hideOryxPageLoader() {
+  const bar = document.getElementById('oryx-page-progress');
+  if (bar) {
+    bar.style.width = '100%';
+    setTimeout(() => {
+      bar.classList.remove('active');
+      setTimeout(() => { bar.style.width = '0%'; }, 200);
+    }, 150);
+  }
+}
+
+function getOryxSkeletonHtml(targetPath) {
+  const isApply = targetPath.includes('/apply');
+  const isAccount = targetPath.includes('/my_account');
+  
+  let secondaryHtml = '';
+  if (isApply) {
+    secondaryHtml = `
+      <div class="oryx-skeleton-card oryx-skeleton-main">
+        <div class="oryx-shimmer-bar" style="width: 28%; height: 20px; margin-bottom: 8px;"></div>
+        <div class="oryx-shimmer-bar" style="width: 50%; height: 14px; margin-bottom: 24px;"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="oryx-shimmer-bar" style="height: 44px; border-radius: 8px;"></div>
+          <div class="oryx-shimmer-bar" style="height: 44px; border-radius: 8px;"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="oryx-shimmer-bar" style="height: 44px; border-radius: 8px;"></div>
+          <div class="oryx-shimmer-bar" style="height: 44px; border-radius: 8px;"></div>
+          <div class="oryx-shimmer-bar" style="height: 44px; border-radius: 8px;"></div>
+        </div>
+        <div class="oryx-shimmer-bar" style="width: 100%; height: 80px; margin-top: 20px; border-radius: 10px;"></div>
+      </div>
+    `;
+  } else if (isAccount) {
+    secondaryHtml = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="oryx-skeleton-card oryx-skeleton-main" style="margin-bottom: 0;">
+            <div class="oryx-shimmer-bar" style="width: 35%; height: 18px; margin-bottom: 8px;"></div>
+            <div class="oryx-shimmer-bar" style="width: 60%; height: 13px; margin-bottom: 20px;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+              <div class="oryx-shimmer-bar" style="height: 42px; border-radius: 8px;"></div>
+              <div class="oryx-shimmer-bar" style="height: 42px; border-radius: 8px;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div class="oryx-shimmer-bar" style="height: 42px; border-radius: 8px;"></div>
+              <div class="oryx-shimmer-bar" style="height: 42px; border-radius: 8px;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="oryx-skeleton-card oryx-skeleton-main" style="margin-bottom: 0;">
+            <div class="oryx-shimmer-bar" style="width: 45%; height: 18px; margin-bottom: 8px;"></div>
+            <div class="oryx-shimmer-bar" style="width: 65%; height: 13px; margin-bottom: 20px;"></div>
+            <div class="oryx-shimmer-bar" style="height: 42px; border-radius: 8px; margin-bottom: 14px;"></div>
+            <div class="oryx-shimmer-bar" style="height: 42px; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    secondaryHtml = `
+      <div class="oryx-skeleton-grid">
+        <div class="oryx-skeleton-card oryx-skeleton-stat">
+          <div class="oryx-shimmer-bar oryx-shimmer-icon"></div>
+          <div class="oryx-skeleton-col" style="flex:1;">
+            <div class="oryx-shimmer-bar" style="width: 45%; height: 12px; margin-bottom: 6px;"></div>
+            <div class="oryx-shimmer-bar" style="width: 75%; height: 20px;"></div>
+          </div>
+        </div>
+        <div class="oryx-skeleton-card oryx-skeleton-stat">
+          <div class="oryx-shimmer-bar oryx-shimmer-icon"></div>
+          <div class="oryx-skeleton-col" style="flex:1;">
+            <div class="oryx-shimmer-bar" style="width: 45%; height: 12px; margin-bottom: 6px;"></div>
+            <div class="oryx-shimmer-bar" style="width: 75%; height: 20px;"></div>
+          </div>
+        </div>
+        <div class="oryx-skeleton-card oryx-skeleton-stat">
+          <div class="oryx-shimmer-bar oryx-shimmer-icon"></div>
+          <div class="oryx-skeleton-col" style="flex:1;">
+            <div class="oryx-shimmer-bar" style="width: 45%; height: 12px; margin-bottom: 6px;"></div>
+            <div class="oryx-shimmer-bar" style="width: 75%; height: 20px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="oryx-skeleton-card oryx-skeleton-main">
+        <div class="oryx-shimmer-bar" style="width: 25%; height: 20px; margin-bottom: 12px;"></div>
+        <div class="oryx-shimmer-bar" style="width: 50%; height: 14px; margin-bottom: 24px;"></div>
+        <div class="oryx-shimmer-bar" style="width: 100%; height: 48px; margin-bottom: 12px; border-radius: 8px;"></div>
+        <div class="oryx-shimmer-bar" style="width: 100%; height: 48px; margin-bottom: 12px; border-radius: 8px;"></div>
+        <div class="oryx-shimmer-bar" style="width: 100%; height: 48px; margin-bottom: 12px; border-radius: 8px;"></div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="oryx-skeleton-wrapper">
+      <div class="oryx-skeleton-card oryx-skeleton-hero">
+        <div class="oryx-skeleton-row-between">
+          <div class="oryx-shimmer-bar oryx-shimmer-badge"></div>
+          <div class="oryx-shimmer-bar oryx-shimmer-user"></div>
+        </div>
+        <div class="oryx-shimmer-bar oryx-shimmer-title"></div>
+        <div class="oryx-shimmer-bar oryx-shimmer-subtitle"></div>
+        ${isApply ? '<div class="oryx-shimmer-bar oryx-shimmer-stepper"></div>' : ''}
+      </div>
+      ${secondaryHtml}
+    </div>
+  `;
+}
+
+function navigateToOryxRoute(targetUrl, pushState) {
+  const currentPath = window.location.pathname;
+  const targetObj = new URL(targetUrl, window.location.origin);
+  const targetPath = targetObj.pathname;
+  
+  if (currentPath === targetPath && pushState) return;
+
+  updateActiveCapsuleTabs(targetPath);
+  showOryxPageLoader();
+
+  const currentRoot = document.getElementById('oryx-app-root');
+  if (currentRoot) {
+    currentRoot.innerHTML = getOryxSkeletonHtml(targetPath);
+  }
+
+  fetch(targetUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(res => res.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      if (doc.title) {
+        document.title = doc.title;
+      }
+
+      const newRoot = doc.getElementById('oryx-app-root');
+      if (newRoot && currentRoot) {
+        currentRoot.innerHTML = newRoot.innerHTML;
+        currentRoot.className = newRoot.className + ' oryx-fade-in';
+        hideOryxPageLoader();
+
+        if (pushState) {
+          history.pushState({ path: targetPath }, '', targetUrl);
+        }
+
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        
+        // Execute page-specific scripts from doc
+        const scripts = doc.querySelectorAll('script');
+        scripts.forEach(script => {
+          if (!script.src && script.textContent && (script.textContent.includes('initOryxSpaNav') || script.textContent.includes('getOryxSkeletonHtml'))) {
+            return;
+          }
+          const newScript = document.createElement('script');
+          if (script.src) {
+            newScript.src = script.src;
+          } else {
+            newScript.textContent = script.textContent;
+          }
+          document.body.appendChild(newScript);
+        });
+
+        if (targetPath.includes('/apply')) {
+          if (typeof goToStep === 'function') {
+            goToStep(1);
+          }
+          if (typeof calculateRepayment === 'function') {
+            calculateRepayment();
+          }
+          if (typeof calcDisposable === 'function') {
+            calcDisposable();
+          }
+        }
+      } else {
+        window.location.href = targetUrl;
+      }
+    })
+    .catch(err => {
+      console.error("SPA Nav error:", err);
+      hideOryxPageLoader();
+      window.location.href = targetUrl;
+    });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initOryxSpaNav);
+} else {
+  initOryxSpaNav();
+}
+</script>
+{% endblock %}

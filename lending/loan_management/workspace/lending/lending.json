@@ -6,18 +6,18 @@
    "label": "New Loans"
   }
  ],
- "content": "[{\"id\":\"u4VgJQmS5B\",\"type\":\"chart\",\"data\":{\"chart_name\":\"New Loans\",\"col\":12}},{\"id\":\"_38WStznya\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"FnMXBOAVyS\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Company\",\"col\":3}},{\"id\":\"t7o_K__1jB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Loan Application\",\"col\":3}},{\"id\":\"IRiNDC6w1p\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Loan\",\"col\":3}},{\"id\":\"xbbo0FYbq0\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dashboard\",\"col\":3}},{\"id\":\"7ZL4Bro-Vi\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"yhyioTViZ3\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports &amp; Masters</b></span>\",\"col\":12}},{\"id\":\"oYFn4b1kSw\",\"type\":\"card\",\"data\":{\"card_name\":\"Loan\",\"col\":4}},{\"id\":\"vZepJF5tl9\",\"type\":\"card\",\"data\":{\"card_name\":\"Loan Processes\",\"col\":4}},{\"id\":\"k-393Mjhqe\",\"type\":\"card\",\"data\":{\"card_name\":\"Disbursement and Repayment\",\"col\":4}},{\"id\":\"6crJ0DBiBJ\",\"type\":\"card\",\"data\":{\"card_name\":\"Loan Security\",\"col\":4}},{\"id\":\"8Nc9Vms3yK\",\"type\":\"card\",\"data\":{\"card_name\":\"Taxes and Charges\",\"col\":4}},{\"id\":\"4FHo-JB0QJ\",\"type\":\"card\",\"data\":{\"card_name\":\"Loan Transfers\",\"col\":4}},{\"id\":\"cC9JraXgnP\",\"type\":\"card\",\"data\":{\"card_name\":\"Loan Classification\",\"col\":4}},{\"id\":\"aQN7y-zrup\",\"type\":\"card\",\"data\":{\"card_name\":\"Co-Lending\",\"col\":4}},{\"id\":\"didc1K7uY4\",\"type\":\"card\",\"data\":{\"card_name\":\"Loan Adjustments\",\"col\":4}},{\"id\":\"wH0P6qZKNg\",\"type\":\"card\",\"data\":{\"card_name\":\"Banking\",\"col\":4}},{\"id\":\"mhOcQEJd2Y\",\"type\":\"card\",\"data\":{\"card_name\":\"LOS\",\"col\":4}},{\"id\":\"Um5YwxVLRJ\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "content": "[{\"id\": \"header_shortcuts\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Lending Operations Pipeline</b></span>\", \"col\": 12}}, {\"id\": \"sc_open\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Open Applications\", \"col\": 4}}, {\"id\": \"sc_approved\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Approved (Pending Loan)\", \"col\": 4}}, {\"id\": \"sc_active\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Active Loans\", \"col\": 4}}, {\"id\": \"sc_disb\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Disbursements\", \"col\": 4}}, {\"id\": \"sc_repay\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Record Repayment\", \"col\": 4}}, {\"id\": \"sc_cust\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Borrowers (Customers)\", \"col\": 4}}, {\"id\": \"spacer_1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header_masters\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Core Masters & Reports</b></span>\", \"col\": 12}}, {\"id\": \"card_loans\", \"type\": \"card\", \"data\": {\"card_name\": \"Loan\", \"col\": 4}}, {\"id\": \"card_disb_repay\", \"type\": \"card\", \"data\": {\"card_name\": \"Disbursement and Repayment\", \"col\": 4}}, {\"id\": \"card_reports\", \"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}]",
  "creation": "2020-03-12 16:35:55.299820",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
- "icon": "loan",
+ "icon": "link",
  "idx": 2,
  "indicator_color": "",
  "is_hidden": 0,
- "label": "Lending",
+ "label": "Quick Links",
  "links": [
   {
    "hidden": 0,
@@ -606,7 +606,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-12-31 15:23:18.551440",
+ "modified": "2026-08-25 14:32:25.833198",
  "modified_by": "Administrator",
  "module": "Loan Management",
  "name": "Lending",
@@ -624,32 +624,54 @@
  "sequence_id": 0.0,
  "shortcuts": [
   {
-   "color": "Grey",
+   "color": "Green",
    "doc_view": "List",
-   "label": "Company",
-   "link_to": "Company",
+   "format": "{} Open",
+   "label": "Open Applications",
+   "link_to": "Loan Application",
+   "stats_filter": "{\"status\": \"Open\"}",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "format": "{} Approved",
+   "label": "Approved (Pending Loan)",
+   "link_to": "Loan Application",
+   "stats_filter": "{\"status\": \"Approved\"}",
    "type": "DocType"
   },
   {
    "color": "Green",
-   "format": "{} Open",
-   "label": "Loan Application",
-   "link_to": "Loan Application",
-   "stats_filter": "{ \"status\": \"Open\" }",
-   "type": "DocType"
-  },
-  {
-   "label": "Loan",
+   "doc_view": "List",
+   "format": "{} Loans",
+   "label": "Active Loans",
    "link_to": "Loan",
+   "stats_filter": "{\"status\": [\"!=\", \"Closed\"]}",
    "type": "DocType"
   },
   {
-   "doc_view": "",
-   "label": "Dashboard",
-   "link_to": "Loan Dashboard",
-   "type": "Dashboard"
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Disbursements",
+   "link_to": "Loan Disbursement",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Record Repayment",
+   "link_to": "Loan Repayment",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Borrowers (Customers)",
+   "link_to": "Customer",
+   "type": "DocType"
   }
  ],
- "title": "Lending",
+ "title": "Quick Links",
  "type": "Workspace"
 }

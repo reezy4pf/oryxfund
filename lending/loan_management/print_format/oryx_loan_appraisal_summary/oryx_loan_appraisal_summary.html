@@ -1,0 +1,268 @@
+<div class="appraisal-doc">
+  <!-- Header -->
+  <div class="appraisal-header">
+    <div class="header-left">
+      <img src="/files/oryx_logo_light.png" alt="Oryx Fund" style="height: 38px; max-width: 170px; object-fit: contain; margin-bottom: 4px;">
+      <div class="brand-title">ORYX FUND — CREDIT UNDERWRITING</div>
+      <div class="brand-sub">Internal Credit Appraisal & Decision Sheet</div>
+    </div>
+    <div class="header-right">
+      <div class="app-status-badge status-{{ doc.status|lower }}">{{ doc.status }}</div>
+      <div class="meta-line"><b>Ref:</b> {{ doc.name }}</div>
+      <div class="meta-line"><b>Date:</b> {{ frappe.utils.format_date(doc.posting_date) }}</div>
+    </div>
+  </div>
+
+  <!-- 1. Applicant Profile -->
+  <div class="sheet-section">
+    <div class="sec-title">1. APPLICANT IDENTIFICATION & KYC PROFILE</div>
+    <table class="data-table">
+      <tr>
+        <td class="lbl">Applicant Full Name</td>
+        <td class="val bold">{{ doc.applicant_name }}</td>
+        <td class="lbl">National ID / Passport</td>
+        <td class="val">{{ doc.national_id_or_passport }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">KRA PIN</td>
+        <td class="val">{{ doc.kra_pin }}</td>
+        <td class="lbl">Primary Phone / M-Pesa</td>
+        <td class="val">{{ doc.applicant_phone_number }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">Residential Address</td>
+        <td class="val">{{ doc.address_line_1 }}, {{ doc.city }} ({{ doc.state }})</td>
+        <td class="lbl">Residence Ownership</td>
+        <td class="val">{{ doc.residence_status or "Rented" }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">Next of Kin</td>
+        <td class="val">{{ doc.next_of_kin_name }} ({{ doc.next_of_kin_relation }})</td>
+        <td class="lbl">Next of Kin Phone</td>
+        <td class="val">{{ doc.next_of_kin_phone }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 2. Facility Requested & Terms -->
+  <div class="sheet-section">
+    <div class="sec-title">2. FACILITY PARTICULARS & DISBURSAL</div>
+    <table class="data-table">
+      <tr>
+        <td class="lbl">Facility Applied For</td>
+        <td class="val bold">{{ doc.loan_product }}</td>
+        <td class="lbl">Amount Requested</td>
+        <td class="val bold highlight">KES {{ "{:,.2f}".format(doc.loan_amount) }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">Tenure</td>
+        <td class="val">{{ doc.repayment_periods }} Months</td>
+        <td class="lbl">Interest Rate</td>
+        <td class="val">{{ doc.rate_of_interest }}% p.a.</td>
+      </tr>
+      <tr>
+        <td class="lbl">Disbursal Method</td>
+        <td class="val">{{ doc.disbursal_method }}</td>
+        <td class="lbl">Disbursal Destination</td>
+        <td class="val">
+          {% if doc.disbursal_method == 'Bank Transfer' %}
+            {{ doc.disbursal_bank_name }} - {{ doc.disbursal_account_number }} ({{ doc.disbursal_account_name }})
+          {% else %}
+            M-Pesa: {{ doc.disbursal_mpesa_number or doc.applicant_phone_number }}
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 3. Financial Capacity & Cashflow Analysis -->
+  <div class="sheet-section">
+    <div class="sec-title">3. CASHFLOW & AFFORDABILITY ASSESSMENT</div>
+    <table class="data-table">
+      <tr>
+        <td class="lbl">Employment / Business</td>
+        <td class="val">{{ doc.employer_or_business_name }} ({{ doc.employment_status }})</td>
+        <td class="lbl">Net Monthly Income (A)</td>
+        <td class="val bold">KES {{ "{:,.2f}".format(doc.monthly_net_income or 0) }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">Existing Monthly Debt (B)</td>
+        <td class="val">KES {{ "{:,.2f}".format(doc.monthly_debt_obligations or 0) }}</td>
+        <td class="lbl">Living Expenses (C)</td>
+        <td class="val">KES {{ "{:,.2f}".format(doc.monthly_fixed_expenses or 0) }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">Calculated Net Disposable Income</td>
+        <td class="val bold highlight" colspan="3">
+          KES {{ "{:,.2f}".format(doc.net_disposable_income or ((doc.monthly_net_income or 0) - ((doc.monthly_debt_obligations or 0) + (doc.monthly_fixed_expenses or 0)))) }}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 4. Guarantor & CRB Bureau Assessment -->
+  <div class="sheet-section">
+    <div class="sec-title">4. GUARANTOR & CREDIT BUREAU (CRB) UNDERWRITING</div>
+    <table class="data-table">
+      <tr>
+        <td class="lbl">Guarantor Name</td>
+        <td class="val">{{ doc.guarantor_full_name or "None Provided" }}</td>
+        <td class="lbl">Guarantor ID & Phone</td>
+        <td class="val">{{ doc.guarantor_national_id }} | {{ doc.guarantor_phone }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">Guarantor Employer & Income</td>
+        <td class="val">{{ doc.guarantor_employer_or_business }}</td>
+        <td class="lbl">Guarantor Monthly Income</td>
+        <td class="val">KES {{ "{:,.2f}".format(doc.guarantor_monthly_income or 0) }}</td>
+      </tr>
+      <tr>
+        <td class="lbl">CRB Bureau Status</td>
+        <td class="val bold">{{ doc.crb_status or "Not Checked" }}</td>
+        <td class="lbl">Underwriter Notes</td>
+        <td class="val">{{ doc.crb_score_notes or "Passed basic affordability threshold." }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 5. Credit Committee Signoff -->
+  <div class="sheet-section">
+    <div class="sec-title">5. CREDIT COMMITTEE APPROVAL & SANCTION DECISION</div>
+    <div class="decision-grid">
+      <div class="decision-box">
+        <div class="d-title">Appraised By (Loan Officer)</div>
+        <div class="d-sig-line"></div>
+        <div class="d-meta">Name: ______________________</div>
+        <div class="d-meta">Date: ______________________</div>
+      </div>
+      <div class="decision-box">
+        <div class="d-title">Reviewed By (Risk / Compliance)</div>
+        <div class="d-sig-line"></div>
+        <div class="d-meta">Name: ______________________</div>
+        <div class="d-meta">Date: ______________________</div>
+      </div>
+      <div class="decision-box">
+        <div class="d-title">Sanctioned By (Managing Director)</div>
+        <div class="d-sig-line"></div>
+        <div class="d-meta">Status: [  ] APPROVED   [  ] REJECTED</div>
+        <div class="d-meta">Date: ______________________</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.appraisal-doc {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 11px;
+  color: #1F3224;
+  line-height: 1.4;
+  padding: 10px;
+}
+
+.appraisal-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #1F3224;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+.brand-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F3224;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #556B59;
+}
+
+.header-right { text-align: right; }
+
+.app-status-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-open { background: #FEF3C7; color: #92400E; }
+.status-approved { background: #E1F8EB; color: #147A3E; }
+.status-rejected { background: #FEE2E2; color: #991B1B; }
+
+.meta-line { font-size: 10.5px; }
+
+.sheet-section {
+  margin-bottom: 12px;
+}
+
+.sec-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1F3224;
+  background: #F4EFEB;
+  border: 1px solid #D8CCC1;
+  padding: 4px 8px;
+  border-radius: 4px 4px 0 0;
+  text-transform: uppercase;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table td {
+  border: 1px solid #D8CCC1;
+  padding: 4px 6px;
+  font-size: 10px;
+}
+
+.lbl {
+  background: #FAF8F5;
+  color: #556B59;
+  font-weight: 600;
+  width: 22%;
+}
+
+.val { width: 28%; }
+.bold { font-weight: bold; }
+.highlight { color: #1F3224; }
+
+.decision-grid {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.decision-box {
+  flex: 1;
+  border: 1px solid #D8CCC1;
+  background: #FAF8F5;
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+
+.d-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: #1F3224;
+}
+
+.d-sig-line {
+  border-bottom: 1px dashed #A3B5A7;
+  margin: 18px 6px 8px 6px;
+}
+
+.d-meta {
+  font-size: 9px;
+  color: #556B59;
+  text-align: left;
+}
+</style>

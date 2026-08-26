@@ -1,21 +1,32 @@
 app_name = "lending"
-app_title = "Lending"
-app_publisher = "Frappe Technologies Pvt. Ltd."
-app_description = "Open Source Lending software"
-app_email = "contact@frappe.io"
-app_license = "GNU General Public License (v3)"
+app_title = "Oryx Fund"
+app_publisher = "Oryx Fund"
+app_description = "Lending & Asset Financing Platform"
+app_email = "admin@oryxfund.co.ke"
+app_license = "Proprietary"
 required_apps = ["erpnext"]
-app_logo_url = "/assets/lending/images/frappe-lending-logo.svg"
+app_logo_url = "/assets/lending/images/oryx-mark-dark.png"
 
 add_to_apps_screen = [
 	{
 		"name": "lending",
-		"logo": "/assets/lending/images/frappe-lending-logo.svg",
-		"title": "Lending",
-		"route": "/app/lending",
+		"logo": "/assets/lending/images/oryx-mark-dark.png",
+		"title": "Oryx Fund",
+		"route": "/desk/dashboard-view/Loan Dashboard",
 		"has_permission": "lending.utils.check_app_permission",
 	}
 ]
+
+get_website_user_home_page = "lending.utils.get_home_page"
+
+role_home_page = {
+	"System Manager": "desk/dashboard-view/Loan Dashboard",
+	"Loan Manager": "desk/dashboard-view/Loan Dashboard",
+	"Loan Officer": "desk/dashboard-view/Loan Dashboard",
+	"Customer": "my_loans",
+}
+
+home_page = "my_loans"
 
 audit_trail_doctypes = [
 	# doctypes that make GL entries require Audit Trail to be maintained
@@ -40,7 +51,7 @@ require_type_annotated_api_methods = True
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/lending/css/lending.css"
+app_include_css = "/assets/lending/css/lending.css?v=3.4"
 app_include_js = "lending.bundle.js"
 
 # fixtures
@@ -52,11 +63,15 @@ fixtures = [
 		"dt": "Workflow Action Master",
 		"filters": [["name", "not in", ("Reject", "Approve", "Review")]],
 	},
+	{"dt": "Loan Product"},
+	{"dt": "Custom Field", "filters": [["dt", "in", ("Loan Application", "Loan", "Customer", "User")]]},
+	{"dt": "Module Profile", "filters": [["name", "=", "Oryx Lending Management"]]},
+	{"dt": "Workspace", "filters": [["name", "in", ("Lending", "Invoicing", "Financial Reports")]]},
 ]
 
 
 # include js, css files in header of web template
-# web_include_css = "/assets/lending/css/lending.css"
+web_include_css = "/assets/lending/css/lending.css"
 # web_include_js = "/assets/lending/js/lending.js"
 
 # include custom scss in every website theme (without file extension ".scss")

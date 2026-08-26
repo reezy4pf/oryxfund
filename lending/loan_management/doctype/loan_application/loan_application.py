@@ -74,6 +74,9 @@ class LoanApplication(Document):
 	# end: auto-generated types
 
 	def validate(self):
+		if not self.company:
+			self.company = frappe.db.get_single_value("Global Defaults", "default_company") or "Oryx Fund"
+		self.calculate_disposable_income()
 		self.set_pledge_amount()
 		self.set_loan_amount()
 		self.validate_loan_amount()
@@ -87,16 +90,25 @@ class LoanApplication(Document):
 		self.get_repayment_details()
 		self.check_sanctioned_amount_limit()
 
+	def calculate_disposable_income(self):
+		net_income = flt(getattr(self, "monthly_net_income", 0))
+		debt = flt(getattr(self, "monthly_debt_obligations", 0))
+		expenses = flt(getattr(self, "monthly_fixed_expenses", 0))
+		self.net_disposable_income = max(0, net_income - (debt + expenses))
+
 	def before_save(self):
 		if self.applicant_type == "Customer":
-			if not self.applicant:
+			if not self.applicant and self.applicant_name:
 				customer = frappe.new_doc("Customer")
 				customer.customer_name = self.applicant_name
-				customer.type = "Company"
-				customer.mobile_number = self.applicant_phone_number
-				customer.email_address = self.applicant_email_address
+				customer.customer_type = "Individual"
+				customer.mobile_no = self.applicant_phone_number
+				customer.email_id = self.applicant_email_address
+				if getattr(self, "kra_pin", None):
+					customer.tax_id = self.kra_pin
 				# need to save customer first to link back from contact and address
-				customer.save()
+				customer.flags.ignore_mandatory = True
+				customer.save(ignore_permissions=True)
 
 				# copying over contact details into the contact doctype
 				contact = frappe.new_doc("Contact")

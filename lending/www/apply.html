@@ -1,0 +1,3254 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head_include %}
+<script>
+(function() {
+  try {
+    var savedTheme = localStorage.getItem('theme') || localStorage.getItem('frappe_theme') || localStorage.getItem('oryx_theme');
+    if (!savedTheme) {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        savedTheme = 'dark';
+      }
+    }
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else if (savedTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+    }
+  } catch (e) {}
+})();
+</script>
+{% endblock %}
+
+{% block banner %}{% endblock %}
+
+{% block navbar %}
+<header class="oryx-navbar">
+  <div id="oryx-page-progress" class="oryx-page-progress"></div>
+  <div class="oryx-nav-inner">
+    <!-- Brand Logo -->
+    <a href="/my_loans" class="oryx-brand">
+      <img src="/files/oryx_logo_light.png" alt="Oryx Fund" class="oryx-logo-img oryx-logo-light" style="height: 38px; width: auto; max-height: 42px;">
+      <img src="/files/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-logo-img oryx-logo-dark" style="display: none; height: 38px; width: auto; max-height: 42px;">
+    </a>
+
+    <!-- Desktop Capsule Tabs & Right Controls -->
+    <div class="oryx-nav-desktop-capsules">
+      <nav class="oryx-capsules-nav">
+        <a href="/my_loans" class="oryx-capsule-tab {% if active_page == 'portal' %}active{% endif %}">My Portal</a>
+        <a href="/apply" class="oryx-capsule-tab {% if active_page == 'apply' %}active{% endif %}">
+          {% if is_express_flow %}⚡ Express Loan{% else %}Loan Application{% endif %}
+        </a>
+        {% if is_logged_in %}
+        <a href="/my_account" class="oryx-capsule-tab {% if active_page == 'account' %}active{% endif %}">
+          <svg class="capsule-user-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>{{ first_name }}</span>
+        </a>
+        {% else %}
+        <a href="/login" class="oryx-capsule-tab oryx-tab-login">
+          <svg class="capsule-login-icon" width="13.5" height="13.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span>Login / Sign up</span>
+        </a>
+        {% endif %}
+      </nav>
+
+      <!-- Dark/Light Theme Toggle -->
+      <button type="button" class="oryx-theme-toggle-btn" id="oryxThemeToggle" onclick="toggleOryxTheme()" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+        <svg class="theme-icon sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="theme-icon moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Top Right Inside Header: Account Button + Theme Toggle -->
+    <div class="oryx-nav-mobile-right">
+      {% if is_logged_in %}
+      <a href="/my_account" class="oryx-mobile-account-btn {% if active_page == 'account' %}active{% endif %}">
+        <svg class="capsule-user-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>{{ first_name }}</span>
+      </a>
+      {% else %}
+      <a href="/login" class="oryx-mobile-account-btn oryx-mobile-login-btn">
+        <svg class="capsule-login-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        <span>Login / Sign up</span>
+      </a>
+      {% endif %}
+
+      <button type="button" class="oryx-theme-toggle-btn" id="oryxThemeToggleMobile" onclick="toggleOryxTheme()" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+        <svg class="theme-icon sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="theme-icon moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Sub-Header Capsule Tabs Bar (Navigation only) -->
+  <div class="oryx-mobile-capsules-bar">
+    <nav class="oryx-mobile-capsules-track">
+      <a href="/my_loans" class="oryx-capsule-tab {% if active_page == 'portal' %}active{% endif %}">My Portal</a>
+      <a href="/apply" class="oryx-capsule-tab {% if active_page == 'apply' %}active{% endif %}">
+        {% if is_express_flow %}⚡ Express Loan{% else %}Loan Application{% endif %}
+      </a>
+    </nav>
+  </div>
+</header>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block page_content %}
+<div id="oryx-app-root">
+<div class="oryx-apply-wrapper">
+
+{% if is_express_flow %}
+  <!-- ==========================================
+       SUBSEQUENT LOAN (EXPRESS REPEAT BORROWER) FLOW
+       ========================================== -->
+  
+  <!-- Express Top Hero Header -->
+  <div class="oryx-hero-card express-hero">
+    <div class="hero-top-row">
+      <div class="oryx-badge express-badge">⚡ FAST-TRACK EXPRESS REPEAT LOAN</div>
+      <span class="user-greeting">Verified Borrower: <b>{{ previous_app.applicant_name }}</b></span>
+    </div>
+    <div class="hero-main-row">
+      <div class="hero-title-box">
+        <h1 class="oryx-title">Subsequent Loan Application</h1>
+        <p class="oryx-subtitle">Welcome back! Your identity & KYC are already verified on file. Configure your new facility below for accelerated same-day underwriting.</p>
+      </div>
+      <div class="flow-switch-box">
+        <a href="/apply?flow=standard" class="oryx-switch-link" title="Fill full form from scratch">Need standard onboarding form? &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Express 2-Step Indicator -->
+    <div class="oryx-steps-container express-steps-container">
+      <div class="oryx-step active" id="exp-step-badge-1" onclick="goToExpressStep(1)">
+        <span class="step-num">1</span>
+        <span class="step-label">Facility Specs & Calculator</span>
+      </div>
+      <div class="step-divider" id="exp-step-div-1"></div>
+      <div class="oryx-step" id="exp-step-badge-2" onclick="goToExpressStep(2)">
+        <span class="step-num">2</span>
+        <span class="step-label">Financial Check & Submit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verified KYC Summary Capsule Card -->
+  <div class="oryx-verified-summary-card">
+    <div class="verified-header">
+      <div class="verified-title-wrap">
+        <span class="verified-icon-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </span>
+        <div>
+          <h4 class="verified-heading">Verified KYC On File (Level 1 Clearance)</h4>
+          <p class="verified-sub">Re-entering your personal identification and next of kin is not required.</p>
+        </div>
+      </div>
+      <button type="button" class="oryx-btn-secondary oryx-btn-sm" onclick="toggleEditDrawer()" id="btnToggleEditDrawer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span>Update KYC / Contact</span>
+      </button>
+    </div>
+
+    <div class="verified-grid">
+      <div class="verified-item">
+        <span class="v-label">Legal Name</span>
+        <span class="v-val">{{ previous_app.applicant_name }}</span>
+      </div>
+      <div class="verified-item">
+        <span class="v-label">National ID / Passport</span>
+        <span class="v-val">{{ masked_id }} <span class="v-tag">Verified ✓</span></span>
+      </div>
+      <div class="verified-item">
+        <span class="v-label">KRA PIN</span>
+        <span class="v-val">{{ previous_app.kra_pin }}</span>
+      </div>
+      <div class="verified-item">
+        <span class="v-label">Phone Number</span>
+        <span class="v-val">{{ masked_phone }}</span>
+      </div>
+      <div class="verified-item">
+        <span class="v-label">Residence & County</span>
+        <span class="v-val">{{ previous_app.address_line_1 or "Nairobi" }}, {{ previous_app.state or "Nairobi" }}</span>
+      </div>
+      <div class="verified-item">
+        <span class="v-label">Default Disbursal</span>
+        <span class="v-val highlight-emerald">
+          {% if previous_app.disbursal_method == 'Bank Transfer' %}
+            {{ previous_app.disbursal_bank_name }} - {{ previous_app.disbursal_account_number }}
+          {% else %}
+            M-Pesa ({{ previous_app.disbursal_mpesa_number or previous_app.applicant_phone_number }})
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Collapsible KYC Update Drawer -->
+    <div id="kycEditDrawer" class="kyc-edit-drawer" style="display:none;">
+      <div class="drawer-inner">
+        <h5 class="drawer-title">Update Contact & Residence Details for This Loan</h5>
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Updated Phone Number</label>
+            <input type="tel" id="exp_phone_override" class="oryx-input" value="{{ previous_app.applicant_phone_number }}">
+          </div>
+          <div class="form-group">
+            <label>Updated Residential Address</label>
+            <input type="text" id="exp_address_override" class="oryx-input" value="{{ previous_app.address_line_1 }}">
+          </div>
+          <div class="form-group">
+            <label>County</label>
+            <input type="text" id="exp_state_override" class="oryx-input" value="{{ previous_app.state }}">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Express Subsequent Form Container -->
+  <div class="oryx-form-container">
+    <form id="oryxSubsequentLoanForm" onsubmit="return false;">
+      <input type="hidden" id="exp_is_subsequent" value="1">
+      <input type="hidden" id="exp_previous_loan_application" value="{{ previous_app.name }}">
+      <input type="hidden" id="exp_applicant_name" value="{{ previous_app.applicant_name }}">
+      <input type="hidden" id="exp_national_id" value="{{ previous_app.national_id_or_passport }}">
+      <input type="hidden" id="exp_kra_pin" value="{{ previous_app.kra_pin }}">
+
+      <!-- STEP 1: Facility Specs, Calculator & Disbursal -->
+      <div class="express-form-step active" id="exp-step-1">
+        <div class="step-header">
+          <h3>1. Choose Loan Product & Requested Amount</h3>
+          <p>Select your desired facility. Repayment estimates update in real time.</p>
+        </div>
+
+        <!-- Product Selector Cards -->
+        <label class="field-label-prominent">Select Loan Facility <span class="req">*</span></label>
+        <div class="product-cards-grid">
+          {% for p in products %}
+          <div class="product-card {% if loop.first %}selected{% endif %}" onclick="selectProductCard('{{ p.name }}', {{ p.rate_of_interest }}, {{ p.maximum_loan_amount }}, {{ p.is_term_loan }}, this)">
+            <div class="pcard-top">
+              <span class="pcard-badge">{% if p.is_term_loan %}Term Loan{% else %}Short Advance{% endif %}</span>
+              <span class="pcard-rate">{{ p.rate_of_interest }}% p.a.</span>
+            </div>
+            <h4 class="pcard-title">{{ p.product_name }}</h4>
+            <p class="pcard-limit">Max Limit: <b>KES {{ "{:,.0f}".format(p.maximum_loan_amount|float) }}</b></p>
+            <div class="pcard-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Hidden Product Select for Data Binding -->
+        <select id="exp_loan_product" class="oryx-select" style="display:none;" onchange="updateSubsequentCalculations()">
+          {% for p in products %}
+          <option value="{{ p.name }}" data-rate="{{ p.rate_of_interest }}" data-max="{{ p.maximum_loan_amount }}" data-term="{{ p.is_term_loan }}" {% if loop.first %}selected{% endif %}>{{ p.product_name }}</option>
+          {% endfor %}
+        </select>
+
+        <!-- Amount Slider & Input Box -->
+        <div class="amount-config-box">
+          <div class="amount-input-row">
+            <div>
+              <label class="field-label-prominent" style="margin-bottom:2px;">Requested Loan Amount (KES) <span class="req">*</span></label>
+              <p class="amount-helper">Enter amount or adjust the slider below.</p>
+            </div>
+            <div class="amount-field-wrap">
+              <span class="currency-prefix">KES</span>
+              <input type="number" id="exp_loan_amount" class="oryx-input amount-large-input" value="50000" min="5000" max="5000000" step="5000" oninput="syncAmountFromInput()" required>
+            </div>
+          </div>
+
+          <div class="slider-wrap">
+            <input type="range" id="exp_amount_slider" class="oryx-range-slider" min="5000" max="500000" step="5000" value="50000" oninput="syncAmountFromSlider()">
+            <div class="slider-labels">
+              <span>KES 5,000</span>
+              <span>KES 250,000</span>
+              <span id="exp_slider_max_label">KES 500,000</span>
+            </div>
+          </div>
+
+          <!-- Quick Preset Pills -->
+          <div class="preset-pills-row">
+            <span class="preset-label">Quick select:</span>
+            <button type="button" class="preset-pill" onclick="setPresetAmount(25000)">KES 25K</button>
+            <button type="button" class="preset-pill active" onclick="setPresetAmount(50000)">KES 50K</button>
+            <button type="button" class="preset-pill" onclick="setPresetAmount(100000)">KES 100K</button>
+            <button type="button" class="preset-pill" onclick="setPresetAmount(200000)">KES 200K</button>
+            <button type="button" class="preset-pill" onclick="setPresetAmount(500000)">KES 500K</button>
+          </div>
+        </div>
+
+        <div class="form-grid grid-2" style="margin-top:20px;">
+          <div class="form-group">
+            <label>Repayment Duration (Tenure) <span class="req">*</span></label>
+            <select id="exp_repayment_periods" class="oryx-select" onchange="updateSubsequentCalculations()" required>
+              <option value="1">1 Month (30 Days)</option>
+              <option value="2">2 Months</option>
+              <option value="3" selected>3 Months</option>
+              <option value="6">6 Months</option>
+              <option value="12">12 Months (1 Year)</option>
+              <option value="18">18 Months</option>
+              <option value="24">24 Months (2 Years)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Primary Purpose of Loan <span class="req">*</span></label>
+            <select id="exp_loan_purpose" class="oryx-select" required>
+              <option value="">Select Purpose</option>
+              {% for pu in purposes %}
+              <option value="{{ pu.name }}">{{ pu.loan_purpose }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Real-Time Calculation HUD -->
+        <div class="calc-hud-card">
+          <div class="hud-header">
+            <span class="hud-tag">⚡ LIVE ESTIMATE</span>
+            <span class="hud-note">No hidden disbursement deductions</span>
+          </div>
+          <div class="hud-stats-grid">
+            <div class="hud-stat">
+              <span class="hud-label">Principal</span>
+              <span class="hud-value" id="exp_hud_principal">KES 50,000</span>
+            </div>
+            <div class="hud-stat">
+              <span class="hud-label">Estimated Interest</span>
+              <span class="hud-value" id="exp_hud_interest">KES 1,500</span>
+            </div>
+            <div class="hud-stat">
+              <span class="hud-label">Monthly Repayment</span>
+              <span class="hud-value highlight-emerald" id="exp_hud_monthly">KES 17,166.67</span>
+            </div>
+            <div class="hud-stat">
+              <span class="hud-label">Total Repayment</span>
+              <span class="hud-value" id="exp_hud_total">KES 51,500</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disbursal Destination Option Cards -->
+        <div style="margin-top:24px;">
+          <label class="field-label-prominent">Confirm Disbursal Destination <span class="req">*</span></label>
+          <div class="disbursal-options-grid">
+            <label class="disbursal-option-card selected" id="opt_disb_mpesa" onclick="selectDisbursalOption('M-Pesa')">
+              <input type="radio" name="exp_disb_type" value="M-Pesa" checked>
+              <div class="disb-card-content">
+                <div class="disb-title-row">
+                  <span class="disb-name">M-Pesa Direct Disbursal</span>
+                  <span class="disb-speed">⚡ Instant</span>
+                </div>
+                <span class="disb-sub">Registered: {{ previous_app.disbursal_mpesa_number or previous_app.applicant_phone_number }}</span>
+              </div>
+            </label>
+
+            <label class="disbursal-option-card" id="opt_disb_bank" onclick="selectDisbursalOption('Bank')">
+              <input type="radio" name="exp_disb_type" value="Bank">
+              <div class="disb-card-content">
+                <div class="disb-title-row">
+                  <span class="disb-name">Bank Wire (EFT / RTGS)</span>
+                  <span class="disb-speed">Same Day</span>
+                </div>
+                <span class="disb-sub">
+                  {% if previous_app.disbursal_bank_name %}
+                    {{ previous_app.disbursal_bank_name }} - {{ previous_app.disbursal_account_number }}
+                  {% else %}
+                    Direct Bank Account Deposit
+                  {% endif %}
+                </span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Hidden disbursal inputs to capture values -->
+          <input type="hidden" id="exp_disbursal_method" value="M-Pesa">
+          <input type="hidden" id="exp_disbursal_mpesa_number" value="{{ previous_app.disbursal_mpesa_number or previous_app.applicant_phone_number }}">
+          <input type="hidden" id="exp_disbursal_bank_name" value="{{ previous_app.disbursal_bank_name or '' }}">
+          <input type="hidden" id="exp_disbursal_bank_branch" value="{{ previous_app.disbursal_bank_branch or '' }}">
+          <input type="hidden" id="exp_disbursal_account_number" value="{{ previous_app.disbursal_account_number or '' }}">
+
+          <!-- Alternate Bank Form (if bank selected and empty) -->
+          <div id="expBankFields" class="bank-details-box" style="display:none; margin-top:14px;">
+            <div class="form-grid grid-3">
+              <div class="form-group">
+                <label>Bank Name</label>
+                <input type="text" id="exp_bank_name_input" class="oryx-input" placeholder="e.g. Equity Bank" value="{{ previous_app.disbursal_bank_name or '' }}">
+              </div>
+              <div class="form-group">
+                <label>Bank Branch</label>
+                <input type="text" id="exp_bank_branch_input" class="oryx-input" placeholder="e.g. Upper Hill" value="{{ previous_app.disbursal_bank_branch or '' }}">
+              </div>
+              <div class="form-group">
+                <label>Account Number</label>
+                <input type="text" id="exp_bank_acc_input" class="oryx-input" placeholder="e.g. 0110192837482" value="{{ previous_app.disbursal_account_number or '' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top:28px;">
+          <div></div>
+          <button type="button" class="oryx-btn oryx-btn-primary" onclick="goToExpressStep(2)">Continue to Financial Verification &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Financial Status & Instant Submission -->
+      <div class="express-form-step" id="exp-step-2">
+        <div class="step-header">
+          <h3>2. Financial Status & Declarations</h3>
+          <p>Confirm that your income and employment details are current before final submission.</p>
+        </div>
+
+        <!-- Income Confirmation Card -->
+        <div class="decision-card">
+          <h4 class="decision-title">Monthly Cashflow & Employment</h4>
+          <div class="decision-radios">
+            <label class="decision-radio-label">
+              <input type="radio" name="income_status" value="current" checked onchange="toggleIncomeUpdate(false)">
+              <div class="decision-text">
+                <span class="dt-main">Keep financial profile on file (Recommended)</span>
+                <span class="dt-sub">Monthly Net Income: KES {{ "{:,.0f}".format(previous_app.monthly_net_income|float) }} | Employer: {{ previous_app.employer_or_business_name or "Active Business / Employment" }}</span>
+              </div>
+            </label>
+
+            <label class="decision-radio-label">
+              <input type="radio" name="income_status" value="changed" onchange="toggleIncomeUpdate(true)">
+              <div class="decision-text">
+                <span class="dt-main">My income or employment has changed</span>
+                <span class="dt-sub">Update your monthly cashflow figures for accurate loan appraisal.</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Collapsible Income Override Inputs -->
+          <div id="incomeOverrideFields" class="override-fields-box" style="display:none;">
+            <div class="form-grid grid-3">
+              <div class="form-group">
+                <label>Employment / Business Status</label>
+                <select id="exp_employment_status" class="oryx-select">
+                  <option value="Permanent / Salaried" {% if previous_app.employment_status == 'Permanent / Salaried' %}selected{% endif %}>Permanent / Salaried</option>
+                  <option value="Self-Employed / Business Owner" {% if previous_app.employment_status == 'Self-Employed / Business Owner' %}selected{% endif %}>Self-Employed / Business</option>
+                  <option value="Contract" {% if previous_app.employment_status == 'Contract' %}selected{% endif %}>Contract</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Employer / Business Name</label>
+                <input type="text" id="exp_employer_name" class="oryx-input" value="{{ previous_app.employer_or_business_name or '' }}">
+              </div>
+              <div class="form-group">
+                <label>Updated Monthly Net Income (KES)</label>
+                <input type="number" id="exp_monthly_net_income" class="oryx-input" value="{{ previous_app.monthly_net_income or 0 }}">
+              </div>
+            </div>
+            <div class="form-grid grid-2">
+              <div class="form-group">
+                <label>Monthly Debt Obligations (KES)</label>
+                <input type="number" id="exp_monthly_debt" class="oryx-input" value="{{ previous_app.monthly_debt_obligations or 0 }}">
+              </div>
+              <div class="form-group">
+                <label>Monthly Living Expenses (KES)</label>
+                <input type="number" id="exp_monthly_expenses" class="oryx-input" value="{{ previous_app.monthly_fixed_expenses or 0 }}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guarantor Confirmation Card -->
+        <div class="decision-card" style="margin-top:16px;">
+          <h4 class="decision-title">Guarantor on File</h4>
+          <div class="decision-radios">
+            <label class="decision-radio-label">
+              <input type="radio" name="guar_status" value="current" checked onchange="toggleGuarantorUpdate(false)">
+              <div class="decision-text">
+                <span class="dt-main">Retain guarantor on file</span>
+                <span class="dt-sub">{{ previous_app.guarantor_full_name or "Guarantor on record" }} ({{ previous_app.guarantor_phone or "Verified" }})</span>
+              </div>
+            </label>
+
+            <label class="decision-radio-label">
+              <input type="radio" name="guar_status" value="changed" onchange="toggleGuarantorUpdate(true)">
+              <div class="decision-text">
+                <span class="dt-main">Provide a new or updated guarantor</span>
+                <span class="dt-sub">Update guarantor name, phone, and national ID.</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Collapsible Guarantor Override Inputs -->
+          <div id="guarOverrideFields" class="override-fields-box" style="display:none;">
+            <div class="form-grid grid-3">
+              <div class="form-group">
+                <label>Guarantor Full Name</label>
+                <input type="text" id="exp_guar_name" class="oryx-input" placeholder="e.g. Peter Kamau" value="{{ previous_app.guarantor_full_name or '' }}">
+              </div>
+              <div class="form-group">
+                <label>Guarantor Phone Number</label>
+                <input type="tel" id="exp_guar_phone" class="oryx-input" placeholder="e.g. 0711000000" value="{{ previous_app.guarantor_phone or '' }}">
+              </div>
+              <div class="form-group">
+                <label>Guarantor National ID</label>
+                <input type="text" id="exp_guar_id" class="oryx-input" placeholder="e.g. 24890123" value="{{ previous_app.guarantor_national_id or '' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subsequent Loan Summary Review Box -->
+        <div class="review-summary-card" style="margin-top:20px;">
+          <h4 class="rv-title">Application Summary & Verification</h4>
+          <div class="rv-grid">
+            <div class="rv-item">
+              <span class="rv-label">Applicant:</span>
+              <span class="rv-val" id="exp_rv_name">{{ previous_app.applicant_name }}</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Facility & Amount:</span>
+              <span class="rv-val highlight-emerald" id="exp_rv_facility">KES 50,000</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Tenure & Disbursal:</span>
+              <span class="rv-val" id="exp_rv_tenure">3 Months via M-Pesa</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Priority Processing:</span>
+              <span class="rv-val highlight-gold">⚡ Same-Day Returning Borrower SLA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consent Checkbox -->
+        <div class="consent-box" style="margin-top:18px;">
+          <label class="oryx-checkbox-label">
+            <input type="checkbox" id="exp_consent_agree" checked required>
+            <span>I confirm that all financial declarations provided for this subsequent loan are accurate and I authorize Oryx Fund to process this facility under standard credit evaluation terms.</span>
+          </label>
+        </div>
+
+        <div id="expSubmitError" class="oryx-error-banner" style="display:none; margin-top:14px;"></div>
+
+        <div class="form-actions" style="margin-top:24px;">
+          <button type="button" class="oryx-btn oryx-btn-secondary" onclick="goToExpressStep(1)">&larr; Back to Loan Terms</button>
+          <button type="button" class="oryx-btn oryx-btn-primary oryx-btn-pulse" id="btnSubmitExpressApp" onclick="submitExpressApplication()">
+            <span>⚡ Submit Subsequent Loan Application</span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- Subsequent Loan Success Screen -->
+    <div id="expressSuccessScreen" class="oryx-success-card" style="display:none;">
+      <div class="success-icon-wrap">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div class="express-priority-badge">⚡ PRIORITY DISBURSAL QUEUE</div>
+      <h2 class="success-title">Subsequent Loan Application Received!</h2>
+      <p class="success-desc">Thank you, <b>{{ previous_app.applicant_name }}</b>. Because your profile and KYC are already verified, your subsequent loan request has bypassed manual identity screening.</p>
+      
+      <div class="app-ref-box">
+        <span class="ref-label">Loan Application Reference</span>
+        <span class="ref-code" id="exp_res_app_id">ACC-LOAP-2026-XXXXX</span>
+      </div>
+
+      <div class="next-steps-card">
+        <h4>Expedited Fast-Track Timeline</h4>
+        <ol>
+          <li><b>Priority Automated Scoring:</b> Your credit profile is immediately evaluated against your historical track record.</li>
+          <li><b>Instant Notification:</b> You will receive an SMS confirmation once final sanction is approved.</li>
+          <li><b>Direct Disbursal:</b> Funds will be routed to your verified destination (<span id="exp_res_disb_target">{{ previous_app.disbursal_mpesa_number or previous_app.applicant_phone_number }}</span>).</li>
+        </ol>
+      </div>
+
+      <div style="margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="/my_loans" class="oryx-btn oryx-btn-primary">View in My Portal &rarr;</a>
+        <a href="/my_account" class="oryx-btn oryx-btn-secondary">My Account Details</a>
+      </div>
+    </div>
+
+  </div>
+
+{% else %}
+  <!-- ==========================================
+       STANDARD FIRST-TIME LOAN ONBOARDING FLOW
+       ========================================== -->
+  
+  <!-- Returning Borrower Notice (if user is logged in with previous loans or visiting standard) -->
+  {% if has_previous_application %}
+  <div class="oryx-returning-banner">
+    <div class="r-banner-left">
+      <span class="r-badge">⚡ RETURNING BORROWER DETECTED</span>
+      <p>Welcome back, <b>{{ previous_app.applicant_name }}</b>! You can fast-track this application with pre-filled verified KYC.</p>
+    </div>
+    <a href="/apply?flow=express" class="oryx-btn oryx-btn-sm oryx-btn-primary">Switch to Express Application &rarr;</a>
+  </div>
+  {% endif %}
+
+  <!-- Top Hero Header -->
+  <div class="oryx-hero-card">
+    <div class="hero-top-row">
+      <div class="oryx-badge">LOAN APPLICATION</div>
+      <span class="user-greeting">{% if is_logged_in %}Account: {{ user_email }}{% else %}Fast 2-Minute Application{% endif %}</span>
+    </div>
+    <div class="hero-main-row">
+      <div class="hero-title-box">
+        <h1 class="oryx-title">Loan Application Form</h1>
+        <p class="oryx-subtitle">Fast, transparent financing for business advances, working capital, and term financing in Kenya.</p>
+      </div>
+    </div>
+    
+    <!-- Step Indicator -->
+    <div class="oryx-steps-container">
+      <div class="oryx-step active" id="step-badge-1" onclick="goToStep(1)">
+        <span class="step-num">1</span>
+        <span class="step-label">Personal KYC</span>
+      </div>
+      <div class="step-divider" id="step-div-1"></div>
+      <div class="oryx-step" id="step-badge-2" onclick="goToStep(2)">
+        <span class="step-num">2</span>
+        <span class="step-label">Loan Specs</span>
+      </div>
+      <div class="step-divider" id="step-div-2"></div>
+      <div class="oryx-step" id="step-badge-3" onclick="goToStep(3)">
+        <span class="step-num">3</span>
+        <span class="step-label">Cashflow &amp; Guarantor</span>
+      </div>
+      <div class="step-divider" id="step-div-3"></div>
+      <div class="oryx-step" id="step-badge-4" onclick="goToStep(4)">
+        <span class="step-num">4</span>
+        <span class="step-label">Consent &amp; Submit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div class="oryx-form-container">
+    <form id="oryxLoanForm" onsubmit="return false;">
+      
+      <!-- STEP 1: Personal Details & Next of Kin -->
+      <div class="form-step active" id="step-1">
+        <div class="step-header">
+          <h3>1. Personal Identity & Contact Details</h3>
+          <p>Please enter your legal identity as indicated on your National ID or Passport.</p>
+        </div>
+
+        <!-- Guest Returning Borrower Detector Alert Box -->
+        <div id="guestReturningAlert" class="guest-returning-alert" style="display:none;">
+          <div class="gra-content">
+            <span class="gra-icon">⚡</span>
+            <div>
+              <strong>Existing Profile Found!</strong>
+              <span id="graText">We found your verified borrower record on file. Sign in to apply in 60 seconds.</span>
+            </div>
+          </div>
+          <a href="/login?redirect-to=/apply?flow=express" class="oryx-btn oryx-btn-sm oryx-btn-primary">Sign In to Fast-Track &rarr;</a>
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="form-group">
+            <label>Full Legal Name <span class="req">*</span></label>
+            <input type="text" id="applicant_name" class="oryx-input" placeholder="e.g. James Mwangi Kariuki" value="{{ previous_app.applicant_name or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>National ID / Passport Number <span class="req">*</span></label>
+            <input type="text" id="national_id_or_passport" class="oryx-input" placeholder="e.g. 12345678" value="{{ previous_app.national_id_or_passport or '' }}" onblur="checkGuestBorrowerLookup(this.value)" required>
+          </div>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>KRA PIN Number <span class="req">*</span></label>
+            <input type="text" id="kra_pin" class="oryx-input" placeholder="e.g. A012345678Z" value="{{ previous_app.kra_pin or '' }}" required style="text-transform:uppercase;">
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="date_of_birth" class="oryx-input" value="{{ previous_app.date_of_birth or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="gender" class="oryx-select">
+              <option value="">Select Gender</option>
+              <option value="Male" {% if previous_app.gender == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if previous_app.gender == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="form-group">
+            <label>Primary Phone Number (M-Pesa Registered) <span class="req">*</span></label>
+            <input type="tel" id="applicant_phone_number" class="oryx-input" placeholder="e.g. 0712345678" value="{{ previous_app.applicant_phone_number or '' }}" onblur="checkGuestBorrowerLookup(this.value)" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="applicant_email_address" class="oryx-input" placeholder="e.g. james@example.com" value="{{ previous_app.applicant_email_address or user_email }}">
+          </div>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Residential Physical Address <span class="req">*</span></label>
+            <input type="text" id="address_line_1" class="oryx-input" placeholder="e.g. Kilimani, Ring Road" value="{{ previous_app.address_line_1 or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Estate / House Number</label>
+            <input type="text" id="address_line_2" class="oryx-input" placeholder="e.g. House No. B4, Palm Court" value="{{ previous_app.address_line_2 or '' }}">
+          </div>
+          <div class="form-group">
+            <label>County <span class="req">*</span></label>
+            <input type="text" id="state" class="oryx-input" placeholder="e.g. Nairobi" value="{{ previous_app.state or 'Nairobi' }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Residence Ownership Status</label>
+          <select id="residence_status" class="oryx-select">
+            <option value="Rented" {% if previous_app.residence_status == 'Rented' %}selected{% endif %}>Rented</option>
+            <option value="Owned" {% if previous_app.residence_status == 'Owned' %}selected{% endif %}>Owned</option>
+            <option value="Family Owned" {% if previous_app.residence_status == 'Family Owned' %}selected{% endif %}>Family Owned</option>
+            <option value="Mortgaged" {% if previous_app.residence_status == 'Mortgaged' %}selected{% endif %}>Mortgaged</option>
+          </select>
+        </div>
+
+        <hr class="section-divider">
+
+        <div class="step-header">
+          <h4>Next of Kin Details</h4>
+          <p>Contact person in case of an emergency.</p>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Next of Kin Full Name <span class="req">*</span></label>
+            <input type="text" id="next_of_kin_name" class="oryx-input" placeholder="e.g. Mary Wanjiku" value="{{ previous_app.next_of_kin_name or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Relationship <span class="req">*</span></label>
+            <input type="text" id="next_of_kin_relation" class="oryx-input" placeholder="e.g. Spouse / Sister" value="{{ previous_app.next_of_kin_relation or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Next of Kin Phone Number <span class="req">*</span></label>
+            <input type="tel" id="next_of_kin_phone" class="oryx-input" placeholder="e.g. 0722000000" value="{{ previous_app.next_of_kin_phone or '' }}" required>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div></div>
+          <button type="button" class="oryx-btn oryx-btn-primary" onclick="goToStep(2)">Continue to Loan Specs &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Loan Specs & Disbursal -->
+      <div class="form-step" id="step-2">
+        <div class="step-header">
+          <h3>2. Loan Facility & Disbursal Destination</h3>
+          <p>Specify the amount required and where the approved funds should be sent.</p>
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="form-group">
+            <label>Loan Product <span class="req">*</span></label>
+            <select id="loan_product" class="oryx-select" onchange="calculateRepayment()" required>
+              {% for p in products %}
+              <option value="{{ p.name }}" data-rate="{{ p.rate_of_interest }}" data-max="{{ p.maximum_loan_amount }}">{{ p.product_name }} ({{ p.rate_of_interest }}% p.a.)</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Requested Loan Amount (KES) <span class="req">*</span></label>
+            <input type="number" id="loan_amount" class="oryx-input" placeholder="e.g. 50000" min="5000" oninput="calculateRepayment()" required>
+          </div>
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="form-group">
+            <label>Repayment Duration (Months) <span class="req">*</span></label>
+            <select id="repayment_periods" class="oryx-select" onchange="calculateRepayment()" required>
+              <option value="1">1 Month</option>
+              <option value="2">2 Months</option>
+              <option value="3" selected>3 Months</option>
+              <option value="6">6 Months</option>
+              <option value="12">12 Months</option>
+              <option value="18">18 Months</option>
+              <option value="24">24 Months</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Purpose of Loan <span class="req">*</span></label>
+            <select id="loan_purpose" class="oryx-select" required>
+              <option value="">Select Purpose</option>
+              {% for pu in purposes %}
+              <option value="{{ pu.name }}">{{ pu.loan_purpose }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Repayment Preview Box -->
+        <div class="calc-preview-card">
+          <div class="preview-item">
+            <span class="p-label">Estimated Monthly Repayment:</span>
+            <span class="p-val" id="est_monthly_repayment">KES 0.00</span>
+          </div>
+          <div class="preview-item">
+            <span class="p-label">Total Payable (Principal + Interest):</span>
+            <span class="p-val" id="est_total_payable">KES 0.00</span>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <div class="step-header">
+          <h4>Disbursal Account Destination</h4>
+          <p>Select whether you prefer funds via M-Pesa or Direct Bank Wire.</p>
+        </div>
+
+        <div class="form-group">
+          <label>Disbursal Method <span class="req">*</span></label>
+          <select id="disbursal_method" class="oryx-select" onchange="toggleDisbursalMethod()">
+            <option value="M-Pesa">M-Pesa Direct (Recommended)</option>
+            <option value="Bank Transfer">Bank Wire (EFT / RTGS)</option>
+          </select>
+        </div>
+
+        <!-- M-Pesa Sub-fields -->
+        <div id="mpesa_fields">
+          <div class="form-group">
+            <label>M-Pesa Disbursal Phone Number <span class="req">*</span></label>
+            <input type="tel" id="disbursal_mpesa_number" class="oryx-input" placeholder="e.g. 0712345678" value="{{ previous_app.disbursal_mpesa_number or previous_app.applicant_phone_number or '' }}">
+            <small class="field-hint">Must be registered under your National ID.</small>
+          </div>
+        </div>
+
+        <!-- Bank Sub-fields -->
+        <div id="bank_fields" style="display:none;">
+          <div class="form-grid grid-2">
+            <div class="form-group">
+              <label>Bank Name</label>
+              <input type="text" id="disbursal_bank_name" class="oryx-input" placeholder="e.g. KCB / Equity / NCBA" value="{{ previous_app.disbursal_bank_name or '' }}">
+            </div>
+            <div class="form-group">
+              <label>Bank Branch</label>
+              <input type="text" id="disbursal_bank_branch" class="oryx-input" placeholder="e.g. Upper Hill Nairobi" value="{{ previous_app.disbursal_bank_branch or '' }}">
+            </div>
+          </div>
+          <div class="form-grid grid-2">
+            <div class="form-group">
+              <label>Account Number</label>
+              <input type="text" id="disbursal_account_number" class="oryx-input" placeholder="e.g. 011000000000" value="{{ previous_app.disbursal_account_number or '' }}">
+            </div>
+            <div class="form-group">
+              <label>Account Name</label>
+              <input type="text" id="disbursal_account_name" class="oryx-input" placeholder="Account Holder Legal Name" value="{{ previous_app.disbursal_account_name or previous_app.applicant_name or '' }}">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="oryx-btn oryx-btn-secondary" onclick="goToStep(1)">&larr; Back to Personal</button>
+          <button type="button" class="oryx-btn oryx-btn-primary" onclick="goToStep(3)">Continue to Cashflow &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Cashflow & Guarantor -->
+      <div class="form-step" id="step-3">
+        <div class="step-header">
+          <h3>3. Employment & Monthly Cashflow</h3>
+          <p>Please enter your income details to determine affordability and loan clearance.</p>
+        </div>
+
+        <div class="form-grid grid-2">
+          <div class="form-group">
+            <label>Employment / Business Status <span class="req">*</span></label>
+            <select id="employment_status" class="oryx-select" required>
+              <option value="Permanent / Salaried" {% if previous_app.employment_status == 'Permanent / Salaried' %}selected{% endif %}>Permanent / Salaried</option>
+              <option value="Self-Employed / Business Owner" {% if previous_app.employment_status == 'Self-Employed / Business Owner' %}selected{% endif %}>Self-Employed / Business Owner</option>
+              <option value="Contract" {% if previous_app.employment_status == 'Contract' %}selected{% endif %}>Contract</option>
+              <option value="Freelancer" {% if previous_app.employment_status == 'Freelancer' %}selected{% endif %}>Freelancer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Employer / Business Legal Name <span class="req">*</span></label>
+            <input type="text" id="employer_or_business_name" class="oryx-input" placeholder="e.g. Safaricom PLC / Nairobi Retail Store" value="{{ previous_app.employer_or_business_name or '' }}" required>
+          </div>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Job Title / Nature of Business</label>
+            <input type="text" id="job_title_or_nature_of_business" class="oryx-input" placeholder="e.g. Operations Manager / General Trade" value="{{ previous_app.job_title_or_nature_of_business or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Workplace Physical Address</label>
+            <input type="text" id="work_physical_address" class="oryx-input" placeholder="e.g. Westlands Commercial Center" value="{{ previous_app.work_physical_address or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Workplace / Business Phone</label>
+            <input type="tel" id="work_phone" class="oryx-input" placeholder="e.g. 0201234567" value="{{ previous_app.work_phone or '' }}">
+          </div>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Monthly Net Income (KES) <span class="req">*</span></label>
+            <input type="number" id="monthly_net_income" class="oryx-input" placeholder="e.g. 85000" oninput="calcDisposable()" value="{{ previous_app.monthly_net_income or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Monthly Debt Obligations (KES)</label>
+            <input type="number" id="monthly_debt_obligations" class="oryx-input" placeholder="e.g. 15000" oninput="calcDisposable()" value="{{ previous_app.monthly_debt_obligations or 0 }}">
+          </div>
+          <div class="form-group">
+            <label>Monthly Fixed Living Expenses (KES)</label>
+            <input type="number" id="monthly_fixed_expenses" class="oryx-input" placeholder="e.g. 25000" oninput="calcDisposable()" value="{{ previous_app.monthly_fixed_expenses or 0 }}">
+          </div>
+        </div>
+
+        <div class="disposable-income-card">
+          <span>Estimated Monthly Net Disposable Income:</span>
+          <b id="disp_income">KES 0.00</b>
+        </div>
+
+        <hr class="section-divider">
+
+        <div class="step-header">
+          <h4>Guarantor Information</h4>
+          <p>Details of an individual who confirms your application.</p>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Guarantor Full Legal Name <span class="req">*</span></label>
+            <input type="text" id="guarantor_full_name" class="oryx-input" placeholder="e.g. Peter Kamau Mwangi" value="{{ previous_app.guarantor_full_name or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Guarantor National ID <span class="req">*</span></label>
+            <input type="text" id="guarantor_national_id" class="oryx-input" placeholder="e.g. 23456789" value="{{ previous_app.guarantor_national_id or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Guarantor KRA PIN</label>
+            <input type="text" id="guarantor_kra_pin" class="oryx-input" placeholder="e.g. A009876543Z" value="{{ previous_app.guarantor_kra_pin or '' }}" style="text-transform:uppercase;">
+          </div>
+        </div>
+
+        <div class="form-grid grid-3">
+          <div class="form-group">
+            <label>Guarantor Phone Number <span class="req">*</span></label>
+            <input type="tel" id="guarantor_phone" class="oryx-input" placeholder="e.g. 0733000000" value="{{ previous_app.guarantor_phone or '' }}" required>
+          </div>
+          <div class="form-group">
+            <label>Guarantor Employer / Business</label>
+            <input type="text" id="guarantor_employer_or_business" class="oryx-input" placeholder="e.g. Kenya Airways / Consultant" value="{{ previous_app.guarantor_employer_or_business or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Guarantor Monthly Income (KES)</label>
+            <input type="number" id="guarantor_monthly_income" class="oryx-input" placeholder="e.g. 100000" value="{{ previous_app.guarantor_monthly_income or '' }}">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="oryx-btn oryx-btn-secondary" onclick="goToStep(2)">&larr; Back to Facility</button>
+          <button type="button" class="oryx-btn oryx-btn-primary" onclick="goToStep(4)">Continue to Consent &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Consent & Submission -->
+      <div class="form-step" id="step-4">
+        <div class="step-header">
+          <h3>4. Statutory Consents & Final Verification</h3>
+          <p>Please review your loan facility details and grant regulatory consents under Kenyan law.</p>
+        </div>
+
+        <div class="review-summary-card">
+          <h4 class="rv-title">Application Summary Review</h4>
+          <div class="rv-grid">
+            <div class="rv-item">
+              <span class="rv-label">Applicant:</span>
+              <span class="rv-val" id="rv_name">-</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">ID / KRA PIN:</span>
+              <span class="rv-val" id="rv_id_pin">-</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Facility Requested:</span>
+              <span class="rv-val" id="rv_facility">-</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Tenure & Disbursal:</span>
+              <span class="rv-val" id="rv_tenure_disb">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="consent-box">
+          <label class="oryx-checkbox-label">
+            <input type="checkbox" id="consent_dpa" checked required>
+            <span>I confirm that all information provided is true and accurate, and grant explicit consent to <b>Oryx Fund</b> to process my personal data pursuant to the <b>Data Protection Act 2019</b>.</span>
+          </label>
+
+          <label class="oryx-checkbox-label" style="margin-top:12px;">
+            <input type="checkbox" id="consent_crb" checked required>
+            <span>I authorize <b>Oryx Fund</b> to perform a credit inquiry with licensed Credit Reference Bureaus (Metropol / CreditInfo / TransUnion) to evaluate my credit eligibility.</span>
+          </label>
+        </div>
+
+        <div id="submitError" class="oryx-error-banner" style="display:none; margin-top:16px;"></div>
+
+        <div class="form-actions" style="margin-top:24px;">
+          <button type="button" class="oryx-btn oryx-btn-secondary" onclick="goToStep(3)">&larr; Back to Financials</button>
+          <button type="button" class="oryx-btn oryx-btn-primary" id="btnSubmitApp" onclick="submitApplication()">Submit Application &rarr;</button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- SUCCESS SCREEN -->
+    <div id="successScreen" class="oryx-success-card" style="display:none;">
+      <div class="success-icon">&#10004;</div>
+      <h2>Application Submitted Successfully!</h2>
+      <p>Your loan application has been received and routed to our credit underwriting desk.</p>
+      
+      <div class="app-ref-box">
+        <span class="ref-label">Application Reference Number</span>
+        <span class="ref-code" id="res_app_id">ACC-LOAP-2026-00001</span>
+      </div>
+
+      <div class="next-steps-card">
+        <h4>What happens next?</h4>
+        <ol>
+          <li>Our loan officer will review your application and KYC details within <b>2 hours</b>.</li>
+          <li>You will receive an SMS confirmation with your loan agreement offer.</li>
+          <li>Upon approval, funds will be disbursed directly to your designated M-Pesa / Bank account.</li>
+        </ol>
+      </div>
+
+      <div style="margin-top:24px; text-align:center;">
+        <a href="/my_loans" class="oryx-btn oryx-btn-primary">View in My Portal &rarr;</a>
+      </div>
+    </div>
+
+  </div>
+{% endif %}
+
+</div>
+</div>
+
+<style>
+/* Eradicate Footer & ERPNext branding on application page */
+footer,
+.web-footer,
+.page-footer,
+.footer-powered,
+.footer-info {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body, html, main, .page-container, .page-content-wrapper {
+  background-color: var(--bg-body, #EAE0D8) !important;
+  color: var(--text-color, #121A14) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  margin: 0;
+  padding: 0;
+}
+
+:root, [data-theme="light"], [data-theme-mode="light"] {
+  --bg-body: #EAE0D8;
+  --bg-card: #FFFFFF;
+  --bg-surface: #F5EFEA;
+  --text-color: #121A14;
+  --text-muted: #556B5D;
+  --border-color: #D1C5BA;
+  --primary-color: #1F3224;
+  --primary-hover: #16251A;
+  --accent-gold: #C1440E;
+}
+
+[data-theme="dark"], html.dark, body.dark, [data-theme-mode="dark"] {
+  --bg-body: #080D0A;
+  --bg-card: #101712;
+  --bg-surface: #141F17;
+  --text-color: #F3F4F6;
+  --text-muted: #9CA3AF;
+  --border-color: #1E2D22;
+  --primary-color: #00D26A;
+  --primary-hover: #00B85C;
+  --accent-gold: #F59E0B;
+}
+
+[data-theme="dark"] body,
+html.dark body,
+body.dark,
+[data-theme="dark"] #oryx-app-root,
+html.dark #oryx-app-root,
+[data-theme="dark"] main,
+html.dark main,
+[data-theme="dark"] .page-content-wrapper,
+html.dark .page-content-wrapper {
+  background-color: #080D0A !important;
+  color: #F3F4F6 !important;
+}
+
+.oryx-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(234, 224, 216, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 20px;
+}
+
+[data-theme="dark"] .oryx-navbar,
+html.dark .oryx-navbar {
+  background: rgba(16, 23, 18, 0.95);
+}
+
+.oryx-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.oryx-capsules-nav {
+  display: flex;
+  gap: 8px;
+  background: var(--bg-surface);
+  padding: 4px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+}
+
+.oryx-capsule-tab {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.oryx-capsule-tab.active {
+  background: var(--primary-color);
+  color: #FFFFFF !important;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .oryx-capsule-tab.active,
+html.dark .oryx-capsule-tab.active {
+  color: #000000 !important;
+}
+
+.oryx-capsule-tab:hover:not(.active) {
+  color: var(--text-color);
+  background: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] .oryx-capsule-tab:hover:not(.active),
+html.dark .oryx-capsule-tab:hover:not(.active) {
+  background: rgba(255,255,255,0.05);
+}
+
+.oryx-theme-toggle-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 12px;
+}
+
+.sun-icon { display: none; }
+.moon-icon { display: inline-block; }
+
+[data-theme="dark"] .sun-icon,
+html.dark .sun-icon { display: inline-block !important; }
+
+[data-theme="dark"] .moon-icon,
+html.dark .moon-icon { display: none !important; }
+
+.oryx-logo-light { display: block; }
+.oryx-logo-dark { display: none; }
+
+[data-theme="dark"] .oryx-logo-light,
+html.dark .oryx-logo-light { display: none !important; }
+
+[data-theme="dark"] .oryx-logo-dark,
+html.dark .oryx-logo-dark { display: block !important; }
+
+.oryx-nav-desktop-capsules {
+  display: flex;
+  align-items: center;
+}
+
+.oryx-nav-mobile-right {
+  display: none;
+}
+
+.oryx-mobile-capsules-bar {
+  display: none;
+}
+
+.oryx-apply-wrapper {
+  max-width: 860px;
+  margin: 32px auto 60px;
+  padding: 0 16px;
+}
+
+/* Hero Header */
+.oryx-hero-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 8px 24px rgba(31, 50, 36, 0.08);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.oryx-hero-card.express-hero {
+  border-color: rgba(31, 50, 36, 0.25);
+  background: linear-gradient(145deg, #FFFFFF 0%, rgba(31, 50, 36, 0.04) 100%);
+}
+
+[data-theme="dark"] .oryx-hero-card.express-hero,
+html.dark .oryx-hero-card.express-hero {
+  border-color: rgba(0, 210, 106, 0.4);
+  background: linear-gradient(145deg, #101712 0%, rgba(0, 210, 106, 0.08) 100%);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+}
+
+.hero-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.oryx-badge {
+  display: inline-block;
+  background: rgba(31, 50, 36, 0.08);
+  color: var(--primary-color);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  border: 1px solid rgba(31, 50, 36, 0.2);
+}
+
+.express-badge {
+  background: rgba(31, 50, 36, 0.12);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .oryx-badge,
+html.dark .oryx-badge {
+  background: rgba(0, 210, 106, 0.2) !important;
+  color: #00D26A !important;
+  border-color: rgba(0, 210, 106, 0.4) !important;
+}
+
+[data-theme="dark"] .express-badge,
+html.dark .express-badge {
+  background: rgba(0, 210, 106, 0.25) !important;
+  color: #00D26A !important;
+  border-color: #00D26A !important;
+}
+
+.user-greeting {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.hero-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.oryx-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .oryx-title,
+html.dark .oryx-title {
+  color: #FAF8F5 !important;
+}
+
+.oryx-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 620px;
+  line-height: 1.5;
+}
+
+.oryx-switch-link {
+  font-size: 12px;
+  color: var(--primary-color);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .oryx-switch-link,
+html.dark .oryx-switch-link {
+  color: #00D26A;
+}
+
+/* Step Indicators */
+.oryx-steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.oryx-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.oryx-step.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.oryx-step.completed {
+  opacity: 0.9;
+}
+
+.step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.oryx-step.active .step-num {
+  background: var(--primary-color);
+  color: #FFFFFF;
+  border-color: var(--primary-color);
+  font-weight: 700;
+}
+
+[data-theme="dark"] .oryx-step.active .step-num,
+html.dark .oryx-step.active .step-num {
+  color: #000000 !important;
+}
+
+.oryx-step.completed .step-num {
+  background: rgba(31, 50, 36, 0.15);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .oryx-step.completed .step-num,
+html.dark .oryx-step.completed .step-num {
+  background: rgba(0, 210, 106, 0.25) !important;
+  color: #00D26A !important;
+  border-color: #00D26A !important;
+}
+
+.step-label {
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .step-label,
+html.dark .step-label {
+  color: #F3F4F6;
+}
+
+.step-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+  margin: 0 12px;
+}
+
+.step-divider.completed {
+  background: var(--primary-color);
+}
+
+/* Verified Summary Card for Express Flow */
+.oryx-verified-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.verified-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.verified-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.verified-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(31, 50, 36, 0.08);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(31, 50, 36, 0.2);
+}
+
+[data-theme="dark"] .verified-icon-badge,
+html.dark .verified-icon-badge {
+  background: rgba(0, 210, 106, 0.2) !important;
+  color: #00D26A !important;
+  border-color: rgba(0, 210, 106, 0.4) !important;
+}
+
+.verified-heading {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .verified-heading,
+html.dark .verified-heading {
+  color: #FAF8F5 !important;
+}
+
+.verified-sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.verified-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: var(--bg-surface);
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.verified-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.v-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.v-val {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .v-val,
+html.dark .v-val {
+  color: #F3F4F6 !important;
+}
+
+.v-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(31, 50, 36, 0.1);
+  color: var(--primary-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  border: 1px solid rgba(31, 50, 36, 0.2);
+}
+
+[data-theme="dark"] .v-tag,
+html.dark .v-tag {
+  background: rgba(0, 210, 106, 0.25) !important;
+  color: #00D26A !important;
+  border-color: rgba(0, 210, 106, 0.4) !important;
+}
+
+.highlight-emerald {
+  color: var(--primary-color) !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .highlight-emerald,
+html.dark .highlight-emerald {
+  color: #00D26A !important;
+}
+
+.highlight-gold {
+  color: var(--accent-gold) !important;
+  font-weight: 700;
+}
+
+/* Edit Drawer */
+.kyc-edit-drawer {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--bg-body);
+  border-radius: 10px;
+  border: 1px dashed var(--border-color);
+}
+
+.drawer-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Product Cards Grid */
+.field-label-prominent {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 10px;
+}
+
+[data-theme="dark"] .field-label-prominent,
+html.dark .field-label-prominent {
+  color: #FAF8F5 !important;
+}
+
+.product-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.product-card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.product-card:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.product-card.selected {
+  border-color: var(--primary-color) !important;
+  background: rgba(31, 50, 36, 0.08) !important;
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+[data-theme="dark"] .product-card.selected,
+html.dark .product-card.selected {
+  background: rgba(0, 210, 106, 0.12) !important;
+  border-color: #00D26A !important;
+}
+
+.pcard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-right: 28px;
+}
+
+.pcard-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .pcard-badge,
+html.dark .pcard-badge {
+  background: rgba(255,255,255,0.08);
+}
+
+.pcard-rate {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .pcard-rate,
+html.dark .pcard-rate {
+  color: #00D26A !important;
+}
+
+.pcard-title {
+  margin: 0 0 4px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .pcard-title,
+html.dark .pcard-title {
+  color: #FAF8F5 !important;
+}
+
+.pcard-limit {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pcard-limit b {
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .pcard-limit b,
+html.dark .pcard-limit b {
+  color: #F3F4F6;
+}
+
+.pcard-check {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #FFFFFF;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .pcard-check,
+html.dark .pcard-check {
+  background: #00D26A;
+  color: #000000;
+}
+
+.product-card.selected .pcard-check {
+  display: flex;
+}
+
+/* Amount Config Box */
+.amount-config-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.amount-input-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.amount-helper {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.amount-field-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 10px;
+  padding: 0 12px;
+}
+
+[data-theme="dark"] .amount-field-wrap,
+html.dark .amount-field-wrap {
+  background: #0B120E;
+  border-color: #00D26A;
+}
+
+.currency-prefix {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-right: 6px;
+}
+
+[data-theme="dark"] .currency-prefix,
+html.dark .currency-prefix {
+  color: #00D26A;
+}
+
+.amount-large-input {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: var(--text-color) !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 8px 0 !important;
+  width: 140px !important;
+  text-align: right;
+}
+
+[data-theme="dark"] .amount-large-input,
+html.dark .amount-large-input {
+  color: #FAF8F5 !important;
+}
+
+.amount-large-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.slider-wrap {
+  margin: 16px 0 12px;
+}
+
+.oryx-range-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: var(--border-color);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .oryx-range-slider,
+html.dark .oryx-range-slider {
+  background: #1E2D22;
+}
+
+.oryx-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(31, 50, 36, 0.3);
+  border: 2px solid #FFFFFF;
+}
+
+[data-theme="dark"] .oryx-range-slider::-webkit-slider-thumb,
+html.dark .oryx-range-slider::-webkit-slider-thumb {
+  background: #00D26A;
+  border-color: #000000;
+  box-shadow: 0 0 10px rgba(0, 210, 106, 0.6);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.preset-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.preset-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.preset-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+[data-theme="dark"] .preset-pill,
+html.dark .preset-pill {
+  background: #141F17;
+  color: #F3F4F6;
+}
+
+.preset-pill:hover {
+  border-color: var(--primary-color);
+}
+
+.preset-pill.active {
+  background: var(--primary-color) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .preset-pill.active,
+html.dark .preset-pill.active {
+  background: #00D26A !important;
+  color: #000000 !important;
+  border-color: #00D26A !important;
+}
+
+/* Calculation HUD */
+.calc-hud-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(31, 50, 36, 0.05) 100%);
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 18px 0;
+}
+
+[data-theme="dark"] .calc-hud-card,
+html.dark .calc-hud-card {
+  background: linear-gradient(135deg, #101712 0%, rgba(0, 210, 106, 0.1) 100%);
+  border: 1.5px solid rgba(0, 210, 106, 0.4);
+}
+
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.hud-tag {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(31, 50, 36, 0.08);
+  color: var(--primary-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(31, 50, 36, 0.2);
+}
+
+[data-theme="dark"] .hud-tag,
+html.dark .hud-tag {
+  background: rgba(0, 210, 106, 0.2);
+  color: #00D26A;
+  border-color: rgba(0, 210, 106, 0.3);
+}
+
+.hud-note {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hud-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hud-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hud-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .hud-value,
+html.dark .hud-value {
+  color: #FAF8F5 !important;
+}
+
+/* Disbursal Options Grid */
+.disbursal-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.disbursal-option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.disbursal-option-card.selected {
+  border-color: var(--primary-color) !important;
+  background: rgba(31, 50, 36, 0.06) !important;
+}
+
+[data-theme="dark"] .disbursal-option-card.selected,
+html.dark .disbursal-option-card.selected {
+  border-color: #00D26A !important;
+  background: rgba(0, 210, 106, 0.1) !important;
+}
+
+.disb-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.disb-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.disb-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .disb-name,
+html.dark .disb-name {
+  color: #FAF8F5 !important;
+}
+
+.disb-speed {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary-color);
+  background: rgba(31, 50, 36, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] .disb-speed,
+html.dark .disb-speed {
+  color: #00D26A;
+  background: rgba(0, 210, 106, 0.2);
+}
+
+.disb-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Step 2 Decision Cards */
+.decision-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.decision-title {
+  margin: 0 0 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .decision-title,
+html.dark .decision-title {
+  color: #FAF8F5 !important;
+}
+
+.decision-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.decision-radio-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .decision-radio-label,
+html.dark .decision-radio-label {
+  background: #0E1611;
+}
+
+.decision-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dt-main {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .dt-main,
+html.dark .dt-main {
+  color: #FAF8F5 !important;
+}
+
+.dt-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.override-fields-box {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-color);
+}
+
+/* Returning Banner for Standard Form */
+.oryx-returning-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(31, 50, 36, 0.08) 0%, rgba(31, 50, 36, 0.02) 100%);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+[data-theme="dark"] .oryx-returning-banner,
+html.dark .oryx-returning-banner {
+  background: linear-gradient(135deg, rgba(0, 210, 106, 0.18) 0%, rgba(0, 210, 106, 0.06) 100%);
+  border-color: #00D26A;
+}
+
+.r-banner-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.r-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--primary-color);
+  letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .r-badge,
+html.dark .r-badge {
+  color: #00D26A;
+}
+
+.r-banner-left p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .r-banner-left p,
+html.dark .r-banner-left p {
+  color: #FAF8F5;
+}
+
+/* Guest Returning Alert */
+.guest-returning-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid var(--accent-gold);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gra-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .gra-content,
+html.dark .gra-content {
+  color: #FAF8F5;
+}
+
+.gra-icon {
+  font-size: 18px;
+}
+
+/* Generic Form Styles */
+.oryx-form-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 8px 24px rgba(31, 50, 36, 0.08);
+}
+
+[data-theme="dark"] .oryx-form-container,
+html.dark .oryx-form-container {
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+}
+
+.form-step, .express-form-step {
+  display: none;
+}
+
+.form-step.active, .express-form-step.active {
+  display: block;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-header {
+  margin-bottom: 20px;
+}
+
+.step-header h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .step-header h3,
+html.dark .step-header h3 {
+  color: #FAF8F5 !important;
+}
+
+.step-header h4 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .step-header h4,
+html.dark .step-header h4 {
+  color: #FAF8F5 !important;
+}
+
+.step-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .form-group label,
+html.dark .form-group label {
+  color: #FAF8F5 !important;
+}
+
+.req {
+  color: #EF4444;
+}
+
+.oryx-input, .oryx-select {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--text-color) !important;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+[data-theme="dark"] .oryx-input,
+html.dark .oryx-input,
+[data-theme="dark"] .oryx-select,
+html.dark .oryx-select {
+  background: #0B120E !important;
+  color: #F3F4F6 !important;
+}
+
+.oryx-input:focus, .oryx-select:focus {
+  outline: none;
+  border-color: var(--primary-color) !important;
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 24px 0 20px;
+}
+
+.calc-preview-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.p-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.p-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .p-val,
+html.dark .p-val {
+  color: #00D26A;
+}
+
+.disposable-income-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.disposable-income-card b {
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .disposable-income-card b,
+html.dark .disposable-income-card b {
+  color: #00D26A;
+}
+
+.review-summary-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.rv-title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .rv-title,
+html.dark .rv-title {
+  color: #FAF8F5 !important;
+}
+
+.rv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.rv-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rv-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.rv-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .rv-val,
+html.dark .rv-val {
+  color: #F3F4F6 !important;
+}
+
+.consent-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.oryx-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.oryx-checkbox-label input {
+  margin-top: 2px;
+}
+
+.oryx-error-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid #EF4444;
+  color: #F87171;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.oryx-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: none;
+}
+
+.oryx-btn:hover {
+  transform: translateY(-1px);
+}
+
+.oryx-btn-primary {
+  background: var(--primary-color) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .oryx-btn-primary,
+html.dark .oryx-btn-primary {
+  background: #00D26A !important;
+  color: #000000 !important;
+}
+
+.oryx-btn-primary:hover {
+  background: var(--primary-hover) !important;
+}
+
+.oryx-btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color);
+}
+
+.oryx-btn-sm {
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.oryx-btn-pulse {
+  box-shadow: 0 4px 15px rgba(31, 50, 36, 0.25);
+}
+
+[data-theme="dark"] .oryx-btn-pulse,
+html.dark .oryx-btn-pulse {
+  box-shadow: 0 0 15px rgba(0, 210, 106, 0.45);
+}
+
+/* Success Card */
+.oryx-success-card {
+  text-align: center;
+  padding: 36px 20px;
+}
+
+.success-icon-wrap, .success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(31, 50, 36, 0.08);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 16px;
+  border: 2px solid var(--primary-color);
+}
+
+[data-theme="dark"] .success-icon-wrap,
+html.dark .success-icon-wrap {
+  background: rgba(0, 210, 106, 0.18);
+  color: #00D26A;
+  border-color: #00D26A;
+}
+
+.express-priority-badge {
+  display: inline-block;
+  background: rgba(31, 50, 36, 0.1);
+  color: var(--primary-color);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(31, 50, 36, 0.2);
+}
+
+[data-theme="dark"] .express-priority-badge,
+html.dark .express-priority-badge {
+  background: rgba(0, 210, 106, 0.25) !important;
+  color: #00D26A !important;
+  border-color: rgba(0, 210, 106, 0.4) !important;
+}
+
+.success-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .success-title,
+html.dark .success-title {
+  color: #FAF8F5 !important;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto 20px;
+  line-height: 1.5;
+}
+
+.app-ref-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 18px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+[data-theme="dark"] .app-ref-box,
+html.dark .app-ref-box {
+  background: #141F17 !important;
+}
+
+.ref-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ref-code {
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .ref-code,
+html.dark .ref-code {
+  color: #00D26A !important;
+}
+
+.next-steps-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: left;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+[data-theme="dark"] .next-steps-card,
+html.dark .next-steps-card {
+  background: #141F17 !important;
+}
+
+.next-steps-card h4 {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .next-steps-card h4,
+html.dark .next-steps-card h4 {
+  color: #FAF8F5 !important;
+}
+
+.next-steps-card ol {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Mobile Breakpoint Refinements */
+@media (max-width: 768px) {
+  .oryx-nav-desktop-capsules { display: none; }
+  .oryx-nav-mobile-right { display: flex; align-items: center; gap: 8px; }
+  .oryx-mobile-capsules-bar { display: block; padding-top: 8px; }
+  .oryx-mobile-capsules-track { display: flex; gap: 6px; overflow-x: auto; }
+  
+  .hero-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .hero-main-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .verified-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .amount-input-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .amount-field-wrap {
+    width: 100%;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+  .amount-large-input {
+    width: 100% !important;
+    text-align: right;
+  }
+  .grid-2, .grid-3, .verified-grid, .hud-stats-grid, .rv-grid, .disbursal-options-grid, .product-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .oryx-apply-wrapper {
+    margin: 16px auto 40px;
+    padding: 0 12px;
+  }
+  .oryx-hero-card, .oryx-form-container, .oryx-verified-summary-card {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+  .oryx-title { font-size: 20px; }
+  .oryx-steps-container { flex-direction: column; gap: 10px; align-items: flex-start; }
+  .step-divider { display: none; }
+}
+</style>
+
+<script>
+// Theme Toggle function
+function toggleOryxTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.classList.contains('dark');
+  const newTheme = isDark ? 'light' : 'dark';
+  
+  document.documentElement.setAttribute('data-theme', newTheme);
+  document.body.setAttribute('data-theme', newTheme);
+  
+  if (newTheme === 'dark') {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+    document.documentElement.style.colorScheme = 'dark';
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+  }
+  
+  try {
+    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('frappe_theme', newTheme);
+    localStorage.setItem('oryx_theme', newTheme);
+    document.cookie = "theme=" + newTheme + "; path=/; max-age=31536000";
+    document.cookie = "frappe_theme=" + newTheme + "; path=/; max-age=31536000";
+  } catch(e) {}
+
+  const sunIcons = document.querySelectorAll('.sun-icon');
+  const moonIcons = document.querySelectorAll('.moon-icon');
+  const lightLogos = document.querySelectorAll('.oryx-logo-light');
+  const darkLogos = document.querySelectorAll('.oryx-logo-dark');
+
+  if (newTheme === 'dark') {
+    sunIcons.forEach(el => el.style.display = 'inline-block');
+    moonIcons.forEach(el => el.style.display = 'none');
+    lightLogos.forEach(el => el.style.display = 'none');
+    darkLogos.forEach(el => el.style.display = 'block');
+  } else {
+    sunIcons.forEach(el => el.style.display = 'none');
+    moonIcons.forEach(el => el.style.display = 'inline-block');
+    lightLogos.forEach(el => el.style.display = 'block');
+    darkLogos.forEach(el => el.style.display = 'none');
+  }
+}
+
+// ==========================================
+// STANDARD 4-STEP WIZARD LOGIC
+// ==========================================
+let currentStep = 1;
+
+function goToStep(step) {
+  if (step > currentStep) {
+    const currentStepEl = document.getElementById('step-' + currentStep);
+    if (currentStepEl) {
+      const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
+      for (let input of inputs) {
+        if (!input.value) {
+          input.focus();
+          input.reportValidity();
+          return;
+        }
+      }
+    }
+  }
+
+  if (step === 4) {
+    const nameEl = document.getElementById('applicant_name');
+    if (nameEl) document.getElementById('rv_name').innerText = nameEl.value || '-';
+    const idEl = document.getElementById('national_id_or_passport');
+    const kraEl = document.getElementById('kra_pin');
+    if (idEl && kraEl) document.getElementById('rv_id_pin').innerText = (idEl.value || '-') + ' / ' + (kraEl.value || '-').toUpperCase();
+    
+    const prodSelect = document.getElementById('loan_product');
+    if (prodSelect) {
+      const prodName = prodSelect.options[prodSelect.selectedIndex] ? prodSelect.options[prodSelect.selectedIndex].text : '-';
+      const amtEl = document.getElementById('loan_amount');
+      document.getElementById('rv_facility').innerText = prodName + ' — KES ' + Number(amtEl ? amtEl.value : 0).toLocaleString();
+    }
+    const tenureEl = document.getElementById('repayment_periods');
+    const disbMethodEl = document.getElementById('disbursal_method');
+    if (tenureEl && disbMethodEl) {
+      document.getElementById('rv_tenure_disb').innerText = tenureEl.value + ' Months via ' + disbMethodEl.value;
+    }
+  }
+
+  document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+  const targetStep = document.getElementById('step-' + step);
+  if (targetStep) targetStep.classList.add('active');
+
+  document.querySelectorAll('.oryx-step').forEach((el, idx) => {
+    const stepNum = idx + 1;
+    if (stepNum === step) {
+      el.classList.add('active');
+      el.classList.remove('completed');
+    } else if (stepNum < step) {
+      el.classList.add('completed');
+      el.classList.remove('active');
+    } else {
+      el.classList.remove('active', 'completed');
+    }
+  });
+
+  [1, 2, 3].forEach(num => {
+    const div = document.getElementById('step-div-' + num);
+    if (div) {
+      if (num < step) div.classList.add('completed');
+      else div.classList.remove('completed');
+    }
+  });
+
+  currentStep = step;
+  window.scrollTo({ top: 80, behavior: 'smooth' });
+}
+
+function toggleDisbursalMethod() {
+  const method = document.getElementById('disbursal_method')?.value;
+  if (method === 'M-Pesa') {
+    if (document.getElementById('mpesa_fields')) document.getElementById('mpesa_fields').style.display = 'block';
+    if (document.getElementById('bank_fields')) document.getElementById('bank_fields').style.display = 'none';
+  } else {
+    if (document.getElementById('mpesa_fields')) document.getElementById('mpesa_fields').style.display = 'none';
+    if (document.getElementById('bank_fields')) document.getElementById('bank_fields').style.display = 'block';
+  }
+}
+
+function calculateRepayment() {
+  const amtEl = document.getElementById('loan_amount');
+  const perEl = document.getElementById('repayment_periods');
+  const prodSelect = document.getElementById('loan_product');
+  if (!amtEl || !perEl || !prodSelect) return;
+
+  const amount = parseFloat(amtEl.value) || 0;
+  const periods = parseInt(perEl.value) || 1;
+  const selectedOption = prodSelect.options[prodSelect.selectedIndex];
+  const rate = selectedOption ? parseFloat(selectedOption.getAttribute('data-rate') || 18.0) : 18.0;
+
+  if (amount > 0) {
+    const totalInterest = (amount * (rate / 100) * (periods / 12));
+    const totalPayable = amount + totalInterest;
+    const monthly = totalPayable / periods;
+
+    const mEl = document.getElementById('est_monthly_repayment');
+    if (mEl) mEl.innerText = 'KES ' + monthly.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const totEl = document.getElementById('est_total_payable');
+    if (totEl) totEl.innerText = 'KES ' + totalPayable.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  } else {
+    const mEl = document.getElementById('est_monthly_repayment');
+    if (mEl) mEl.innerText = 'KES 0.00';
+    const totEl = document.getElementById('est_total_payable');
+    if (totEl) totEl.innerText = 'KES 0.00';
+  }
+}
+
+function calcDisposable() {
+  const incEl = document.getElementById('monthly_net_income');
+  const debtEl = document.getElementById('monthly_debt_obligations');
+  const expEl = document.getElementById('monthly_fixed_expenses');
+  if (!incEl) return;
+
+  const income = parseFloat(incEl.value) || 0;
+  const debt = parseFloat(debtEl ? debtEl.value : 0) || 0;
+  const expenses = parseFloat(expEl ? expEl.value : 0) || 0;
+  const disp = Math.max(0, income - (debt + expenses));
+  const dispEl = document.getElementById('disp_income');
+  if (dispEl) dispEl.innerText = 'KES ' + disp.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function checkGuestBorrowerLookup(val) {
+  if (!val || val.length < 5) return;
+  frappe.call({
+    method: 'lending.api.check_borrower_status',
+    args: { identifier: val },
+    callback: function(r) {
+      if (r.message && r.message.exists) {
+        const alertBox = document.getElementById('guestReturningAlert');
+        const alertText = document.getElementById('graText');
+        if (alertBox && alertText) {
+          alertText.innerText = 'Welcome back, ' + r.message.applicant_name + ' (ID ' + r.message.masked_id + '). You are eligible for the 60-Second Express Repeat Loan!';
+          alertBox.style.display = 'flex';
+        }
+      }
+    }
+  });
+}
+
+function submitApplication() {
+  const btn = document.getElementById('btnSubmitApp');
+  const errDiv = document.getElementById('submitError');
+  if (errDiv) errDiv.style.display = 'none';
+
+  const dpa = document.getElementById('consent_dpa');
+  const crb = document.getElementById('consent_crb');
+  if (dpa && crb && (!dpa.checked || !crb.checked)) {
+    if (errDiv) {
+      errDiv.innerText = 'Please confirm consent to Data Protection Act and CRB Credit Inquiry.';
+      errDiv.style.display = 'block';
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Processing Application...';
+  }
+
+  const payload = {
+    applicant_name: document.getElementById('applicant_name')?.value,
+    national_id_or_passport: document.getElementById('national_id_or_passport')?.value,
+    kra_pin: (document.getElementById('kra_pin')?.value || '').toUpperCase(),
+    date_of_birth: document.getElementById('date_of_birth')?.value,
+    gender: document.getElementById('gender')?.value,
+    applicant_phone_number: document.getElementById('applicant_phone_number')?.value,
+    applicant_email_address: document.getElementById('applicant_email_address')?.value,
+    address_line_1: document.getElementById('address_line_1')?.value,
+    address_line_2: document.getElementById('address_line_2')?.value,
+    state: document.getElementById('state')?.value,
+    residence_status: document.getElementById('residence_status')?.value,
+    next_of_kin_name: document.getElementById('next_of_kin_name')?.value,
+    next_of_kin_relation: document.getElementById('next_of_kin_relation')?.value,
+    next_of_kin_phone: document.getElementById('next_of_kin_phone')?.value,
+    loan_product: document.getElementById('loan_product')?.value,
+    loan_amount: document.getElementById('loan_amount')?.value,
+    repayment_periods: document.getElementById('repayment_periods')?.value,
+    loan_purpose: document.getElementById('loan_purpose')?.value,
+    disbursal_method: document.getElementById('disbursal_method')?.value,
+    disbursal_mpesa_number: document.getElementById('disbursal_mpesa_number')?.value || document.getElementById('applicant_phone_number')?.value,
+    disbursal_bank_name: document.getElementById('disbursal_bank_name')?.value,
+    disbursal_bank_branch: document.getElementById('disbursal_bank_branch')?.value,
+    disbursal_account_number: document.getElementById('disbursal_account_number')?.value,
+    disbursal_account_name: document.getElementById('disbursal_account_name')?.value,
+    employment_status: document.getElementById('employment_status')?.value,
+    employer_or_business_name: document.getElementById('employer_or_business_name')?.value,
+    job_title_or_nature_of_business: document.getElementById('job_title_or_nature_of_business')?.value,
+    work_physical_address: document.getElementById('work_physical_address')?.value,
+    work_phone: document.getElementById('work_phone')?.value,
+    monthly_net_income: document.getElementById('monthly_net_income')?.value,
+    monthly_debt_obligations: document.getElementById('monthly_debt_obligations')?.value,
+    monthly_fixed_expenses: document.getElementById('monthly_fixed_expenses')?.value,
+    guarantor_full_name: document.getElementById('guarantor_full_name')?.value,
+    guarantor_national_id: document.getElementById('guarantor_national_id')?.value,
+    guarantor_kra_pin: (document.getElementById('guarantor_kra_pin')?.value || '').toUpperCase(),
+    guarantor_phone: document.getElementById('guarantor_phone')?.value,
+    guarantor_employer_or_business: document.getElementById('guarantor_employer_or_business')?.value,
+    guarantor_monthly_income: document.getElementById('guarantor_monthly_income')?.value
+  };
+
+  frappe.call({
+    method: 'lending.api.submit_loan_application',
+    args: { payload: JSON.stringify(payload) },
+    callback: function(r) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = 'Submit Application →';
+      }
+      if (r.message && r.message.status === 'success') {
+        const formEl = document.getElementById('oryxLoanForm');
+        if (formEl) formEl.style.display = 'none';
+        const refEl = document.getElementById('res_app_id');
+        if (refEl) refEl.innerText = r.message.name;
+        const succEl = document.getElementById('successScreen');
+        if (succEl) succEl.style.display = 'block';
+        window.scrollTo({ top: 50, behavior: 'smooth' });
+      } else {
+        if (errDiv) {
+          errDiv.innerText = (r.message && r.message.message) || 'Error processing application. Please try again.';
+          errDiv.style.display = 'block';
+        }
+      }
+    },
+    error: function(err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = 'Submit Application →';
+      }
+      if (errDiv) {
+        errDiv.innerText = 'Server error processing your application. Please check your details and try again.';
+        errDiv.style.display = 'block';
+      }
+    }
+  });
+}
+
+
+// ==========================================
+// SUBSEQUENT / EXPRESS REPEAT LOAN LOGIC
+// ==========================================
+let currentExpressStep = 1;
+
+function goToExpressStep(step) {
+  if (step > currentExpressStep) {
+    if (step === 2) {
+      const prod = document.getElementById('exp_loan_product')?.value;
+      const amt = parseFloat(document.getElementById('exp_loan_amount')?.value) || 0;
+      const purp = document.getElementById('exp_loan_purpose')?.value;
+
+      if (!prod) {
+        alert('Please select a loan product');
+        return;
+      }
+      if (amt <= 0) {
+        alert('Please specify a valid loan amount');
+        return;
+      }
+      if (!purp) {
+        const purpEl = document.getElementById('exp_loan_purpose');
+        purpEl.focus();
+        purpEl.reportValidity();
+        return;
+      }
+
+      // Update Review Data
+      const prodSelect = document.getElementById('exp_loan_product');
+      const prodName = prodSelect.options[prodSelect.selectedIndex]?.text || 'Oryx Facility';
+      const periods = document.getElementById('exp_repayment_periods')?.value || '3';
+      const disbMethod = document.getElementById('exp_disbursal_method')?.value || 'M-Pesa';
+
+      document.getElementById('exp_rv_facility').innerText = prodName + ' — KES ' + amt.toLocaleString();
+      document.getElementById('exp_rv_tenure').innerText = periods + ' Months via ' + disbMethod;
+    }
+  }
+
+  document.querySelectorAll('.express-form-step').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('exp-step-' + step);
+  if (target) target.classList.add('active');
+
+  const b1 = document.getElementById('exp-step-badge-1');
+  const b2 = document.getElementById('exp-step-badge-2');
+  const div1 = document.getElementById('exp-step-div-1');
+
+  if (step === 1) {
+    if (b1) { b1.classList.add('active'); b1.classList.remove('completed'); }
+    if (b2) { b2.classList.remove('active', 'completed'); }
+    if (div1) div1.classList.remove('completed');
+  } else if (step === 2) {
+    if (b1) { b1.classList.add('completed'); b1.classList.remove('active'); }
+    if (b2) { b2.classList.add('active'); }
+    if (div1) div1.classList.add('completed');
+  }
+
+  currentExpressStep = step;
+  window.scrollTo({ top: 100, behavior: 'smooth' });
+}
+
+function selectProductCard(prodName, rate, maxAmt, isTerm, cardEl) {
+  document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+  if (cardEl) cardEl.classList.add('selected');
+
+  const select = document.getElementById('exp_loan_product');
+  if (select) {
+    select.value = prodName;
+  }
+
+  const slider = document.getElementById('exp_amount_slider');
+  if (slider) {
+    slider.max = maxAmt;
+    document.getElementById('exp_slider_max_label').innerText = 'KES ' + Number(maxAmt).toLocaleString();
+    if (parseFloat(slider.value) > maxAmt) {
+      slider.value = maxAmt;
+      document.getElementById('exp_loan_amount').value = maxAmt;
+    }
+  }
+
+  updateSubsequentCalculations();
+}
+
+function syncAmountFromSlider() {
+  const slider = document.getElementById('exp_amount_slider');
+  const input = document.getElementById('exp_loan_amount');
+  if (slider && input) {
+    input.value = slider.value;
+  }
+  updatePresetPillsState(parseFloat(slider.value));
+  updateSubsequentCalculations();
+}
+
+function syncAmountFromInput() {
+  const slider = document.getElementById('exp_amount_slider');
+  const input = document.getElementById('exp_loan_amount');
+  if (slider && input) {
+    const val = parseFloat(input.value) || 0;
+    if (val <= parseFloat(slider.max)) {
+      slider.value = val;
+    }
+    updatePresetPillsState(val);
+  }
+  updateSubsequentCalculations();
+}
+
+function setPresetAmount(val) {
+  const input = document.getElementById('exp_loan_amount');
+  const slider = document.getElementById('exp_amount_slider');
+  if (input) input.value = val;
+  if (slider) {
+    slider.value = Math.min(val, parseFloat(slider.max || 500000));
+  }
+  updatePresetPillsState(val);
+  updateSubsequentCalculations();
+}
+
+function updatePresetPillsState(val) {
+  document.querySelectorAll('.preset-pill').forEach(pill => {
+    const pillText = pill.innerText.replace(/[^0-9]/g, '');
+    let pillVal = parseInt(pillText) * 1000;
+    if (pillVal === val) {
+      pill.classList.add('active');
+    } else {
+      pill.classList.remove('active');
+    }
+  });
+}
+
+function updateSubsequentCalculations() {
+  const amtEl = document.getElementById('exp_loan_amount');
+  const perEl = document.getElementById('exp_repayment_periods');
+  const prodSelect = document.getElementById('exp_loan_product');
+  if (!amtEl || !perEl || !prodSelect) return;
+
+  const amount = parseFloat(amtEl.value) || 0;
+  const periods = parseInt(perEl.value) || 1;
+  const selectedOption = prodSelect.options[prodSelect.selectedIndex];
+  const rate = selectedOption ? parseFloat(selectedOption.getAttribute('data-rate') || 18.0) : 18.0;
+
+  const principalEl = document.getElementById('exp_hud_principal');
+  const interestEl = document.getElementById('exp_hud_interest');
+  const monthlyEl = document.getElementById('exp_hud_monthly');
+  const totalEl = document.getElementById('exp_hud_total');
+
+  if (amount > 0) {
+    const totalInterest = (amount * (rate / 100) * (periods / 12));
+    const totalPayable = amount + totalInterest;
+    const monthly = totalPayable / periods;
+
+    if (principalEl) principalEl.innerText = 'KES ' + amount.toLocaleString('en-KE');
+    if (interestEl) interestEl.innerText = 'KES ' + totalInterest.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    if (monthlyEl) monthlyEl.innerText = 'KES ' + monthly.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (totalEl) totalEl.innerText = 'KES ' + totalPayable.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  } else {
+    if (principalEl) principalEl.innerText = 'KES 0';
+    if (interestEl) interestEl.innerText = 'KES 0';
+    if (monthlyEl) monthlyEl.innerText = 'KES 0.00';
+    if (totalEl) totalEl.innerText = 'KES 0';
+  }
+}
+
+function selectDisbursalOption(type) {
+  document.getElementById('opt_disb_mpesa')?.classList.toggle('selected', type === 'M-Pesa');
+  document.getElementById('opt_disb_bank')?.classList.toggle('selected', type === 'Bank');
+  
+  const m = document.getElementById('exp_disbursal_method');
+  if (m) m.value = (type === 'Bank') ? 'Bank Transfer' : 'M-Pesa';
+
+  const bankBox = document.getElementById('expBankFields');
+  if (bankBox) bankBox.style.display = (type === 'Bank') ? 'block' : 'none';
+}
+
+function toggleEditDrawer() {
+  const d = document.getElementById('kycEditDrawer');
+  const btn = document.getElementById('btnToggleEditDrawer');
+  if (d) {
+    const isHidden = (d.style.display === 'none' || !d.style.display);
+    d.style.display = isHidden ? 'block' : 'none';
+    if (btn) btn.querySelector('span').innerText = isHidden ? 'Close Drawer' : 'Update KYC / Contact';
+  }
+}
+
+function toggleIncomeUpdate(isChanged) {
+  const f = document.getElementById('incomeOverrideFields');
+  if (f) f.style.display = isChanged ? 'block' : 'none';
+}
+
+function toggleGuarantorUpdate(isChanged) {
+  const f = document.getElementById('guarOverrideFields');
+  if (f) f.style.display = isChanged ? 'block' : 'none';
+}
+
+function submitExpressApplication() {
+  const btn = document.getElementById('btnSubmitExpressApp');
+  const errDiv = document.getElementById('expSubmitError');
+  if (errDiv) errDiv.style.display = 'none';
+
+  const agree = document.getElementById('exp_consent_agree');
+  if (agree && !agree.checked) {
+    if (errDiv) {
+      errDiv.innerText = 'Please confirm authorization to proceed with express underwriting.';
+      errDiv.style.display = 'block';
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>⚡ Processing Fast-Track Request...</span>';
+  }
+
+  const isIncomeChanged = document.querySelector('input[name="income_status"]:checked')?.value === 'changed';
+  const isGuarChanged = document.querySelector('input[name="guar_status"]:checked')?.value === 'changed';
+
+  const payload = {
+    is_subsequent_loan: 1,
+    previous_loan_application: document.getElementById('exp_previous_loan_application')?.value,
+    applicant_name: document.getElementById('exp_applicant_name')?.value,
+    national_id_or_passport: document.getElementById('exp_national_id')?.value,
+    kra_pin: document.getElementById('exp_kra_pin')?.value,
+    applicant_phone_number: document.getElementById('exp_phone_override')?.value || '',
+    address_line_1: document.getElementById('exp_address_override')?.value || '',
+    state: document.getElementById('exp_state_override')?.value || '',
+    loan_product: document.getElementById('exp_loan_product')?.value,
+    loan_amount: document.getElementById('exp_loan_amount')?.value,
+    repayment_periods: document.getElementById('exp_repayment_periods')?.value,
+    loan_purpose: document.getElementById('exp_loan_purpose')?.value,
+    disbursal_method: document.getElementById('exp_disbursal_method')?.value,
+    disbursal_mpesa_number: document.getElementById('exp_disbursal_mpesa_number')?.value,
+    disbursal_bank_name: document.getElementById('exp_bank_name_input')?.value || document.getElementById('exp_disbursal_bank_name')?.value,
+    disbursal_bank_branch: document.getElementById('exp_bank_branch_input')?.value || document.getElementById('exp_disbursal_bank_branch')?.value,
+    disbursal_account_number: document.getElementById('exp_bank_acc_input')?.value || document.getElementById('exp_disbursal_account_number')?.value
+  };
+
+  if (isIncomeChanged) {
+    payload.employment_status = document.getElementById('exp_employment_status')?.value;
+    payload.employer_or_business_name = document.getElementById('exp_employer_name')?.value;
+    payload.monthly_net_income = document.getElementById('exp_monthly_net_income')?.value;
+    payload.monthly_debt_obligations = document.getElementById('exp_monthly_debt')?.value;
+    payload.monthly_fixed_expenses = document.getElementById('exp_monthly_expenses')?.value;
+  }
+
+  if (isGuarChanged) {
+    payload.guarantor_full_name = document.getElementById('exp_guar_name')?.value;
+    payload.guarantor_phone = document.getElementById('exp_guar_phone')?.value;
+    payload.guarantor_national_id = document.getElementById('exp_guar_id')?.value;
+  }
+
+  frappe.call({
+    method: 'lending.api.submit_loan_application',
+    args: { payload: JSON.stringify(payload) },
+    callback: function(r) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Submit Subsequent Loan Application</span>';
+      }
+      if (r.message && r.message.status === 'success') {
+        const formEl = document.getElementById('oryxSubsequentLoanForm');
+        if (formEl) formEl.style.display = 'none';
+        const refEl = document.getElementById('exp_res_app_id');
+        if (refEl) refEl.innerText = r.message.name;
+        const succEl = document.getElementById('expressSuccessScreen');
+        if (succEl) succEl.style.display = 'block';
+        window.scrollTo({ top: 50, behavior: 'smooth' });
+      } else {
+        if (errDiv) {
+          errDiv.innerText = (r.message && r.message.message) || 'Error processing application. Please try again.';
+          errDiv.style.display = 'block';
+        }
+      }
+    },
+    error: function(err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Submit Subsequent Loan Application</span>';
+      }
+      if (errDiv) {
+        errDiv.innerText = 'Server error processing your application. Please check your details and try again.';
+        errDiv.style.display = 'block';
+      }
+    }
+  });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  calculateRepayment();
+  updateSubsequentCalculations();
+});
+</script>
+{% endblock %}
