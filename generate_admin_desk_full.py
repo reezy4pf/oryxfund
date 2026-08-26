@@ -1,762 +1,11 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark" class="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oryx Fund — Institutional Lending Management</title>
-  <meta name="description" content="Institutional credit and loan portfolio management dashboard for Oryx Fund.">
-  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
+import os
+import json
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+def generate_full_admin_desk():
+    base_dir = "/home/reezy/.gemini/antigravity-ide/scratch/oryx_fund"
 
-  <style>
-    :root {
-      --desk-bg: #090909;
-      --desk-sidebar-bg: #0D0D0D;
-      --desk-card-bg: #121212;
-      --desk-card-hover: #171717;
-      --desk-card-surface: #181818;
-      --desk-border: #1F1F1F;
-      --desk-border-light: #181818;
-      --text-main: #FAF8F5;
-      --text-sub: #9E9E9E;
-      --text-dim: #666666;
-      --accent-green: #34D399;
-      --accent-emerald: #00D26A;
-      --accent-red: #F87171;
-      --accent-blue: #60A5FA;
-      --accent-amber: #FBBF24;
-      --pill-active-bg: #1C1C1C;
-      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'IBM Plex Mono', monospace;
-    }
-
-    [data-theme="light"], html:not(.dark) {
-      --desk-bg: #F4EFEB;
-      --desk-sidebar-bg: #EAE3DC;
-      --desk-card-bg: #FFFFFF;
-      --desk-card-hover: #F9F7F5;
-      --desk-card-surface: #F0EAE3;
-      --desk-border: #DFD5CB;
-      --desk-border-light: #E8E0D7;
-      --text-main: #1F3224;
-      --text-sub: #556B5D;
-      --text-dim: #829488;
-      --accent-green: #059669;
-      --accent-emerald: #059669;
-      --accent-red: #DC2626;
-      --accent-blue: #2563EB;
-      --accent-amber: #D97706;
-      --pill-active-bg: #DFD5CB;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
-
-    body {
-      font-family: var(--font-body);
-      background-color: var(--desk-bg);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      overflow-x: hidden;
-    }
-
-    /* Sidebar Styling (Matches Screenshot 1:1) */
-    .desk-sidebar {
-      width: 250px;
-      min-width: 250px;
-      background: var(--desk-sidebar-bg);
-      border-right: 1px solid var(--desk-border);
-      display: flex;
-      flex-direction: column;
-      padding: 14px 10px;
-      height: 100vh;
-      position: sticky;
-      top: 0;
-      overflow-y: auto;
-      user-select: none;
-    }
-
-    .desk-brand-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      text-decoration: none;
-      color: var(--text-main);
-      cursor: pointer;
-    }
-    .desk-brand-header:hover { background: rgba(255, 255, 255, 0.04); }
-
-    .brand-icon-box {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      background: #00D26A;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000;
-      font-weight: 900;
-      font-size: 13px;
-    }
-
-    .brand-title-group {
-      display: flex;
-      flex-direction: column;
-    }
-    .brand-title-group .main-title {
-      font-size: 13.5px;
-      font-weight: 800;
-      color: var(--text-main);
-      line-height: 1.2;
-    }
-    .brand-title-group .sub-title {
-      font-size: 10.5px;
-      color: var(--text-sub);
-    }
-
-    .sidebar-search-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--desk-border);
-      border-radius: 6px;
-      padding: 7px 10px;
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-    .sidebar-search-box:hover {
-      border-color: var(--accent-emerald);
-      color: var(--text-main);
-    }
-
-    .kbd-shortcut {
-      background: rgba(255, 255, 255, 0.08);
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-    }
-
-    .sidebar-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--text-sub);
-      text-decoration: none;
-      cursor: pointer;
-      margin-bottom: 2px;
-    }
-    .sidebar-item:hover {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .sidebar-item.active {
-      background: var(--pill-active-bg);
-      color: var(--text-main);
-      font-weight: 700;
-    }
-
-    .sidebar-category-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-main);
-      cursor: pointer;
-      margin-top: 6px;
-    }
-    .sidebar-category-header:hover { background: rgba(255, 255, 255, 0.03); }
-    .sidebar-category-header .arrow {
-      font-size: 9px;
-      color: var(--text-dim);
-      transition: transform 0.2s ease;
-    }
-    .sidebar-category-header.collapsed .arrow {
-      transform: rotate(-90deg);
-    }
-
-    .sidebar-sub-list {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: max-height 0.25s ease;
-    }
-    .sidebar-sub-list.hidden {
-      display: none;
-    }
-
-    .sidebar-sub-item {
-      padding: 6px 10px 6px 28px;
-      font-size: 12px;
-      color: var(--text-sub);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 4px;
-      cursor: pointer;
-      margin: 1px 0;
-    }
-    .sidebar-sub-item:hover {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .sidebar-sub-item.active {
-      color: var(--accent-emerald);
-      font-weight: 700;
-      background: rgba(0, 210, 106, 0.08);
-    }
-
-    .sidebar-user-footer {
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 10px;
-      border-top: 1px solid var(--desk-border);
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .sidebar-user-footer:hover { background: rgba(255, 255, 255, 0.04); }
-
-    .user-avatar-circle {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #E0561B;
-      color: #FFFFFF;
-      font-size: 10.5px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Main Area */
-    .desk-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow-y: auto;
-    }
-
-    .desk-topbar {
-      height: 50px;
-      padding: 0 24px;
-      border-bottom: 1px solid var(--desk-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--desk-bg);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .breadcrumb-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12.5px;
-      color: var(--text-sub);
-    }
-    .breadcrumb-current { font-weight: 700; color: var(--text-main); }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .theme-toggle-btn {
-      width: 32px;
-      height: 32px;
-      font-size: 14px;
-      background: transparent;
-      border: 1px solid var(--desk-border);
-      color: var(--text-main);
-      cursor: pointer;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .theme-toggle-btn:hover { border-color: var(--accent-emerald); }
-
-    .borrower-switch-link {
-      font-size: 11.5px;
-      color: var(--accent-emerald);
-      text-decoration: none;
-      font-weight: 700;
-      padding: 5px 12px;
-      border: 1px solid rgba(0, 210, 106, 0.3);
-      border-radius: 6px;
-    }
-    .borrower-switch-link:hover {
-      background: rgba(0, 210, 106, 0.1);
-    }
-
-    .desk-canvas {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      flex: 1;
-    }
-
-    /* Data Table / List View Styles */
-    .list-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-
-    .list-title-group h1 {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text-main);
-    }
-    .list-title-group p {
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    .list-action-btns {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-action-sec {
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      color: var(--text-main);
-      padding: 7px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-action-sec:hover {
-      border-color: var(--accent-emerald);
-    }
-
-    .btn-action-pri {
-      background: var(--accent-emerald);
-      color: #000000 !important;
-      border: none;
-      padding: 7px 16px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 8px rgba(0, 210, 106, 0.25);
-    }
-    .btn-action-pri:hover { transform: translateY(-1px); }
-
-    .table-container-card {
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .table-controls-bar {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--desk-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      background: var(--desk-card-surface);
-    }
-
-    .table-search-input {
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 12px;
-      color: var(--text-main);
-      width: 240px;
-      outline: none;
-    }
-    .table-search-input:focus {
-      border-color: var(--accent-emerald);
-    }
-
-    .filter-pills-wrap {
-      display: flex;
-      gap: 6px;
-    }
-    .filter-pill {
-      background: transparent;
-      border: 1px solid var(--desk-border);
-      color: var(--text-sub);
-      padding: 4px 10px;
-      border-radius: 14px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .filter-pill.active {
-      background: var(--pill-active-bg);
-      color: var(--text-main);
-      border-color: var(--accent-emerald);
-    }
-
-    .oryx-data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12.5px;
-      text-align: left;
-    }
-    .oryx-data-table th {
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text-sub);
-      font-weight: 700;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--desk-border);
-    }
-    .oryx-data-table td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--desk-border-light);
-      color: var(--text-main);
-    }
-    .oryx-data-table tr:hover td {
-      background: var(--desk-card-hover);
-    }
-
-    .table-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 10.5px;
-      font-weight: 700;
-    }
-    .badge-green { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.3); }
-    .badge-blue { background: rgba(96, 165, 250, 0.15); color: var(--accent-blue); border: 1px solid rgba(96, 165, 250, 0.3); }
-    .badge-amber { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }
-    .badge-red { background: rgba(248, 113, 113, 0.15); color: var(--accent-red); border: 1px solid rgba(248, 113, 113, 0.3); }
-    .badge-gray { background: rgba(158, 158, 158, 0.15); color: var(--text-sub); border: 1px solid rgba(158, 158, 158, 0.3); }
-
-    .btn-row-action {
-      background: transparent;
-      border: 1px solid var(--desk-border);
-      color: var(--text-sub);
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-    .btn-row-action:hover {
-      color: var(--text-main);
-      border-color: var(--accent-emerald);
-    }
-
-    .table-empty-wrap {
-      padding: 48px 24px;
-      text-align: center;
-      color: var(--text-sub);
-    }
-
-    /* Executive Dashboard Styles */
-    .number-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-    }
-    .number-card {
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      position: relative;
-      cursor: pointer;
-    }
-    .number-card:hover {
-      background: var(--desk-card-hover);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-    .card-title {
-      font-size: 11px;
-      color: var(--text-sub);
-      font-weight: 500;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .card-val {
-      font-family: var(--font-mono);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-top: 6px;
-    }
-    .card-val.green { color: var(--accent-green); }
-    .card-val.red { color: var(--accent-red); }
-
-    .highlight-cards-row {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-    }
-
-    .charts-grid-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .chart-card {
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      border-radius: 12px;
-      padding: 18px 20px;
-    }
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .chart-title-text { font-size: 13.5px; font-weight: 700; color: var(--text-main); }
-    .chart-canvas-mock {
-      height: 180px;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      padding-bottom: 24px;
-    }
-    .chart-grid-line {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.04);
-    }
-    .chart-axis-labels {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-    }
-    .chart-svg-line {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    /* Global Search Modal (Ctrl+K) */
-    .search-modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: none;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 80px;
-    }
-    .search-modal-box {
-      width: 540px;
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      border-radius: 12px;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-      overflow: hidden;
-    }
-    .search-modal-header {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--desk-border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .search-modal-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      font-size: 14px;
-      color: var(--text-main);
-      font-family: var(--font-body);
-    }
-    .search-results-list {
-      max-height: 360px;
-      overflow-y: auto;
-      padding: 8px;
-    }
-    .search-result-item {
-      padding: 10px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-    .search-result-item:hover, .search-result-item.selected {
-      background: var(--pill-active-bg);
-      color: var(--accent-emerald);
-    }
-
-    /* Add Record Modal */
-    .record-modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .record-modal-box {
-      width: 580px;
-      max-width: 100%;
-      background: var(--desk-card-bg);
-      border: 1px solid var(--desk-border);
-      border-radius: 14px;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
-      overflow: hidden;
-    }
-    .record-modal-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--desk-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .record-modal-body {
-      padding: 20px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-    .record-modal-footer {
-      padding: 14px 20px;
-      border-top: 1px solid var(--desk-border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      background: var(--desk-card-surface);
-    }
-    .form-group-modal {
-      margin-bottom: 14px;
-    }
-    .form-label-modal {
-      display: block;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-    }
-    .form-control-modal {
-      width: 100%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--desk-border);
-      background: var(--desk-bg);
-      color: var(--text-main);
-      font-size: 13px;
-      outline: none;
-    }
-    .form-control-modal:focus {
-      border-color: var(--accent-emerald);
-    }
-
-    /* Notification Drawer */
-    .notif-drawer-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 1000;
-      display: none;
-    }
-    .notif-drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 360px;
-      background: var(--desk-card-bg);
-      border-left: 1px solid var(--desk-border);
-      z-index: 1001;
-      display: none;
-      flex-direction: column;
-      box-shadow: -8px 0 32px rgba(0,0,0,0.5);
-    }
-    .notif-drawer-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--desk-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .notif-item {
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--desk-border-light);
-      cursor: pointer;
-    }
-    .notif-item:hover {
-      background: var(--desk-card-hover);
-    }
-
-    @media (max-width: 1200px) {
-      .number-cards-grid, .highlight-cards-row { grid-template-columns: repeat(3, 1fr); }
-      .charts-grid-row { grid-template-columns: 1fr; }
-    }
-
-    
+    # Logo CSS
+    logo_css = """
     .oryx-brand-logo {
       height: 38px;
       width: auto;
@@ -775,7 +24,767 @@
     .oryx-logo-dark-img { display: none !important; }
     [data-theme="dark"] .oryx-logo-light-img, html.dark .oryx-logo-light-img { display: none !important; }
     [data-theme="dark"] .oryx-logo-dark-img, html.dark .oryx-logo-dark-img { display: block !important; }
-    
+    """
+
+    admin_html = f"""<!DOCTYPE html>
+<html lang="en" data-theme="dark" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oryx Fund — Institutional Lending Management</title>
+  <meta name="description" content="Institutional credit and loan portfolio management dashboard for Oryx Fund.">
+  <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {{
+      --desk-bg: #090909;
+      --desk-sidebar-bg: #0D0D0D;
+      --desk-card-bg: #121212;
+      --desk-card-hover: #171717;
+      --desk-card-surface: #181818;
+      --desk-border: #1F1F1F;
+      --desk-border-light: #181818;
+      --text-main: #FAF8F5;
+      --text-sub: #9E9E9E;
+      --text-dim: #666666;
+      --accent-green: #34D399;
+      --accent-emerald: #00D26A;
+      --accent-red: #F87171;
+      --accent-blue: #60A5FA;
+      --accent-amber: #FBBF24;
+      --pill-active-bg: #1C1C1C;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }}
+
+    [data-theme="light"], html:not(.dark) {{
+      --desk-bg: #F4EFEB;
+      --desk-sidebar-bg: #EAE3DC;
+      --desk-card-bg: #FFFFFF;
+      --desk-card-hover: #F9F7F5;
+      --desk-card-surface: #F0EAE3;
+      --desk-border: #DFD5CB;
+      --desk-border-light: #E8E0D7;
+      --text-main: #1F3224;
+      --text-sub: #556B5D;
+      --text-dim: #829488;
+      --accent-green: #059669;
+      --accent-emerald: #059669;
+      --accent-red: #DC2626;
+      --accent-blue: #2563EB;
+      --accent-amber: #D97706;
+      --pill-active-bg: #DFD5CB;
+    }}
+
+    * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }}
+
+    body {{
+      font-family: var(--font-body);
+      background-color: var(--desk-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }}
+
+    /* Sidebar Styling (Matches Screenshot 1:1) */
+    .desk-sidebar {{
+      width: 250px;
+      min-width: 250px;
+      background: var(--desk-sidebar-bg);
+      border-right: 1px solid var(--desk-border);
+      display: flex;
+      flex-direction: column;
+      padding: 14px 10px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      user-select: none;
+    }}
+
+    .desk-brand-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      cursor: pointer;
+    }}
+    .desk-brand-header:hover {{ background: rgba(255, 255, 255, 0.04); }}
+
+    .brand-icon-box {{
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #00D26A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 900;
+      font-size: 13px;
+    }}
+
+    .brand-title-group {{
+      display: flex;
+      flex-direction: column;
+    }}
+    .brand-title-group .main-title {{
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }}
+    .brand-title-group .sub-title {{
+      font-size: 10.5px;
+      color: var(--text-sub);
+    }}
+
+    .sidebar-search-box {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--desk-border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      cursor: pointer;
+    }}
+    .sidebar-search-box:hover {{
+      border-color: var(--accent-emerald);
+      color: var(--text-main);
+    }}
+
+    .kbd-shortcut {{
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }}
+
+    .sidebar-item {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-sub);
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: 2px;
+    }}
+    .sidebar-item:hover {{
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }}
+    .sidebar-item.active {{
+      background: var(--pill-active-bg);
+      color: var(--text-main);
+      font-weight: 700;
+    }}
+
+    .sidebar-category-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      margin-top: 6px;
+    }}
+    .sidebar-category-header:hover {{ background: rgba(255, 255, 255, 0.03); }}
+    .sidebar-category-header .arrow {{
+      font-size: 9px;
+      color: var(--text-dim);
+      transition: transform 0.2s ease;
+    }}
+    .sidebar-category-header.collapsed .arrow {{
+      transform: rotate(-90deg);
+    }}
+
+    .sidebar-sub-list {{
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+    }}
+    .sidebar-sub-list.hidden {{
+      display: none;
+    }}
+
+    .sidebar-sub-item {{
+      padding: 6px 10px 6px 28px;
+      font-size: 12px;
+      color: var(--text-sub);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 1px 0;
+    }}
+    .sidebar-sub-item:hover {{
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }}
+    .sidebar-sub-item.active {{
+      color: var(--accent-emerald);
+      font-weight: 700;
+      background: rgba(0, 210, 106, 0.08);
+    }}
+
+    .sidebar-user-footer {{
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 10px;
+      border-top: 1px solid var(--desk-border);
+      border-radius: 8px;
+      cursor: pointer;
+    }}
+    .sidebar-user-footer:hover {{ background: rgba(255, 255, 255, 0.04); }}
+
+    .user-avatar-circle {{
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #E0561B;
+      color: #FFFFFF;
+      font-size: 10.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }}
+
+    /* Main Area */
+    .desk-main {{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }}
+
+    .desk-topbar {{
+      height: 50px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--desk-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--desk-bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }}
+
+    .breadcrumb-wrap {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-sub);
+    }}
+    .breadcrumb-current {{ font-weight: 700; color: var(--text-main); }}
+
+    .topbar-right {{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }}
+
+    .theme-toggle-btn {{
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      background: transparent;
+      border: 1px solid var(--desk-border);
+      color: var(--text-main);
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }}
+    .theme-toggle-btn:hover {{ border-color: var(--accent-emerald); }}
+
+    .borrower-switch-link {{
+      font-size: 11.5px;
+      color: var(--accent-emerald);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 5px 12px;
+      border: 1px solid rgba(0, 210, 106, 0.3);
+      border-radius: 6px;
+    }}
+    .borrower-switch-link:hover {{
+      background: rgba(0, 210, 106, 0.1);
+    }}
+
+    .desk-canvas {{
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex: 1;
+    }}
+
+    /* Data Table / List View Styles */
+    .list-header-row {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 6px;
+    }}
+
+    .list-title-group h1 {{
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+    }}
+    .list-title-group p {{
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }}
+
+    .list-action-btns {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+
+    .btn-action-sec {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }}
+    .btn-action-sec:hover {{
+      border-color: var(--accent-emerald);
+    }}
+
+    .btn-action-pri {{
+      background: var(--accent-emerald);
+      color: #000000 !important;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0, 210, 106, 0.25);
+    }}
+    .btn-action-pri:hover {{ transform: translateY(-1px); }}
+
+    .table-container-card {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }}
+
+    .table-controls-bar {{
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--desk-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--desk-card-surface);
+    }}
+
+    .table-search-input {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text-main);
+      width: 240px;
+      outline: none;
+    }}
+    .table-search-input:focus {{
+      border-color: var(--accent-emerald);
+    }}
+
+    .filter-pills-wrap {{
+      display: flex;
+      gap: 6px;
+    }}
+    .filter-pill {{
+      background: transparent;
+      border: 1px solid var(--desk-border);
+      color: var(--text-sub);
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }}
+    .filter-pill.active {{
+      background: var(--pill-active-bg);
+      color: var(--text-main);
+      border-color: var(--accent-emerald);
+    }}
+
+    .oryx-data-table {{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }}
+    .oryx-data-table th {{
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-sub);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--desk-border);
+    }}
+    .oryx-data-table td {{
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--desk-border-light);
+      color: var(--text-main);
+    }}
+    .oryx-data-table tr:hover td {{
+      background: var(--desk-card-hover);
+    }}
+
+    .table-badge {{
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }}
+    .badge-green {{ background: rgba(52, 211, 153, 0.15); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.3); }}
+    .badge-blue {{ background: rgba(96, 165, 250, 0.15); color: var(--accent-blue); border: 1px solid rgba(96, 165, 250, 0.3); }}
+    .badge-amber {{ background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }}
+    .badge-red {{ background: rgba(248, 113, 113, 0.15); color: var(--accent-red); border: 1px solid rgba(248, 113, 113, 0.3); }}
+    .badge-gray {{ background: rgba(158, 158, 158, 0.15); color: var(--text-sub); border: 1px solid rgba(158, 158, 158, 0.3); }}
+
+    .btn-row-action {{
+      background: transparent;
+      border: 1px solid var(--desk-border);
+      color: var(--text-sub);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }}
+    .btn-row-action:hover {{
+      color: var(--text-main);
+      border-color: var(--accent-emerald);
+    }}
+
+    .table-empty-wrap {{
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-sub);
+    }}
+
+    /* Executive Dashboard Styles */
+    .number-cards-grid {{
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }}
+    .number-card {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      position: relative;
+      cursor: pointer;
+    }}
+    .number-card:hover {{
+      background: var(--desk-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }}
+    .card-title {{
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }}
+    .card-val {{
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 6px;
+    }}
+    .card-val.green {{ color: var(--accent-green); }}
+    .card-val.red {{ color: var(--accent-red); }}
+
+    .highlight-cards-row {{
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }}
+
+    .charts-grid-row {{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }}
+    .chart-card {{
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }}
+    .chart-header {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }}
+    .chart-title-text {{ font-size: 13.5px; font-weight: 700; color: var(--text-main); }}
+    .chart-canvas-mock {{
+      height: 180px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 24px;
+    }}
+    .chart-grid-line {{
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.04);
+    }}
+    .chart-axis-labels {{
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }}
+    .chart-svg-line {{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }}
+
+    /* Global Search Modal (Ctrl+K) */
+    .search-modal-backdrop {{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
+    }}
+    .search-modal-box {{
+      width: 540px;
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }}
+    .search-modal-header {{
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--desk-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }}
+    .search-modal-input {{
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: var(--text-main);
+      font-family: var(--font-body);
+    }}
+    .search-results-list {{
+      max-height: 360px;
+      overflow-y: auto;
+      padding: 8px;
+    }}
+    .search-result-item {{
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }}
+    .search-result-item:hover, .search-result-item.selected {{
+      background: var(--pill-active-bg);
+      color: var(--accent-emerald);
+    }}
+
+    /* Add Record Modal */
+    .record-modal-backdrop {{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }}
+    .record-modal-box {{
+      width: 580px;
+      max-width: 100%;
+      background: var(--desk-card-bg);
+      border: 1px solid var(--desk-border);
+      border-radius: 14px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }}
+    .record-modal-header {{
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--desk-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }}
+    .record-modal-body {{
+      padding: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }}
+    .record-modal-footer {{
+      padding: 14px 20px;
+      border-top: 1px solid var(--desk-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--desk-card-surface);
+    }}
+    .form-group-modal {{
+      margin-bottom: 14px;
+    }}
+    .form-label-modal {{
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }}
+    .form-control-modal {{
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--desk-border);
+      background: var(--desk-bg);
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+    }}
+    .form-control-modal:focus {{
+      border-color: var(--accent-emerald);
+    }}
+
+    /* Notification Drawer */
+    .notif-drawer-backdrop {{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      display: none;
+    }}
+    .notif-drawer {{
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 360px;
+      background: var(--desk-card-bg);
+      border-left: 1px solid var(--desk-border);
+      z-index: 1001;
+      display: none;
+      flex-direction: column;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+    }}
+    .notif-drawer-header {{
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--desk-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }}
+    .notif-item {{
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--desk-border-light);
+      cursor: pointer;
+    }}
+    .notif-item:hover {{
+      background: var(--desk-card-hover);
+    }}
+
+    @media (max-width: 1200px) {{
+      .number-cards-grid, .highlight-cards-row {{ grid-template-columns: repeat(3, 1fr); }}
+      .charts-grid-row {{ grid-template-columns: 1fr; }}
+    }}
+
+    {logo_css}
   </style>
 </head>
 <body>
@@ -964,134 +973,134 @@
     // =========================================================================
     // COMPLETE DATA STORES & DEFAULT MOCK DATA FOR ALL 22 DOCTYPES
     // =========================================================================
-    const DB = {
+    const DB = {{
       company: [
-        { id: "COMP-001", name: "Oryx Fund Limited", country: "Kenya", currency: "KES", default_bank: "Equity Bank - Corporate #0112938472", reg_no: "CPR/2023/98214", status: "Active" }
+        {{ id: "COMP-001", name: "Oryx Fund Limited", country: "Kenya", currency: "KES", default_bank: "Equity Bank - Corporate #0112938472", reg_no: "CPR/2023/98214", status: "Active" }}
       ],
       loan_product: [
-        { id: "LP-001", name: "Oryx Subsequent Fast-Track Facility", type: "Unsecured Revolving", rate: "14.00%", penalty: "2.00%", freq: "Monthly", max_tenure: "12 Months", status: "Active" },
-        { id: "LP-002", name: "Oryx SME Working Capital", type: "Secured Commercial", rate: "13.50%", penalty: "2.00%", freq: "Monthly", max_tenure: "24 Months", status: "Active" },
-        { id: "LP-003", name: "Oryx Asset Finance & Logbook Loan", type: "Secured Asset", rate: "12.50%", penalty: "2.50%", freq: "Monthly", max_tenure: "36 Months", status: "Active" },
-        { id: "LP-004", name: "Oryx Emergency Bridging Facility", type: "Short-Term Micro", rate: "15.00%", penalty: "3.00%", freq: "Bullet / Weekly", max_tenure: "3 Months", status: "Active" }
+        {{ id: "LP-001", name: "Oryx Subsequent Fast-Track Facility", type: "Unsecured Revolving", rate: "14.00%", penalty: "2.00%", freq: "Monthly", max_tenure: "12 Months", status: "Active" }},
+        {{ id: "LP-002", name: "Oryx SME Working Capital", type: "Secured Commercial", rate: "13.50%", penalty: "2.00%", freq: "Monthly", max_tenure: "24 Months", status: "Active" }},
+        {{ id: "LP-003", name: "Oryx Asset Finance & Logbook Loan", type: "Secured Asset", rate: "12.50%", penalty: "2.50%", freq: "Monthly", max_tenure: "36 Months", status: "Active" }},
+        {{ id: "LP-004", name: "Oryx Emergency Bridging Facility", type: "Short-Term Micro", rate: "15.00%", penalty: "3.00%", freq: "Bullet / Weekly", max_tenure: "3 Months", status: "Active" }}
       ],
       charges: [
-        { id: "CHG-001", name: "Facility Appraisal Fee", type: "Percentage", base: "Sanctioned Principal", rate: "1.50%", acc: "Fee Income - Appraisal", status: "Active" },
-        { id: "CHG-002", name: "Processing & Documentation Fee", type: "Percentage", base: "Disbursed Amount", rate: "2.00%", acc: "Fee Income - Processing", status: "Active" },
-        { id: "CHG-003", name: "Late Repayment Default Penalty", type: "Percentage", base: "Overdue Installment", rate: "2.00% / mo", acc: "Penalty Income - Lending", status: "Active" },
-        { id: "CHG-004", name: "Collateral Legal Charge & Stamp Duty", type: "Fixed Amount", base: "Fixed", rate: "KES 15,000.00", acc: "Legal Fees Payable", status: "Active" }
+        {{ id: "CHG-001", name: "Facility Appraisal Fee", type: "Percentage", base: "Sanctioned Principal", rate: "1.50%", acc: "Fee Income - Appraisal", status: "Active" }},
+        {{ id: "CHG-002", name: "Processing & Documentation Fee", type: "Percentage", base: "Disbursed Amount", rate: "2.00%", acc: "Fee Income - Processing", status: "Active" }},
+        {{ id: "CHG-003", name: "Late Repayment Default Penalty", type: "Percentage", base: "Overdue Installment", rate: "2.00% / mo", acc: "Penalty Income - Lending", status: "Active" }},
+        {{ id: "CHG-004", name: "Collateral Legal Charge & Stamp Duty", type: "Fixed Amount", base: "Fixed", rate: "KES 15,000.00", acc: "Legal Fees Payable", status: "Active" }}
       ],
       loan: [
-        { id: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", product: "Oryx Subsequent Fast-Track Facility", sanctioned: "KES 250,000.00", disbursed: "KES 250,000.00", balance: "KES 185,420.00", status: "Active", date: "2026-08-15" },
-        { id: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", product: "Oryx SME Working Capital", sanctioned: "KES 500,000.00", disbursed: "KES 500,000.00", balance: "KES 420,000.00", status: "Active", date: "2026-08-10" },
-        { id: "ACC-LOAN-2026-00003", customer: "Sarah Muthoni Njoroge", product: "Oryx Asset Finance & Logbook Loan", sanctioned: "KES 750,000.00", disbursed: "KES 750,000.00", balance: "KES 0.00", status: "Closed", date: "2026-05-01" }
+        {{ id: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", product: "Oryx Subsequent Fast-Track Facility", sanctioned: "KES 250,000.00", disbursed: "KES 250,000.00", balance: "KES 185,420.00", status: "Active", date: "2026-08-15" }},
+        {{ id: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", product: "Oryx SME Working Capital", sanctioned: "KES 500,000.00", disbursed: "KES 500,000.00", balance: "KES 420,000.00", status: "Active", date: "2026-08-10" }},
+        {{ id: "ACC-LOAN-2026-00003", customer: "Sarah Muthoni Njoroge", product: "Oryx Asset Finance & Logbook Loan", sanctioned: "KES 750,000.00", disbursed: "KES 750,000.00", balance: "KES 0.00", status: "Closed", date: "2026-05-01" }}
       ],
       loan_disbursement: [
-        { id: "DISB-2026-0001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", amount: "KES 250,000.00", mode: "M-Pesa B2C", ref: "QK82910291", date: "2026-08-15", status: "Completed" },
-        { id: "DISB-2026-0002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", amount: "KES 500,000.00", mode: "Bank Wire (RTGS)", ref: "RTGS/2026/0921", date: "2026-08-10", status: "Completed" }
+        {{ id: "DISB-2026-0001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", amount: "KES 250,000.00", mode: "M-Pesa B2C", ref: "QK82910291", date: "2026-08-15", status: "Completed" }},
+        {{ id: "DISB-2026-0002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", amount: "KES 500,000.00", mode: "Bank Wire (RTGS)", ref: "RTGS/2026/0921", date: "2026-08-10", status: "Completed" }}
       ],
       loan_repayment_schedule: [
-        { id: "SCH-001", loan: "ACC-LOAN-2026-00001", inst_no: "1 of 12", due_date: "2026-09-15", principal: "KES 20,833.33", interest: "KES 2,916.67", total: "KES 23,750.00", status: "Upcoming" },
-        { id: "SCH-002", loan: "ACC-LOAN-2026-00001", inst_no: "2 of 12", due_date: "2026-10-15", principal: "KES 20,833.33", interest: "KES 2,673.61", total: "KES 23,506.94", status: "Upcoming" },
-        { id: "SCH-003", loan: "ACC-LOAN-2026-00002", inst_no: "1 of 24", due_date: "2026-09-10", principal: "KES 20,833.33", interest: "KES 5,625.00", total: "KES 26,458.33", status: "Upcoming" }
+        {{ id: "SCH-001", loan: "ACC-LOAN-2026-00001", inst_no: "1 of 12", due_date: "2026-09-15", principal: "KES 20,833.33", interest: "KES 2,916.67", total: "KES 23,750.00", status: "Upcoming" }},
+        {{ id: "SCH-002", loan: "ACC-LOAN-2026-00001", inst_no: "2 of 12", due_date: "2026-10-15", principal: "KES 20,833.33", interest: "KES 2,673.61", total: "KES 23,506.94", status: "Upcoming" }},
+        {{ id: "SCH-003", loan: "ACC-LOAN-2026-00002", inst_no: "1 of 24", due_date: "2026-09-10", principal: "KES 20,833.33", interest: "KES 5,625.00", total: "KES 26,458.33", status: "Upcoming" }}
       ],
       loan_transfer: [
-        { id: "TRF-2026-0001", loan: "ACC-LOAN-2026-00003", from_branch: "Nairobi CBD Branch", to_branch: "Westlands Executive Branch", effective_date: "2026-08-01", status: "Approved" }
+        {{ id: "TRF-2026-0001", loan: "ACC-LOAN-2026-00003", from_branch: "Nairobi CBD Branch", to_branch: "Westlands Executive Branch", effective_date: "2026-08-01", status: "Approved" }}
       ],
       loan_restructure: [
-        { id: "RST-2026-0001", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", old_tenure: "12 Months", new_tenure: "24 Months", moratorium: "30 Days", status: "Approved" }
+        {{ id: "RST-2026-0001", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", old_tenure: "12 Months", new_tenure: "24 Months", moratorium: "30 Days", status: "Approved" }}
       ],
       loan_repayment: [
-        { id: "REP-2026-0001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", method: "M-Pesa C2B Paybill", ref: "QK91827364", amount: "KES 23,750.00", principal: "KES 20,833.33", interest: "KES 2,916.67", date: "2026-08-20" },
-        { id: "REP-2026-0002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", method: "Direct Bank Transfer", ref: "TXN-882910", amount: "KES 26,458.33", principal: "KES 20,833.33", interest: "KES 5,625.00", date: "2026-08-18" }
+        {{ id: "REP-2026-0001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", method: "M-Pesa C2B Paybill", ref: "QK91827364", amount: "KES 23,750.00", principal: "KES 20,833.33", interest: "KES 2,916.67", date: "2026-08-20" }},
+        {{ id: "REP-2026-0002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", method: "Direct Bank Transfer", ref: "TXN-882910", amount: "KES 26,458.33", principal: "KES 20,833.33", interest: "KES 5,625.00", date: "2026-08-18" }}
       ],
       loan_demand: [
-        { id: "DMD-2026-001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", demand_date: "2026-09-01", inst_due: "KES 23,750.00", penalty: "KES 0.00", total_demand: "KES 23,750.00", status: "Issued" },
-        { id: "DMD-2026-002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", demand_date: "2026-09-01", inst_due: "KES 26,458.33", penalty: "KES 0.00", total_demand: "KES 26,458.33", status: "Issued" }
+        {{ id: "DMD-2026-001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", demand_date: "2026-09-01", inst_due: "KES 23,750.00", penalty: "KES 0.00", total_demand: "KES 23,750.00", status: "Issued" }},
+        {{ id: "DMD-2026-002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", demand_date: "2026-09-01", inst_due: "KES 26,458.33", penalty: "KES 0.00", total_demand: "KES 26,458.33", status: "Issued" }}
       ],
       loan_interest_accrual: [
-        { id: "INT-2026-08", start_date: "2026-08-01", end_date: "2026-08-26", accrued_amt: "KES 42,910.45", loans_count: "2 Active", journal: "JV-2026-0891", status: "Posted" }
+        {{ id: "INT-2026-08", start_date: "2026-08-01", end_date: "2026-08-26", accrued_amt: "KES 42,910.45", loans_count: "2 Active", journal: "JV-2026-0891", status: "Posted" }}
       ],
       loan_write_off: [
-        { id: "WO-2026-0001", loan: "ACC-LOAN-2025-00099", customer: "Defunct Borrower", principal: "KES 0.00", interest: "KES 0.00", reason: "N/A - Clean Portfolio", provision_acc: "Bad Debt Reserve", status: "Zero Write-Offs" }
+        {{ id: "WO-2026-0001", loan: "ACC-LOAN-2025-00099", customer: "Defunct Borrower", principal: "KES 0.00", interest: "KES 0.00", reason: "N/A - Clean Portfolio", provision_acc: "Bad Debt Reserve", status: "Zero Write-Offs" }}
       ],
       dpd_log: [
-        { id: "DPD-2026-001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", dpd: "0 Days", bucket: "Standard (Performing)", date: "2026-08-26" },
-        { id: "DPD-2026-002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", dpd: "0 Days", bucket: "Standard (Performing)", date: "2026-08-26" }
+        {{ id: "DPD-2026-001", loan: "ACC-LOAN-2026-00001", customer: "Jane Wanjiku Kamau", dpd: "0 Days", bucket: "Standard (Performing)", date: "2026-08-26" }},
+        {{ id: "DPD-2026-002", loan: "ACC-LOAN-2026-00002", customer: "David Ochieng Otieno", dpd: "0 Days", bucket: "Standard (Performing)", date: "2026-08-26" }}
       ],
       customer: [
-        { id: "CUST-2026-0001", name: "Jane Wanjiku Kamau", email: "jane.wanjiku@oryxfund.co.ke", phone: "+254711223344", national_id: "28394857", score: "740 (Prime)", kyc: "Verified", date: "2026-08-15" },
-        { id: "CUST-2026-0002", name: "David Ochieng Otieno", email: "david.otieno@gmail.com", phone: "+254722334455", national_id: "29384712", score: "715 (Good)", kyc: "Verified", date: "2026-08-10" },
-        { id: "CUST-2026-0003", name: "Sarah Muthoni Njoroge", email: "sarah.muthoni@yahoo.com", phone: "+254733445566", national_id: "30192837", score: "780 (Excellent)", kyc: "Verified", date: "2026-05-01" }
+        {{ id: "CUST-2026-0001", name: "Jane Wanjiku Kamau", email: "jane.wanjiku@oryxfund.co.ke", phone: "+254711223344", national_id: "28394857", score: "740 (Prime)", kyc: "Verified", date: "2026-08-15" }},
+        {{ id: "CUST-2026-0002", name: "David Ochieng Otieno", email: "david.otieno@gmail.com", phone: "+254722334455", national_id: "29384712", score: "715 (Good)", kyc: "Verified", date: "2026-08-10" }},
+        {{ id: "CUST-2026-0003", name: "Sarah Muthoni Njoroge", email: "sarah.muthoni@yahoo.com", phone: "+254733445566", national_id: "30192837", score: "780 (Excellent)", kyc: "Verified", date: "2026-05-01" }}
       ],
       loan_application: [
-        { id: "ACC-LOAP-2026-00001", applicant: "Jane Wanjiku Kamau", product: "Oryx Subsequent Fast-Track Facility", amount: "KES 250,000.00", income: "KES 180,000.00", decision: "Sanctioned & Disbursed", date: "2026-08-15" },
-        { id: "ACC-LOAP-2026-00002", applicant: "David Ochieng Otieno", product: "Oryx SME Working Capital", amount: "KES 500,000.00", income: "KES 350,000.00", decision: "Sanctioned & Disbursed", date: "2026-08-10" },
-        { id: "ACC-LOAP-2026-00003", applicant: "Kipchoge Brian Koech", product: "Oryx Subsequent Fast-Track Facility", amount: "KES 100,000.00", income: "KES 95,000.00", decision: "Under Review", date: "2026-08-26" }
+        {{ id: "ACC-LOAP-2026-00001", applicant: "Jane Wanjiku Kamau", product: "Oryx Subsequent Fast-Track Facility", amount: "KES 250,000.00", income: "KES 180,000.00", decision: "Sanctioned & Disbursed", date: "2026-08-15" }},
+        {{ id: "ACC-LOAP-2026-00002", applicant: "David Ochieng Otieno", product: "Oryx SME Working Capital", amount: "KES 500,000.00", income: "KES 350,000.00", decision: "Sanctioned & Disbursed", date: "2026-08-10" }},
+        {{ id: "ACC-LOAP-2026-00003", applicant: "Kipchoge Brian Koech", product: "Oryx Subsequent Fast-Track Facility", amount: "KES 100,000.00", income: "KES 95,000.00", decision: "Under Review", date: "2026-08-26" }}
       ],
       loan_security_type: [
-        { id: "LST-001", name: "Motor Vehicle (Logbook)", category: "Movable Collateral", rule: "Certified Valuation Report", margin: "25.00%", status: "Active" },
-        { id: "LST-002", name: "Title Deed (Freehold / Leasehold)", category: "Immovable Property", rule: "Registered Valuer Assessment", margin: "30.00%", status: "Active" },
-        { id: "LST-003", name: "Fixed Deposit Receipt (Cash Lien)", category: "Cash Equivalent", rule: "100% Face Value", margin: "0.00%", status: "Active" },
-        { id: "LST-004", name: "NSE Quoted Securities / Shares", category: "Marketable Securities", rule: "30-Day VWAP", margin: "35.00%", status: "Active" }
+        {{ id: "LST-001", name: "Motor Vehicle (Logbook)", category: "Movable Collateral", rule: "Certified Valuation Report", margin: "25.00%", status: "Active" }},
+        {{ id: "LST-002", name: "Title Deed (Freehold / Leasehold)", category: "Immovable Property", rule: "Registered Valuer Assessment", margin: "30.00%", status: "Active" }},
+        {{ id: "LST-003", name: "Fixed Deposit Receipt (Cash Lien)", category: "Cash Equivalent", rule: "100% Face Value", margin: "0.00%", status: "Active" }},
+        {{ id: "LST-004", name: "NSE Quoted Securities / Shares", category: "Marketable Securities", rule: "30-Day VWAP", margin: "35.00%", status: "Active" }}
       ],
       loan_security: [
-        { id: "SEC-2026-001", name: "Toyota Prado TX 2019 (KDD 819X)", type: "Motor Vehicle (Logbook)", owner: "David Ochieng Otieno", value: "KES 4,200,000.00", reg_no: "KDD 819X", custodian: "Oryx Vault (Safe 2)" },
-        { id: "SEC-2026-002", name: "Residential Plot LR 209/1829 Kiambu", type: "Title Deed (Freehold / Leasehold)", owner: "Sarah Muthoni Njoroge", value: "KES 8,500,000.00", reg_no: "LR Kiambu/1829", custodian: "Discharged / Released" }
+        {{ id: "SEC-2026-001", name: "Toyota Prado TX 2019 (KDD 819X)", type: "Motor Vehicle (Logbook)", owner: "David Ochieng Otieno", value: "KES 4,200,000.00", reg_no: "KDD 819X", custodian: "Oryx Vault (Safe 2)" }},
+        {{ id: "SEC-2026-002", name: "Residential Plot LR 209/1829 Kiambu", type: "Title Deed (Freehold / Leasehold)", owner: "Sarah Muthoni Njoroge", value: "KES 8,500,000.00", reg_no: "LR Kiambu/1829", custodian: "Discharged / Released" }}
       ],
       loan_security_price: [
-        { id: "PRC-2026-001", security: "SEC-2026-001 (Toyota Prado)", value: "KES 4,200,000.00", val_date: "2026-08-05", valuer: "Regent Automobile Valuers Ltd" }
+        {{ id: "PRC-2026-001", security: "SEC-2026-001 (Toyota Prado)", value: "KES 4,200,000.00", val_date: "2026-08-05", valuer: "Regent Automobile Valuers Ltd" }}
       ],
       loan_security_assignment: [
-        { id: "ASG-2026-001", loan: "ACC-LOAN-2026-00002", security: "SEC-2026-001 (Toyota Prado)", assigned_val: "KES 4,200,000.00", ltv: "11.90% (Low Risk)", status: "Active Lien" }
+        {{ id: "ASG-2026-001", loan: "ACC-LOAN-2026-00002", security: "SEC-2026-001 (Toyota Prado)", assigned_val: "KES 4,200,000.00", ltv: "11.90% (Low Risk)", status: "Active Lien" }}
       ],
       loan_security_release: [
-        { id: "REL-2026-001", loan: "ACC-LOAN-2026-00003", security: "SEC-2026-002 (Plot LR Kiambu)", date: "2026-08-01", discharged_by: "Oryx Legal Counsel", status: "Released & Discharged" }
+        {{ id: "REL-2026-001", loan: "ACC-LOAN-2026-00003", security: "SEC-2026-002 (Plot LR Kiambu)", date: "2026-08-01", discharged_by: "Oryx Legal Counsel", status: "Released & Discharged" }}
       ],
       sanctioned_loan_amount: [
-        { id: "SANCT-001", customer: "Jane Wanjiku Kamau", limit: "KES 500,000.00", utilized: "KES 250,000.00", available: "KES 250,000.00", expiry: "2027-08-15", status: "Active" },
-        { id: "SANCT-002", customer: "David Ochieng Otieno", limit: "KES 1,000,000.00", utilized: "KES 500,000.00", available: "KES 500,000.00", expiry: "2027-08-10", status: "Active" }
+        {{ id: "SANCT-001", customer: "Jane Wanjiku Kamau", limit: "KES 500,000.00", utilized: "KES 250,000.00", available: "KES 250,000.00", expiry: "2027-08-15", status: "Active" }},
+        {{ id: "SANCT-002", customer: "David Ochieng Otieno", limit: "KES 1,000,000.00", utilized: "KES 500,000.00", available: "KES 500,000.00", expiry: "2027-08-10", status: "Active" }}
       ]
-    };
+    }};
 
     // Meta definition for views
-    const VIEWS = {
-      dashboard: { title: "Loan Dashboard", category: "Dashboard" },
-      company: { title: "Company", category: "Setup", doctype: "Company", singular: "Company" },
-      loan_product: { title: "Loan Product", category: "Setup", doctype: "Loan Product", singular: "Loan Product" },
-      charges: { title: "Charges", category: "Setup", doctype: "Charges", singular: "Charge" },
-      loan: { title: "Loan", category: "Loan Management", doctype: "Loan", singular: "Loan" },
-      loan_disbursement: { title: "Loan Disbursement", category: "Loan Management", doctype: "Loan Disbursement", singular: "Disbursement" },
-      loan_repayment_schedule: { title: "Loan Repayment Schedule", category: "Loan Management", doctype: "Loan Repayment Schedule", singular: "Schedule Entry" },
-      loan_transfer: { title: "Loan Transfer", category: "Loan Management", doctype: "Loan Transfer", singular: "Transfer" },
-      loan_restructure: { title: "Loan Restructure", category: "Loan Management", doctype: "Loan Restructure", singular: "Restructure Request" },
-      loan_repayment: { title: "Loan Repayment", category: "Loan Management", doctype: "Loan Repayment", singular: "Repayment" },
-      loan_demand: { title: "Loan Demand", category: "Loan Management", doctype: "Loan Demand", singular: "Demand" },
-      loan_interest_accrual: { title: "Loan Interest Accrual", category: "Loan Management", doctype: "Loan Interest Accrual", singular: "Interest Accrual Run" },
-      loan_write_off: { title: "Loan Write Off", category: "Loan Management", doctype: "Loan Write Off", singular: "Write Off Record" },
-      dpd_log: { title: "DPD Log", category: "Loan Management", doctype: "DPD Log", singular: "DPD Log" },
-      customer: { title: "Customer", category: "Loan Origination", doctype: "Customer", singular: "Customer" },
-      loan_application: { title: "Loan Application", category: "Loan Origination", doctype: "Loan Application", singular: "Loan Application" },
-      loan_security_type: { title: "Loan Security Type", category: "Security Management", doctype: "Loan Security Type", singular: "Security Type" },
-      loan_security: { title: "Loan Security", category: "Security Management", doctype: "Loan Security", singular: "Loan Security" },
-      loan_security_price: { title: "Loan Security Price", category: "Security Management", doctype: "Loan Security Price", singular: "Security Valuation" },
-      loan_security_assignment: { title: "Loan Security Assignment", category: "Security Management", doctype: "Loan Security Assignment", singular: "Security Assignment" },
-      loan_security_release: { title: "Loan Security Release", category: "Security Management", doctype: "Loan Security Release", singular: "Security Release" },
-      sanctioned_loan_amount: { title: "Sanctioned Loan Amount", category: "Security Management", doctype: "Sanctioned Loan Amount", singular: "Sanction Limit" }
-    };
+    const VIEWS = {{
+      dashboard: {{ title: "Loan Dashboard", category: "Dashboard" }},
+      company: {{ title: "Company", category: "Setup", doctype: "Company", singular: "Company" }},
+      loan_product: {{ title: "Loan Product", category: "Setup", doctype: "Loan Product", singular: "Loan Product" }},
+      charges: {{ title: "Charges", category: "Setup", doctype: "Charges", singular: "Charge" }},
+      loan: {{ title: "Loan", category: "Loan Management", doctype: "Loan", singular: "Loan" }},
+      loan_disbursement: {{ title: "Loan Disbursement", category: "Loan Management", doctype: "Loan Disbursement", singular: "Disbursement" }},
+      loan_repayment_schedule: {{ title: "Loan Repayment Schedule", category: "Loan Management", doctype: "Loan Repayment Schedule", singular: "Schedule Entry" }},
+      loan_transfer: {{ title: "Loan Transfer", category: "Loan Management", doctype: "Loan Transfer", singular: "Transfer" }},
+      loan_restructure: {{ title: "Loan Restructure", category: "Loan Management", doctype: "Loan Restructure", singular: "Restructure Request" }},
+      loan_repayment: {{ title: "Loan Repayment", category: "Loan Management", doctype: "Loan Repayment", singular: "Repayment" }},
+      loan_demand: {{ title: "Loan Demand", category: "Loan Management", doctype: "Loan Demand", singular: "Demand" }},
+      loan_interest_accrual: {{ title: "Loan Interest Accrual", category: "Loan Management", doctype: "Loan Interest Accrual", singular: "Interest Accrual Run" }},
+      loan_write_off: {{ title: "Loan Write Off", category: "Loan Management", doctype: "Loan Write Off", singular: "Write Off Record" }},
+      dpd_log: {{ title: "DPD Log", category: "Loan Management", doctype: "DPD Log", singular: "DPD Log" }},
+      customer: {{ title: "Customer", category: "Loan Origination", doctype: "Customer", singular: "Customer" }},
+      loan_application: {{ title: "Loan Application", category: "Loan Origination", doctype: "Loan Application", singular: "Loan Application" }},
+      loan_security_type: {{ title: "Loan Security Type", category: "Security Management", doctype: "Loan Security Type", singular: "Security Type" }},
+      loan_security: {{ title: "Loan Security", category: "Security Management", doctype: "Loan Security", singular: "Loan Security" }},
+      loan_security_price: {{ title: "Loan Security Price", category: "Security Management", doctype: "Loan Security Price", singular: "Security Valuation" }},
+      loan_security_assignment: {{ title: "Loan Security Assignment", category: "Security Management", doctype: "Loan Security Assignment", singular: "Security Assignment" }},
+      loan_security_release: {{ title: "Loan Security Release", category: "Security Management", doctype: "Loan Security Release", singular: "Security Release" }},
+      sanctioned_loan_amount: {{ title: "Sanctioned Loan Amount", category: "Security Management", doctype: "Sanctioned Loan Amount", singular: "Sanction Limit" }}
+    }};
 
     let currentViewKey = 'dashboard';
 
     // =========================================================================
     // VIEW SWITCHER & RENDER ENGINE
     // =========================================================================
-    function switchView(viewKey) {
+    function switchView(viewKey) {{
       if (!VIEWS[viewKey]) return;
       currentViewKey = viewKey;
 
       // Update sidebar active highlights
-      document.querySelectorAll('.sidebar-item, .sidebar-sub-item').forEach(el => {
+      document.querySelectorAll('.sidebar-item, .sidebar-sub-item').forEach(el => {{
         el.classList.remove('active');
-      });
+      }});
 
       const activeNav = document.getElementById('nav_' + viewKey);
       if (activeNav) activeNav.classList.add('active');
@@ -1103,27 +1112,27 @@
 
       const canvas = document.getElementById('mainCanvas');
 
-      if (viewKey === 'dashboard') {
+      if (viewKey === 'dashboard') {{
         renderExecutiveDashboard(canvas);
-      } else {
+      }} else {{
         renderDoctypeTableView(canvas, viewKey);
-      }
+      }}
 
       // Store in window hash
       window.location.hash = viewKey;
-    }
+    }}
 
-    function toggleCategory(groupId, headerEl) {
+    function toggleCategory(groupId, headerEl) {{
       const list = document.getElementById(groupId);
       if (!list) return;
       const isCollapsed = list.classList.toggle('hidden');
       headerEl.classList.toggle('collapsed', isCollapsed);
-    }
+    }}
 
     // =========================================================================
     // EXECUTIVE DASHBOARD RENDERER
     // =========================================================================
-    function renderExecutiveDashboard(container) {
+    function renderExecutiveDashboard(container) {{
       const activeLoanCount = DB.loan.filter(l => l.status === 'Active').length;
       const newAppCount = DB.loan_application.length;
       
@@ -1132,11 +1141,11 @@
         <div class="number-cards-grid">
           <div class="number-card" onclick="switchView('loan')">
             <div class="card-title"><span>New Loans</span> <span>•••</span></div>
-            <div class="card-val">${DB.loan.length}</div>
+            <div class="card-val">${{DB.loan.length}}</div>
           </div>
           <div class="number-card" onclick="switchView('loan')">
             <div class="card-title"><span>Active Loans</span> <span>•••</span></div>
-            <div class="card-val">${activeLoanCount}</div>
+            <div class="card-val">${{activeLoanCount}}</div>
           </div>
           <div class="number-card" onclick="switchView('loan')">
             <div class="card-title"><span>Closed Loans</span> <span>•••</span></div>
@@ -1148,7 +1157,7 @@
           </div>
           <div class="number-card" onclick="switchView('loan_application')">
             <div class="card-title"><span>Open Applications</span> <span>•••</span></div>
-            <div class="card-val">${newAppCount}</div>
+            <div class="card-val">${{newAppCount}}</div>
           </div>
         </div>
 
@@ -1164,7 +1173,7 @@
           </div>
           <div class="number-card" onclick="switchView('loan_security')">
             <div class="card-title"><span>Active Securities</span> <span>•••</span></div>
-            <div class="card-val">${DB.loan_security.length}</div>
+            <div class="card-val">${{DB.loan_security.length}}</div>
           </div>
           <div class="number-card" onclick="switchView('dpd_log')">
             <div class="card-title"><span>Unpaid Shortfall</span> <span>•••</span></div>
@@ -1236,69 +1245,69 @@
 
         </div>
       `;
-    }
+    }}
 
     // =========================================================================
     // TABLE VIEW RENDERER (ALL DOCTYPES)
     // =========================================================================
-    function renderDoctypeTableView(container, key) {
+    function renderDoctypeTableView(container, key) {{
       const meta = VIEWS[key];
       const data = DB[key] || [];
 
       let columns = [];
-      if (data.length > 0) {
+      if (data.length > 0) {{
         columns = Object.keys(data[0]);
-      }
+      }}
 
       // Build Headers HTML
-      let thHtml = columns.map(c => `<th>${c.replace(/_/g, ' ')}</th>`).join('');
+      let thHtml = columns.map(c => `<th>${{c.replace(/_/g, ' ')}}</th>`).join('');
       thHtml += '<th style="text-align: right;">Action</th>';
 
       // Build Rows HTML
       let rowsHtml = '';
-      if (data.length === 0) {
-        rowsHtml = `<tr><td colspan="${columns.length + 1}" class="table-empty-wrap">No records found for ${meta.title}. Click "+ Add ${meta.singular}" to create one.</td></tr>`;
-      } else {
-        rowsHtml = data.map((item, idx) => {
-          let cells = columns.map(colKey => {
+      if (data.length === 0) {{
+        rowsHtml = `<tr><td colspan="${{columns.length + 1}}" class="table-empty-wrap">No records found for ${{meta.title}}. Click "+ Add ${{meta.singular}}" to create one.</td></tr>`;
+      }} else {{
+        rowsHtml = data.map((item, idx) => {{
+          let cells = columns.map(colKey => {{
             let val = item[colKey];
-            if (colKey === 'status' || colKey === 'kyc' || colKey === 'decision') {
+            if (colKey === 'status' || colKey === 'kyc' || colKey === 'decision') {{
               let badgeCls = 'badge-gray';
               if (val.includes('Active') || val.includes('Verified') || val.includes('Completed') || val.includes('Sanctioned') || val.includes('Approved')) badgeCls = 'badge-green';
               else if (val.includes('Review') || val.includes('Upcoming')) badgeCls = 'badge-amber';
               else if (val.includes('Rejected') || val.includes('Closed')) badgeCls = 'badge-red';
-              return `<td><span class="table-badge ${badgeCls}">${val}</span></td>`;
-            }
-            return `<td>${val}</td>`;
-          }).join('');
+              return `<td><span class="table-badge ${{badgeCls}}">${{val}}</span></td>`;
+            }}
+            return `<td>${{val}}</td>`;
+          }}).join('');
 
           return `
             <tr>
-              ${cells}
+              ${{cells}}
               <td style="text-align: right;">
-                <button class="btn-row-action" onclick="viewRowDetails('${key}', ${idx})">Details</button>
+                <button class="btn-row-action" onclick="viewRowDetails('${{key}}', ${{idx}})">Details</button>
               </td>
             </tr>
           `;
-        }).join('');
-      }
+        }}).join('');
+      }}
 
       container.innerHTML = `
         <div class="list-header-row">
           <div class="list-title-group">
-            <h1>${meta.title}</h1>
-            <p>Frappe DocType: <code>${meta.doctype}</code> • ${data.length} records</p>
+            <h1>${{meta.title}}</h1>
+            <p>Frappe DocType: <code>${{meta.doctype}}</code> • ${{data.length}} records</p>
           </div>
           <div class="list-action-btns">
-            <button class="btn-action-sec" onclick="exportDataCSV('${key}')">📥 Export CSV</button>
-            <button class="btn-action-sec" onclick="switchView('${key}')">🔄 Refresh</button>
-            <button class="btn-action-pri" onclick="openAddRecordModal('${key}')">+ Add ${meta.singular}</button>
+            <button class="btn-action-sec" onclick="exportDataCSV('${{key}}')">📥 Export CSV</button>
+            <button class="btn-action-sec" onclick="switchView('${{key}}')">🔄 Refresh</button>
+            <button class="btn-action-pri" onclick="openAddRecordModal('${{key}}')">+ Add ${{meta.singular}}</button>
           </div>
         </div>
 
         <div class="table-container-card">
           <div class="table-controls-bar">
-            <input type="text" class="table-search-input" placeholder="Filter ${meta.title}..." oninput="filterCurrentTable(this.value)">
+            <input type="text" class="table-search-input" placeholder="Filter ${{meta.title}}..." oninput="filterCurrentTable(this.value)">
             <div class="filter-pills-wrap">
               <button class="filter-pill active" onclick="setTableFilter(this, 'all')">All</button>
               <button class="filter-pill" onclick="setTableFilter(this, 'active')">Active / Verified</button>
@@ -1308,142 +1317,142 @@
           <div style="overflow-x: auto;">
             <table class="oryx-data-table" id="activeDataTable">
               <thead>
-                <tr>${thHtml}</tr>
+                <tr>${{thHtml}}</tr>
               </thead>
               <tbody id="activeTableBody">
-                ${rowsHtml}
+                ${{rowsHtml}}
               </tbody>
             </table>
           </div>
         </div>
       `;
-    }
+    }}
 
     // =========================================================================
     // SEARCH MODAL (Ctrl+K)
     // =========================================================================
-    const searchIndex = Object.keys(VIEWS).map(k => ({
+    const searchIndex = Object.keys(VIEWS).map(k => ({{
       key: k,
       title: VIEWS[k].title,
       category: VIEWS[k].category
-    }));
+    }}));
 
-    function openSearchModal() {
+    function openSearchModal() {{
       const modal = document.getElementById('searchModal');
       modal.style.display = 'flex';
       const input = document.getElementById('searchModalInput');
       input.value = '';
       filterSearchResults('');
       setTimeout(() => input.focus(), 50);
-    }
+    }}
 
-    function closeSearchModal(e) {
+    function closeSearchModal(e) {{
       document.getElementById('searchModal').style.display = 'none';
-    }
-    function closeSearchModalDirect() {
+    }}
+    function closeSearchModalDirect() {{
       document.getElementById('searchModal').style.display = 'none';
-    }
+    }}
 
-    function filterSearchResults(query) {
+    function filterSearchResults(query) {{
       const container = document.getElementById('searchResultsContainer');
       const q = query.toLowerCase().trim();
       const matches = searchIndex.filter(item => 
         item.title.toLowerCase().includes(q) || item.category.toLowerCase().includes(q)
       );
 
-      if (matches.length === 0) {
+      if (matches.length === 0) {{
         container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-dim); font-size: 13px;">No matching DocTypes found</div>';
         return;
-      }
+      }}
 
       container.innerHTML = matches.map(m => `
-        <div class="search-result-item" onclick="selectSearchResult('${m.key}')">
+        <div class="search-result-item" onclick="selectSearchResult('${{m.key}}')">
           <div>
-            <span style="font-weight: 700;">${m.title}</span>
-            <span style="font-size: 11px; color: var(--text-dim); margin-left: 8px;">${m.category}</span>
+            <span style="font-weight: 700;">${{m.title}}</span>
+            <span style="font-size: 11px; color: var(--text-dim); margin-left: 8px;">${{m.category}}</span>
           </div>
           <span style="font-size: 11px; color: var(--accent-emerald);">Jump ➔</span>
         </div>
       `).join('');
-    }
+    }}
 
-    function selectSearchResult(key) {
+    function selectSearchResult(key) {{
       closeSearchModalDirect();
       switchView(key);
-    }
+    }}
 
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    document.addEventListener('keydown', (e) => {{
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {{
         e.preventDefault();
         openSearchModal();
-      }
-      if (e.key === 'Escape') {
+      }}
+      if (e.key === 'Escape') {{
         closeSearchModalDirect();
         closeRecordModalDirect();
         closeNotifications();
-      }
-    });
+      }}
+    }});
 
     // =========================================================================
     // ADD NEW RECORD MODAL ENGINE
     // =========================================================================
     let currentModalKey = '';
 
-    function openAddRecordModal(key) {
+    function openAddRecordModal(key) {{
       currentModalKey = key;
       const meta = VIEWS[key];
       document.getElementById('recordModalTitle').innerText = 'New ' + meta.singular;
       const body = document.getElementById('recordModalBody');
 
       // Sample template fields based on key
-      const sampleItem = DB[key] && DB[key][0] ? DB[key][0] : {};
+      const sampleItem = DB[key] && DB[key][0] ? DB[key][0] : {{}};
       const fields = Object.keys(sampleItem).filter(f => f !== 'id');
 
-      if (fields.length === 0) {
+      if (fields.length === 0) {{
         body.innerHTML = `
           <div class="form-group-modal">
             <label class="form-label-modal">Title / Name</label>
             <input type="text" class="form-control-modal" id="modal_field_name" placeholder="Enter name" required>
           </div>
         `;
-      } else {
+      }} else {{
         body.innerHTML = fields.map(f => `
           <div class="form-group-modal">
-            <label class="form-label-modal">${f.replace(/_/g, ' ').toUpperCase()}</label>
-            <input type="text" class="form-control-modal" id="modal_field_${f}" placeholder="Enter ${f.replace(/_/g, ' ')}" value="">
+            <label class="form-label-modal">${{f.replace(/_/g, ' ').toUpperCase()}}</label>
+            <input type="text" class="form-control-modal" id="modal_field_${{f}}" placeholder="Enter ${{f.replace(/_/g, ' ')}}" value="">
           </div>
         `).join('');
-      }
+      }}
 
       document.getElementById('recordModal').style.display = 'flex';
-    }
+    }}
 
-    function closeRecordModal(e) {
+    function closeRecordModal(e) {{
       document.getElementById('recordModal').style.display = 'none';
-    }
-    function closeRecordModalDirect() {
+    }}
+    function closeRecordModalDirect() {{
       document.getElementById('recordModal').style.display = 'none';
-    }
+    }}
 
-    function saveNewRecord() {
+    function saveNewRecord() {{
       const key = currentModalKey;
       if (!key) return;
 
-      const sampleItem = DB[key] && DB[key][0] ? DB[key][0] : {};
+      const sampleItem = DB[key] && DB[key][0] ? DB[key][0] : {{}};
       const fields = Object.keys(sampleItem).filter(f => f !== 'id');
 
-      const newItem = {
+      const newItem = {{
         id: key.toUpperCase().substring(0, 4) + '-' + Math.floor(1000 + Math.random() * 9000)
-      };
+      }};
 
-      if (fields.length === 0) {
+      if (fields.length === 0) {{
         newItem.name = document.getElementById('modal_field_name').value || 'New Entry';
-      } else {
-        fields.forEach(f => {
+      }} else {{
+        fields.forEach(f => {{
           const input = document.getElementById('modal_field_' + f);
           newItem[f] = input ? input.value : 'N/A';
-        });
-      }
+        }});
+      }}
 
       if (!DB[key]) DB[key] = [];
       DB[key].unshift(newItem);
@@ -1451,36 +1460,36 @@
       closeRecordModalDirect();
       alert('✓ New ' + VIEWS[key].singular + ' created successfully in local session!');
       switchView(key);
-    }
+    }}
 
-    function viewRowDetails(key, idx) {
+    function viewRowDetails(key, idx) {{
       const item = DB[key][idx];
-      alert('DocType Record [' + (item.id || 'ID') + ']:\n\n' + JSON.stringify(item, null, 2));
-    }
+      alert('DocType Record [' + (item.id || 'ID') + ']:\\n\\n' + JSON.stringify(item, null, 2));
+    }}
 
-    function exportDataCSV(key) {
+    function exportDataCSV(key) {{
       alert('Exporting ' + DB[key].length + ' records from DocType [' + VIEWS[key].doctype + '] to CSV...');
-    }
+    }}
 
     // =========================================================================
     // NOTIFICATIONS & USER MENUS
     // =========================================================================
-    function openNotifications() {
+    function openNotifications() {{
       document.getElementById('notifBackdrop').style.display = 'block';
       document.getElementById('notifDrawer').style.display = 'flex';
-    }
-    function closeNotifications() {
+    }}
+    function closeNotifications() {{
       document.getElementById('notifBackdrop').style.display = 'none';
       document.getElementById('notifDrawer').style.display = 'none';
-    }
+    }}
 
-    function openUserMenu() {
-      if (confirm("Admin Session: admin@oryxfund.co.ke\n\nWould you like to log out of the Admin Desk?")) {
+    function openUserMenu() {{
+      if (confirm("Admin Session: admin@oryxfund.co.ke\\n\\nWould you like to log out of the Admin Desk?")) {{
         window.location.href = 'login.html';
-      }
-    }
+      }}
+    }}
 
-    function toggleAdminTheme() {
+    function toggleAdminTheme() {{
       const html = document.documentElement;
       const cur = html.getAttribute('data-theme') || 'dark';
       const next = cur === 'dark' ? 'light' : 'dark';
@@ -1488,22 +1497,34 @@
       html.classList.toggle('dark', next === 'dark');
       document.getElementById('adminThemeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('oryx_admin_theme', next);
-    }
+    }}
 
     // Init View from Hash or default to dashboard
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {{
       const savedTheme = localStorage.getItem('oryx_admin_theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
       document.documentElement.classList.toggle('dark', savedTheme === 'dark');
       document.getElementById('adminThemeBtn').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
 
       const initialHash = window.location.hash.replace('#', '');
-      if (initialHash && VIEWS[initialHash]) {
+      if (initialHash && VIEWS[initialHash]) {{
         switchView(initialHash);
-      } else {
+      }} else {{
         switchView('dashboard');
-      }
-    });
+      }}
+    }});
   </script>
 </body>
 </html>
+"""
+
+    # Write to admin.html and desk.html
+    with open(f"{base_dir}/admin.html", "w") as f:
+        f.write(admin_html)
+    with open(f"{base_dir}/desk.html", "w") as f:
+        f.write(admin_html)
+
+    print("Fully working Admin Desk generated with all 22 sidebar modules interactive!")
+
+if __name__ == '__main__':
+    generate_full_admin_desk()
