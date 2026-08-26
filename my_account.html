@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — Oryx Fund</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-page: #EAE0D8;
+      --bg-surface: #FFFFFF;
+      --bg-surface-alt: #F7F3EE;
+      --border-color: #E2D7CC;
+      --border-light: #ECE5DC;
+      --text-primary: #1F3224;
+      --text-secondary: #556B5D;
+      --text-muted: #829488;
+      --primary: #1F3224;
+      --accent-green: #059669;
+      --accent-emerald: #00D26A;
+      --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    [data-theme="dark"], html.dark {
+      --bg-page: #080D0A;
+      --bg-surface: #101712;
+      --bg-surface-alt: #16221A;
+      --border-color: #1F3325;
+      --border-light: #18281D;
+      --text-primary: #FAF8F5;
+      --text-secondary: #9DB4A5;
+      --text-muted: #667D6F;
+      --primary: #00D26A;
+      --accent-green: #00D26A;
+      --accent-emerald: #00D26A;
+      --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0 20px 60px;
+    }
+
+    .portal-nav-wrap {
+      max-width: 1060px;
+      margin: 20px auto 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .nav-actions-cluster {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-pill-btn {
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-pill-active {
+      background: var(--primary);
+      color: #FFFFFF !important;
+    }
+    [data-theme="dark"] .nav-pill-active {
+      background: var(--accent-emerald);
+      color: #000000 !important;
+    }
+
+    .nav-pill-light {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .theme-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .account-layout {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .oryx-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface-alt);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-family: var(--font-body);
+      outline: none;
+    }
+
+    .oryx-btn-express {
+      background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      font-size: 13.5px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
+    }
+
+    @media (max-width: 768px) {
+      .account-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="portal-nav-wrap">
+    <a href="index.html" class="brand-logo-cluster">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="7" fill="#1F3224"/>
+        <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
+      </svg>
+      <span style="font-weight: 800; font-size: 17px; letter-spacing: -0.3px;">Oryx <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+    </a>
+
+    <div class="nav-actions-cluster">
+      <a href="index.html" class="nav-pill-btn nav-pill-light">My Portal</a>
+      <a href="apply.html" class="nav-pill-btn nav-pill-light">Loan Application</a>
+      <a href="my_account.html" class="nav-pill-btn nav-pill-active">👤 Reezy</a>
+      <button class="theme-icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Light / Dark Mode">🌙</button>
+      <a href="admin.html" class="nav-pill-btn nav-pill-light" style="font-size: 11px;">🛡️ Admin Desk</a>
+    </div>
+  </header>
+
+  <main class="account-layout">
+    
+    <div>
+      <section class="oryx-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 700;">Personal &amp; Contact Details</h2>
+            <p style="font-size: 12.5px; color: var(--text-secondary);">Keep your legal name and contact details updated for loan verification.</p>
+          </div>
+          <span style="background: rgba(0, 210, 106, 0.12); color: var(--accent-green); font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px;">✓ Verified Borrower</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">Full Legal Name</label>
+            <input type="text" class="form-control" value="Reezy Mwangi" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" value="reezyhoops@gmail.com" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mobile / Phone Number</label>
+            <input type="tel" class="form-control" value="+254712345678" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">National ID Number</label>
+            <input type="text" class="form-control" value="31456789" readonly>
+          </div>
+        </div>
+      </section>
+
+      <section class="oryx-card">
+        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Disbursement &amp; Banking Preferences</h2>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">Designated payout accounts used for instant loan disbursements.</p>
+        
+        <div class="form-group">
+          <label class="form-label">M-Pesa Disbursal Number</label>
+          <input type="text" class="form-control" value="+254712345678" readonly>
+        </div>
+      </section>
+    </div>
+
+    <div>
+      <!-- Express Subsequent Loan Card -->
+      <div class="oryx-card" style="border: 1.5px solid #00D26A; background: linear-gradient(145deg, rgba(0, 210, 106, 0.08) 0%, transparent 100%);">
+        <span style="font-size: 10px; font-weight: 800; color: #00D26A; letter-spacing: 0.8px;">⚡ EXPRESS REPEAT FACILITY</span>
+        <h3 style="font-size: 17px; font-weight: 700; margin: 4px 0 6px;">Fast-Track Subsequent Loan</h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 16px;">Apply for a new advance using your existing verified profile.</p>
+        <a href="apply.html?flow=express" class="oryx-btn-express">⚡ Apply in 60 Seconds ➔</a>
+      </div>
+
+      <!-- Security Card -->
+      <div class="oryx-card">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Security &amp; Password</h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">Update your account login password.</p>
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" class="form-control" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input type="password" class="form-control" placeholder="Min. 6 characters">
+        </div>
+        <button style="width: 100%; padding: 10px; border-radius: 8px; background: var(--primary); color: #FFF; font-weight: 700; border: none; cursor: pointer;">Update Password</button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme') || 'light';
+      const next = cur === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', next);
+      document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('oryx_theme', next);
+    }
+    const saved = localStorage.getItem('oryx_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
+    }
+  </script>
+</body>
+</html>

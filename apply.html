@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Application — Oryx Fund</title>
+  <meta name="description" content="Instant digital loan applications and returning borrower subsequent facility portal.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='8' fill='%231F3224'/%3E%3Cpath d='M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z' fill='%2300D26A'/%3E%3C/svg%3E">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-page: #EAE0D8;
+      --bg-surface: #FFFFFF;
+      --bg-surface-alt: #F7F3EE;
+      --border-color: #E2D7CC;
+      --border-light: #ECE5DC;
+      --text-primary: #1F3224;
+      --text-secondary: #556B5D;
+      --text-muted: #829488;
+      --primary: #1F3224;
+      --accent-green: #059669;
+      --accent-emerald: #00D26A;
+      --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    [data-theme="dark"], html.dark {
+      --bg-page: #080D0A;
+      --bg-surface: #101712;
+      --bg-surface-alt: #16221A;
+      --border-color: #1F3325;
+      --border-light: #18281D;
+      --text-primary: #FAF8F5;
+      --text-secondary: #9DB4A5;
+      --text-muted: #667D6F;
+      --primary: #00D26A;
+      --accent-green: #00D26A;
+      --accent-emerald: #00D26A;
+      --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0 20px 60px;
+    }
+
+    .portal-nav-wrap {
+      max-width: 1060px;
+      margin: 20px auto 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .nav-actions-cluster {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-pill-btn {
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-pill-active {
+      background: var(--primary);
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 8px rgba(31, 50, 36, 0.15);
+    }
+    [data-theme="dark"] .nav-pill-active {
+      background: var(--accent-emerald);
+      color: #000000 !important;
+    }
+
+    .nav-pill-light {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .theme-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .apply-container {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .express-hero-bar {
+      background: linear-gradient(135deg, #1F3224 0%, #101B13 100%);
+      color: #FAF8F5;
+      padding: 28px 32px;
+      border-radius: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--card-shadow);
+    }
+    [data-theme="dark"] .express-hero-bar {
+      background: linear-gradient(135deg, #101712 0%, #080D0A 100%);
+      border: 1px solid var(--border-color);
+    }
+
+    .verified-kyc-banner {
+      background: var(--bg-surface);
+      border: 1.5px solid #00D26A;
+      border-radius: 14px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .kyc-val {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .kyc-label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .oryx-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .calc-box {
+      background: var(--bg-surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 18px;
+    }
+
+    .amount-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--border-color);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      margin: 14px 0;
+    }
+
+    .amount-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      cursor: pointer;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .preset-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .pill-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .pill-btn.active {
+      border-color: var(--accent-emerald);
+      color: var(--text-primary);
+      background: rgba(0, 210, 106, 0.1);
+    }
+
+    .metrics-live-hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .hud-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .hud-number {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 4px;
+    }
+
+    .oryx-btn-express {
+      background: linear-gradient(135deg, #00D26A 0%, #059669 100%) !important;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      font-size: 14px;
+      padding: 12px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(0, 210, 106, 0.35) !important;
+      cursor: pointer;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="portal-nav-wrap">
+    <a href="index.html" class="brand-logo-cluster">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="7" fill="#1F3224"/>
+        <path d="M7 23L14 9H18L25 23H20.5L18.8 19H13.2L11.5 23H7ZM14.3 16.5H17.7L16 12.5L14.3 16.5Z" fill="#00D26A"/>
+      </svg>
+      <span style="font-weight: 800; font-size: 17px; letter-spacing: -0.3px;">Oryx <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Fund</span></span>
+    </a>
+
+    <div class="nav-actions-cluster">
+      <a href="index.html" class="nav-pill-btn nav-pill-light">My Portal</a>
+      <a href="apply.html" class="nav-pill-btn nav-pill-active">Loan Application</a>
+      <a href="my_account.html" class="nav-pill-btn nav-pill-light">👤 Reezy</a>
+      <button class="theme-icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Light / Dark Mode">🌙</button>
+      <a href="admin.html" class="nav-pill-btn nav-pill-light" style="font-size: 11px;">🛡️ Admin Desk</a>
+    </div>
+  </header>
+
+  <main class="apply-container">
+
+    <div class="express-hero-bar">
+      <div>
+        <span style="background: rgba(0, 210, 106, 0.15); border: 1px solid #00D26A; color: #00D26A; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 12px; display: inline-block; margin-bottom: 6px;">⚡ FAST-TRACK RETURNING BORROWER</span>
+        <h1 style="font-size: 24px; font-weight: 800;">Subsequent Facility Application</h1>
+        <p style="font-size: 13px; color: #B4C6BA;">Choose your facility terms for priority underwriting and direct disbursal.</p>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 11px; color: #9DB4A5; font-weight: 700; text-transform: uppercase;">Average SLA</div>
+        <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #00D26A;">15 Minutes</div>
+      </div>
+    </div>
+
+    <!-- Verified KYC Banner -->
+    <div class="verified-kyc-banner">
+      <div>
+        <div class="kyc-label">Borrower</div>
+        <div class="kyc-val">Reezy Mwangi</div>
+      </div>
+      <div>
+        <div class="kyc-label">National ID</div>
+        <div class="kyc-val" style="font-family: var(--font-mono);">31****89</div>
+      </div>
+      <div>
+        <div class="kyc-label">Payout Route</div>
+        <div class="kyc-val">M-Pesa (+254***678)</div>
+      </div>
+      <div style="background: rgba(0, 210, 106, 0.12); color: var(--accent-green); font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 20px;">
+        ✓ Verified KYC on Record
+      </div>
+    </div>
+
+    <!-- Interactive Facility Specs Card -->
+    <section class="oryx-card">
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">1. Facility Specifications</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">Configure your loan amount and view live monthly repayments.</p>
+
+      <div class="calc-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Requested Facility Amount</span>
+          <span id="amountDisplay" style="font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--text-primary);">KES 100,000</span>
+        </div>
+
+        <input type="range" class="amount-slider" id="loanSlider" min="10000" max="1000000" step="5000" value="100000" oninput="calcLoan(this.value)">
+
+        <div class="preset-pills">
+          <button class="pill-btn" onclick="setVal(25000)">KES 25K</button>
+          <button class="pill-btn" onclick="setVal(50000)">KES 50K</button>
+          <button class="pill-btn active" onclick="setVal(100000)">KES 100K</button>
+          <button class="pill-btn" onclick="setVal(250000)">KES 250K</button>
+          <button class="pill-btn" onclick="setVal(500000)">KES 500K</button>
+        </div>
+
+        <div class="metrics-live-hud">
+          <div>
+            <div class="hud-title">Principal</div>
+            <div class="hud-number" id="hudPrincipal">KES 100,000</div>
+          </div>
+          <div>
+            <div class="hud-title">Est. Interest</div>
+            <div class="hud-number" id="hudInterest">KES 7,000</div>
+          </div>
+          <div>
+            <div class="hud-title">Monthly Installment</div>
+            <div class="hud-number" style="color: var(--accent-emerald);" id="hudMonthly">KES 17,833 / mo</div>
+          </div>
+          <div>
+            <div class="hud-title">Total Repayment</div>
+            <div class="hud-number" id="hudTotal">KES 107,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+        <button class="oryx-btn-express" onclick="alert('⚡ Subsequent Loan Application Submitted! Disbursal scheduled within 15 minutes to M-Pesa +254***678')">
+          ⚡ Submit Subsequent Loan Application
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme') || 'light';
+      const next = cur === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', next);
+      document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('oryx_theme', next);
+    }
+    const saved = localStorage.getItem('oryx_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeBtn').innerText = saved === 'dark' ? '☀️' : '🌙';
+    }
+
+    function setVal(amt) {
+      document.getElementById('loanSlider').value = amt;
+      calcLoan(amt);
+    }
+
+    function calcLoan(val) {
+      const amount = parseInt(val, 10);
+      document.getElementById('amountDisplay').innerText = 'KES ' + amount.toLocaleString('en-US');
+      const interest = Math.round(amount * 0.14 * (6 / 12));
+      const total = amount + interest;
+      const monthly = Math.round(total / 6);
+      document.getElementById('hudPrincipal').innerText = 'KES ' + amount.toLocaleString('en-US');
+      document.getElementById('hudInterest').innerText = 'KES ' + interest.toLocaleString('en-US');
+      document.getElementById('hudMonthly').innerText = 'KES ' + monthly.toLocaleString('en-US') + ' / mo';
+      document.getElementById('hudTotal').innerText = 'KES ' + total.toLocaleString('en-US');
+    }
+  </script>
+</body>
+</html>
