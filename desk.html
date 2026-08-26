@@ -2,9 +2,10 @@
 <html lang="en" data-theme="dark" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Oryx Fund — Institutional Lending Management</title>
   <meta name="description" content="Institutional credit and loan portfolio management dashboard for Oryx Fund.">
+  <meta name="theme-color" content="#09090B">
   <link rel="icon" type="image/png" href="assets/images/oryx-mark-dark.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,16 +55,24 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
 
-    body {
-      font-family: var(--font-body);
-      background-color: var(--desk-bg);
-      color: var(--text-main);
+    html, body {
+      width: 100%;
       min-height: 100vh;
-      display: flex;
       overflow-x: hidden;
+      background-color: var(--desk-bg);
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Sidebar Styling */
+    body {
+      font-family: var(--font-body);
+      color: var(--text-main);
+      display: flex;
+      position: relative;
+    }
+
+    /* =========================================================================
+       SIDEBAR & MOBILE DRAWER STYLES
+       ========================================================================= */
     .desk-sidebar {
       width: 250px;
       min-width: 250px;
@@ -77,6 +86,71 @@
       top: 0;
       overflow-y: auto;
       user-select: none;
+      z-index: 100;
+    }
+
+    .sidebar-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 10040;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .mobile-sidebar-close {
+      display: none;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--desk-border);
+      color: var(--text-main);
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .mobile-sidebar-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--accent-red);
+    }
+
+    @media (max-width: 991px) {
+      .desk-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 285px;
+        max-width: 84vw;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 10050;
+        transform: translateX(-100%);
+        visibility: hidden;
+        pointer-events: none;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease, box-shadow 0.28s ease;
+        box-shadow: none;
+      }
+      .desk-sidebar.open {
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+        box-shadow: 12px 0 50px rgba(0, 0, 0, 0.75);
+      }
+      .mobile-sidebar-close {
+        display: flex;
+      }
     }
 
     .desk-brand-header {
@@ -85,7 +159,6 @@
       justify-content: space-between;
       padding: 8px 10px;
       border-radius: 8px;
-      margin-bottom: 12px;
       text-decoration: none;
       color: var(--text-main);
       cursor: pointer;
@@ -103,6 +176,7 @@
       color: #000;
       font-weight: 900;
       font-size: 13px;
+      flex-shrink: 0;
     }
 
     .brand-title-group {
@@ -126,12 +200,12 @@
       justify-content: space-between;
       background: var(--desk-card-bg);
       border: 1px solid var(--desk-border);
-      padding: 7px 10px;
+      padding: 8px 10px;
       border-radius: 8px;
       font-size: 12px;
       color: var(--text-sub);
       cursor: pointer;
-      margin-bottom: 8px;
+      margin: 8px 0;
     }
     .sidebar-search-btn:hover { border-color: var(--accent-emerald); color: var(--text-main); }
 
@@ -147,7 +221,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
+      padding: 9px 10px;
       border-radius: 7px;
       font-size: 12.5px;
       font-weight: 600;
@@ -155,6 +229,7 @@
       text-decoration: none;
       cursor: pointer;
       margin-bottom: 2px;
+      min-height: 36px;
     }
     .sidebar-nav-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-main); }
     .sidebar-nav-item.active {
@@ -171,6 +246,7 @@
       background: rgba(0, 210, 106, 0.15);
       color: #00D26A;
       font-family: var(--font-mono);
+      white-space: nowrap;
     }
 
     .sidebar-category-header {
@@ -184,6 +260,7 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
+      min-height: 32px;
     }
     .sidebar-category-header:hover { color: var(--text-sub); }
 
@@ -194,7 +271,7 @@
     }
 
     .sidebar-sub-item {
-      padding: 6px 10px 6px 20px;
+      padding: 7px 10px 7px 20px;
       font-size: 12px;
       color: var(--text-sub);
       border-radius: 6px;
@@ -204,6 +281,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      min-height: 34px;
     }
     .sidebar-sub-item:hover { background: rgba(255, 255, 255, 0.03); color: var(--text-main); }
     .sidebar-sub-item.active {
@@ -231,20 +309,25 @@
       justify-content: center;
       font-size: 11px;
       font-weight: 800;
+      flex-shrink: 0;
     }
 
-    /* Main Area Styling */
+    /* =========================================================================
+       MAIN DESK & TOPBAR STYLES
+       ========================================================================= */
     .desk-main {
       flex: 1;
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow-y: auto;
+      min-width: 0;
+      width: 100%;
     }
 
     .desk-topbar {
-      height: 48px;
-      min-height: 48px;
+      height: 52px;
+      min-height: 52px;
       border-bottom: 1px solid var(--desk-border);
       display: flex;
       align-items: center;
@@ -254,54 +337,170 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      gap: 10px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--desk-border);
+      background: var(--desk-card-bg);
+      color: var(--text-main);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .mobile-menu-btn:hover, .mobile-menu-btn:active {
+      background: var(--desk-card-surface);
+      border-color: var(--accent-emerald);
+    }
+
+    @media (max-width: 991px) {
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .desk-topbar {
+        padding: 0 12px;
+        height: 48px;
+        min-height: 48px;
+      }
     }
 
     .breadcrumb-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-size: 12px;
       color: var(--text-sub);
+      min-width: 0;
+      overflow: hidden;
     }
     .breadcrumb-current {
       color: var(--text-main);
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 600px) {
+      .breadcrumb-cat { display: none; }
+      .breadcrumb-sep { display: none; }
     }
 
     .topbar-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
-    .theme-toggle-btn {
-      background: transparent;
+    .topbar-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
       border: 1px solid var(--desk-border);
+      background: var(--desk-card-bg);
       color: var(--text-main);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .topbar-icon-btn:hover { background: var(--desk-card-hover); border-color: var(--desk-border-light); }
+
+    .topbar-signout-btn {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 7px;
+      color: #F87171;
+      border: 1px solid rgba(248,113,113,0.3);
+      background: rgba(248,113,113,0.08);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .topbar-signout-btn:hover { background: rgba(248,113,113,0.18); }
+
+    @media (max-width: 480px) {
+      .signout-label { display: none; }
+      .topbar-signout-btn { padding: 6px 8px; }
+    }
+
+    .topbar-badge-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00D26A;
     }
 
     .desk-canvas {
-      padding: 20px 24px;
+      padding: 24px 28px;
       flex: 1;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
-    /* Stats Grid */
+    @media (max-width: 991px) {
+      .desk-canvas {
+        padding: 16px 14px;
+      }
+    }
+    @media (max-width: 480px) {
+      .desk-canvas {
+        padding: 12px 10px;
+      }
+    }
+
+    /* =========================================================================
+       KPI METRIC CARDS GRID
+       ========================================================================= */
     .desk-kpi-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     @media (max-width: 1200px) {
-      .desk-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .desk-kpi-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
     }
-    @media (max-width: 800px) {
-      .desk-kpi-grid { grid-template-columns: 1fr; }
+    @media (max-width: 768px) {
+      .desk-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+    }
+    @media (max-width: 360px) {
+      .desk-kpi-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .desk-kpi-card {
@@ -313,6 +512,13 @@
     }
     .desk-kpi-card:hover { border-color: var(--desk-border-light); }
     
+    @media (max-width: 768px) {
+      .desk-kpi-card {
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+    }
+
     .kpi-title-row {
       display: flex;
       align-items: center;
@@ -322,15 +528,30 @@
       color: var(--text-sub);
       margin-bottom: 8px;
     }
+    @media (max-width: 768px) {
+      .kpi-title-row {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+    }
+
     .kpi-value {
       font-size: 20px;
       font-weight: 800;
       color: var(--text-main);
       font-family: var(--font-mono);
       line-height: 1.1;
+      word-break: break-word;
+    }
+    @media (max-width: 768px) {
+      .kpi-value {
+        font-size: 15px !important;
+      }
     }
 
-    /* Chart Cards */
+    /* =========================================================================
+       CHART CARDS
+       ========================================================================= */
     .desk-charts-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -338,7 +559,11 @@
       margin-bottom: 24px;
     }
     @media (max-width: 900px) {
-      .desk-charts-grid { grid-template-columns: 1fr; }
+      .desk-charts-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
     }
 
     .desk-chart-card {
@@ -346,6 +571,12 @@
       border: 1px solid var(--desk-border);
       border-radius: 12px;
       padding: 18px 20px;
+    }
+    @media (max-width: 768px) {
+      .desk-chart-card {
+        padding: 14px 14px;
+        border-radius: 10px;
+      }
     }
 
     .chart-card-head {
@@ -359,6 +590,11 @@
       font-weight: 700;
       color: var(--text-main);
     }
+    @media (max-width: 768px) {
+      .chart-title {
+        font-size: 12.5px;
+      }
+    }
     .chart-badge {
       font-size: 10.5px;
       color: var(--text-sub);
@@ -371,14 +607,22 @@
       width: 100%;
       height: 120px;
     }
+    @media (max-width: 768px) {
+      .svg-chart-container {
+        height: 100px;
+      }
+    }
 
-    /* Table View Container */
+    /* =========================================================================
+       TABLE CARDS & RESPONSIVE TOOLBAR
+       ========================================================================= */
     .desk-table-card {
       background: var(--desk-card-bg);
       border: 1px solid var(--desk-border);
       border-radius: 12px;
       overflow: hidden;
       margin-bottom: 20px;
+      width: 100%;
     }
 
     .table-toolbar {
@@ -405,6 +649,36 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px 12px;
+        gap: 8px;
+      }
+      .table-title {
+        justify-content: space-between;
+        font-size: 13px;
+      }
+      .table-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        width: 100%;
+      }
+      .table-actions .btn-action-pri {
+        grid-column: span 2;
+        justify-content: center;
+        padding: 9px 12px;
+      }
+      .table-actions .btn-action-sec {
+        justify-content: center;
+        padding: 7px 10px;
+        font-size: 11px;
+      }
     }
 
     .btn-action-pri {
@@ -420,6 +694,7 @@
       align-items: center;
       gap: 4px;
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
     .btn-action-pri:hover { background: #00FF80; transform: scale(1.02); }
 
@@ -433,11 +708,32 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .btn-action-sec:hover { background: rgba(255, 255, 255, 0.05); }
 
+    .table-scroll-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-scroll-container::-webkit-scrollbar {
+      height: 5px;
+    }
+    .table-scroll-container::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .table-scroll-container::-webkit-scrollbar-thumb {
+      background: var(--desk-border);
+      border-radius: 4px;
+    }
+
     .desk-data-table {
       width: 100%;
+      min-width: 620px;
       border-collapse: collapse;
       font-size: 12px;
       text-align: left;
@@ -452,12 +748,27 @@
       text-transform: uppercase;
       font-size: 10.5px;
       letter-spacing: 0.04em;
+      white-space: nowrap;
     }
 
     .desk-data-table td {
       padding: 12px 16px;
       border-bottom: 1px solid var(--desk-border-light);
       color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .desk-data-table {
+        font-size: 11.5px;
+      }
+      .desk-data-table th {
+        padding: 8px 12px;
+        font-size: 10px;
+      }
+      .desk-data-table td {
+        padding: 9px 12px;
+      }
     }
 
     .desk-data-table tr:hover td {
@@ -476,22 +787,25 @@
       border-radius: 12px;
       font-size: 10.5px;
       font-weight: 700;
+      white-space: nowrap;
     }
     .status-tag.active { background: rgba(52, 211, 153, 0.15); color: #34D399; }
     .status-tag.review { background: rgba(251, 191, 36, 0.15); color: #FBBF24; }
     .status-tag.closed { background: rgba(158, 158, 158, 0.15); color: #9E9E9E; }
 
-    /* Command Palette / Search Modal */
+    /* =========================================================================
+       COMMAND PALETTE / SEARCH MODAL
+       ========================================================================= */
     .search-modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.78);
       backdrop-filter: blur(8px);
       display: none;
       align-items: flex-start;
       justify-content: center;
-      padding-top: 100px;
-      z-index: 10000;
+      padding-top: 80px;
+      z-index: 10100;
     }
 
     .search-modal-box {
@@ -502,6 +816,7 @@
       border-radius: 12px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
       overflow: hidden;
+      margin: 0 14px;
     }
 
     .search-modal-header {
@@ -516,7 +831,7 @@
       background: transparent;
       border: none;
       color: #FAF8F5;
-      font-size: 14px;
+      font-size: 15px;
       outline: none;
       font-family: var(--font-body);
     }
@@ -542,14 +857,29 @@
       color: #FAF8F5;
     }
 
-    /* Underwriting Slide-over Drawer */
+    @media (max-width: 640px) {
+      .search-modal-backdrop {
+        padding-top: 30px;
+      }
+      .search-modal-box {
+        max-width: 100%;
+      }
+      .search-results-list {
+        max-height: 60vh;
+      }
+    }
+
+    /* =========================================================================
+       UNDERWRITING SLIDE-OVER DRAWER
+       ========================================================================= */
     .drawer-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.72);
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       display: none;
-      z-index: 9990;
+      z-index: 10090;
     }
 
     .drawer-panel {
@@ -559,15 +889,62 @@
       max-width: 90vw;
       background: #121215;
       border-left: 1px solid #27272A;
-      box-shadow: -10px 0 40px rgba(0,0,0,0.8);
-      z-index: 9995;
+      box-shadow: none;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 10095;
       display: flex;
       flex-direction: column;
       transform: translateX(100%);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease, box-shadow 0.25s ease;
     }
     .drawer-panel.open {
       transform: translateX(0);
+      visibility: visible;
+      pointer-events: auto;
+      box-shadow: -10px 0 40px rgba(0,0,0,0.8);
+    }
+
+    [data-theme="light"] .drawer-panel {
+      background: #FFFFFF;
+      border-left-color: var(--desk-border);
+      color: #1F3224;
+    }
+    [data-theme="light"] .drawer-panel.open {
+      box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+    }
+    [data-theme="light"] .drawer-header {
+      border-bottom-color: var(--desk-border);
+      color: #1F3224;
+    }
+    [data-theme="light"] .drawer-footer {
+      background: var(--desk-card-surface);
+      border-top-color: var(--desk-border);
+    }
+    [data-theme="light"] .search-modal-box {
+      background: #FFFFFF;
+      border-color: var(--desk-border);
+    }
+    [data-theme="light"] .search-modal-input {
+      color: #1F3224;
+    }
+    [data-theme="light"] .search-result-item:hover,
+    [data-theme="light"] .search-result-item.selected {
+      background: var(--desk-card-surface);
+      color: #1F3224;
+    }
+    [data-theme="light"] .admin-auth-modal {
+      background: #FFFFFF;
+      border-color: var(--desk-border);
+      color: #1F3224;
+    }
+    [data-theme="light"] .admin-auth-modal h3 {
+      color: #1F3224 !important;
+    }
+    [data-theme="light"] .modal-input {
+      background: #F7F3EE;
+      border-color: var(--desk-border);
+      color: #1F3224;
     }
 
     .drawer-header {
@@ -582,6 +959,7 @@
       padding: 24px;
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .drawer-footer {
@@ -590,19 +968,54 @@
       display: flex;
       gap: 10px;
       background: #0E0E11;
+      flex-wrap: wrap;
     }
 
-    /* In-DOM Clearance Auth Modal */
+    @media (max-width: 640px) {
+      .drawer-panel {
+        width: 100vw;
+        max-width: 100vw;
+        left: 0;
+        right: 0;
+        border-left: none;
+      }
+      .drawer-header {
+        padding: 14px 16px;
+      }
+      .drawer-body {
+        padding: 16px;
+      }
+      .drawer-footer {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .drawer-footer .btn-action-pri,
+      .drawer-footer .btn-action-sec {
+        width: 100%;
+        justify-content: center;
+        padding: 11px;
+        font-size: 13px;
+      }
+      .drawer-grid-2col {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* =========================================================================
+       IN-DOM CLEARANCE AUTH MODAL & RESTRICTED GATE
+       ========================================================================= */
     .admin-auth-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      z-index: 10000;
+      padding: 16px;
+      z-index: 10120;
     }
     .admin-auth-overlay.active { display: flex !important; }
 
@@ -616,18 +1029,27 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.9);
       text-align: center;
       position: relative;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 480px) {
+      .admin-auth-modal {
+        padding: 24px 18px;
+        border-radius: 14px;
+      }
     }
 
     .modal-input {
       width: 100%;
-      padding: 11px 14px;
+      padding: 12px 14px;
       border-radius: 8px;
       border: 1px solid #27272A;
       background: #18181C;
       color: #FAF8F5;
-      font-size: 13.5px;
+      font-size: 15px;
       outline: none;
       margin-bottom: 14px;
+      box-sizing: border-box;
     }
     .modal-input:focus { border-color: #00D26A; }
 
@@ -654,14 +1076,14 @@
 <body>
 
   <!-- RESTRICTED ACCESS GATE CONTAINER (SHOWN IF NOT AUTHENTICATED) -->
-  <div id="adminGateContainer" style="display:none; min-height: 100vh; width: 100%; background: #090909; color: #FAF8F5; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; padding: 20px; box-sizing: border-box; position: fixed; top: 0; left: 0; z-index: 9000;">
-    <div style="background: #121215; border: 1px solid #27272A; border-radius: 18px; padding: 40px 32px; max-width: 460px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.85);">
-      <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(220, 38, 38, 0.15); border: 1.5px solid rgba(220, 38, 38, 0.4); color: #F87171; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 28px;">
+  <div id="adminGateContainer" style="display:none; min-height: 100vh; width: 100%; background: #090909; color: #FAF8F5; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; padding: 16px; box-sizing: border-box; position: fixed; top: 0; left: 0; z-index: 9000;">
+    <div style="background: #121215; border: 1px solid #27272A; border-radius: 18px; padding: 36px 24px; max-width: 460px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.85); box-sizing: border-box;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(220, 38, 38, 0.15); border: 1.5px solid rgba(220, 38, 38, 0.4); color: #F87171; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px;">
         🔒
       </div>
       <div style="display:inline-block; background:rgba(220,38,38,0.15); color:#F87171; border:1px solid rgba(220,38,38,0.3); font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px;">Access Restricted</div>
-      <h2 style="font-size: 22px; font-weight: 800; color: #FAF8F5; margin-bottom: 10px;">Administrator Privilege Required</h2>
-      <p id="gateBorrowerDesc" style="font-size: 13.5px; color: #9CA3AF; line-height: 1.5; margin-bottom: 24px;">
+      <h2 style="font-size: 20px; font-weight: 800; color: #FAF8F5; margin-bottom: 10px;">Administrator Privilege Required</h2>
+      <p id="gateBorrowerDesc" style="font-size: 13px; color: #9CA3AF; line-height: 1.5; margin-bottom: 22px;">
         You are currently not signed in as an administrator. Institutional underwriting &amp; disbursement operations require verified staff clearance.
       </p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -675,30 +1097,35 @@
     </div>
   </div>
 
-  <!-- Left Sidebar -->
+  <!-- Mobile Sidebar Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+  <!-- Left Sidebar (Desktop Fixed / Mobile Slide-over Drawer) -->
   <aside class="desk-sidebar" id="mainSidebar">
     
-    <!-- Brand Header -->
-    <a href="index.html" class="desk-brand-header" title="Oryx Fund Lending Management Platform">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <div class="brand-icon-box">▲</div>
-        <div class="brand-title-group">
-          <span class="main-title">Oryx Fund</span>
-          <span class="sub-title">Lending Platform</span>
+    <!-- Brand Header with Mobile Close Button -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px;">
+      <a href="index.html" class="desk-brand-header" title="Oryx Fund Lending Management Platform" style="margin-bottom:0; flex:1;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-icon-box">▲</div>
+          <div class="brand-title-group">
+            <span class="main-title">Oryx Fund</span>
+            <span class="sub-title">Lending Platform</span>
+          </div>
         </div>
-      </div>
-      <span style="font-size: 11px; color: var(--text-dim);">▼</span>
-    </a>
+      </a>
+      <button class="mobile-sidebar-close" onclick="closeMobileSidebar()" aria-label="Close navigation menu" title="Close Menu">✕</button>
+    </div>
 
     <!-- Quick Search / Command Bar Trigger -->
     <div class="sidebar-search-btn" onclick="openSearchModal()">
-      <span>🔍 Search</span>
+      <span>🔍 Search DocTypes</span>
       <span class="kbd-shortcut">Ctrl+K</span>
     </div>
 
     <!-- Notification Trigger -->
-    <div class="sidebar-nav-item" onclick="openNotifications()">
-      <span>🔔 Notification</span>
+    <div class="sidebar-nav-item" onclick="openNotifications(); closeMobileSidebar();">
+      <span>🔔 Notifications</span>
       <span class="badge-pill" id="notifBadge">3 New</span>
     </div>
 
@@ -762,14 +1189,14 @@
 
     <!-- User Footer -->
     <div class="sidebar-user-footer" onclick="logoutAdmin()" title="Click to Sign Out" style="cursor:pointer;">
-      <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px; min-width:0; overflow:hidden;">
         <div class="user-avatar-circle">DA</div>
-        <div>
-          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-main);">Dervin Aziza</div>
-          <div style="font-size: 9.5px; color: var(--text-sub);">dervinaziza9@gmail.com &bull; <span style="color:#F87171;">Sign Out</span></div>
+        <div style="min-width:0; overflow:hidden;">
+          <div style="font-size: 11.5px; font-weight: 700; color: var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Dervin Aziza</div>
+          <div style="font-size: 9.5px; color: var(--text-sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">dervinaziza9@gmail.com &bull; <span style="color:#F87171;">Sign Out</span></div>
         </div>
       </div>
-      <span style="font-size: 11px; color: var(--accent-red);">🚪</span>
+      <span style="font-size: 11px; color: var(--accent-red); flex-shrink:0;">🚪</span>
     </div>
   </aside>
 
@@ -777,19 +1204,43 @@
   <main class="desk-main">
     
     <header class="desk-topbar">
-      <div class="breadcrumb-wrap">
-        <span onclick="switchView('dashboard')" style="cursor: pointer;">🏠</span>
-        <span>/</span>
-        <span id="topbarCategory">Dashboard</span>
-        <span>/</span>
-        <span class="breadcrumb-current" id="topbarTitle">Loan Dashboard</span>
+      <div class="topbar-left">
+        <!-- Hamburger Menu Button for Mobile & Tablet -->
+        <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Open navigation menu" title="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Breadcrumbs with Smart Mobile Truncation -->
+        <div class="breadcrumb-wrap">
+          <span onclick="switchView('dashboard')" style="cursor: pointer;" title="Home / Dashboard">🏠</span>
+          <span class="breadcrumb-sep">/</span>
+          <span id="topbarCategory" class="breadcrumb-cat">Dashboard</span>
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current" id="topbarTitle">Loan Dashboard</span>
+        </div>
       </div>
 
+      <!-- Topbar Action Controls -->
       <div class="topbar-right">
-        <button onclick="logoutAdmin()" title="Sign Out of Admin Desk" style="font-size:12px; font-weight:700; padding:6px 14px; border-radius:8px; color:#F87171; border:1px solid rgba(248,113,113,0.3); background:rgba(248,113,113,0.08); display:flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit;">
-          <span>🚪</span> Sign Out
+        <!-- Mobile/Touch Quick Search Trigger -->
+        <button class="topbar-icon-btn" onclick="openSearchModal()" title="Search DocTypes (Ctrl+K)" aria-label="Search">
+          <span>🔍</span>
         </button>
-        <button class="theme-toggle-btn" onclick="toggleAdminTheme()" id="adminThemeBtn" title="Toggle Light / Dark Mode">☀️</button>
+        <!-- Notifications Trigger -->
+        <button class="topbar-icon-btn" onclick="openNotifications()" title="Notifications" aria-label="Notifications" style="position:relative;">
+          <span>🔔</span>
+          <span class="topbar-badge-dot"></span>
+        </button>
+        <!-- Theme Toggle -->
+        <button class="topbar-icon-btn" onclick="toggleAdminTheme()" id="adminThemeBtn" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">☀️</button>
+        <!-- Sign Out -->
+        <button class="topbar-signout-btn" onclick="logoutAdmin()" title="Sign Out of Admin Desk" aria-label="Sign Out">
+          <span>🚪</span> <span class="signout-label">Sign Out</span>
+        </button>
       </div>
     </header>
 
@@ -800,13 +1251,13 @@
 
   </main>
 
-  <!-- Global Command Palette (Ctrl+K) -->
+  <!-- Global Command Palette (Ctrl+K or 🔍 Click) -->
   <div class="search-modal-backdrop" id="searchModal" onclick="closeSearchModal(event)">
     <div class="search-modal-box" onclick="event.stopPropagation()">
       <div class="search-modal-header">
         <span>🔍</span>
         <input type="text" class="search-modal-input" id="searchModalInput" placeholder="Search docTypes, actions, or jump to view (e.g. Loan, Customer)..." oninput="filterSearchResults(this.value)">
-        <span class="kbd-shortcut" onclick="closeSearchModalDirect()">ESC</span>
+        <span class="kbd-shortcut" onclick="closeSearchModalDirect()" style="cursor:pointer;">ESC</span>
       </div>
       <div class="search-results-list" id="searchResultsContainer">
         <!-- Injected -->
@@ -819,15 +1270,15 @@
   <div class="drawer-panel" id="notifDrawer">
     <div class="drawer-header">
       <h3 style="font-size: 14px; font-weight: 800;">🔔 System Notifications</h3>
-      <span style="cursor: pointer; font-size: 16px;" onclick="closeNotifications()">✕</span>
+      <span style="cursor: pointer; font-size: 16px; padding: 4px;" onclick="closeNotifications()">✕</span>
     </div>
     <div class="drawer-body">
-      <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px; margin-bottom:10px;">
+      <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--desk-border);">
         <div style="font-size: 11px; color: var(--accent-emerald); font-weight: 700;">DIGITAL CREDIT APPLICATION</div>
         <div style="font-size: 12.5px; font-weight: 600; margin-top: 2px;">New application submitted: KES 100,000</div>
         <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 4px;">2 minutes ago • Automated KYC Match</div>
       </div>
-      <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px; margin-bottom:10px;">
+      <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px; margin-bottom:10px; border:1px solid var(--desk-border);">
         <div style="font-size: 11px; color: var(--accent-blue); font-weight: 700;">REPAYMENT RECORDED</div>
         <div style="font-size: 12.5px; font-weight: 600; margin-top: 2px;">M-Pesa payment received: KES 23,750.00</div>
         <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 4px;">18 minutes ago • Ref # QK91827364</div>
@@ -841,9 +1292,9 @@
     <div class="drawer-header">
       <div>
         <div class="badge-pill" style="margin-bottom:4px;">UNDERWRITING ASSESSMENT</div>
-        <h3 style="font-size: 16px; font-weight: 800;" id="undAppTitle">Application Review</h3>
+        <h3 style="font-size: 15px; font-weight: 800;" id="undAppTitle">Application Review</h3>
       </div>
-      <span style="cursor: pointer; font-size: 18px;" onclick="closeUnderwritingDrawer()">✕</span>
+      <span style="cursor: pointer; font-size: 18px; padding: 4px;" onclick="closeUnderwritingDrawer()">✕</span>
     </div>
 
     <div class="drawer-body" id="undDrawerBody">
@@ -851,28 +1302,30 @@
     </div>
 
     <div class="drawer-footer">
-      <button class="btn-action-pri" style="flex:1.5; padding:10px;" onclick="sanctionAndDisburseActiveApp()">
+      <button class="btn-action-pri" style="flex:1.5; padding:11px;" onclick="sanctionAndDisburseActiveApp()">
         <span>⚡ Sanction &amp; Disburse</span>
       </button>
-      <button class="btn-action-sec" style="flex:1;" onclick="requestCollateralActiveApp()">
-        <span>📑 Collateral</span>
-      </button>
-      <button class="btn-action-sec" style="color:#F87171; border-color:#7F1D1D;" onclick="declineActiveApp()">
-        <span>✕ Decline</span>
-      </button>
+      <div style="display:flex; gap:8px; flex:1.5; width:100%;">
+        <button class="btn-action-sec" style="flex:1; padding:10px; justify-content:center;" onclick="requestCollateralActiveApp()">
+          <span>📑 Collateral</span>
+        </button>
+        <button class="btn-action-sec" style="flex:1; color:#F87171; border-color:#7F1D1D; padding:10px; justify-content:center;" onclick="declineActiveApp()">
+          <span>✕ Decline</span>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- IN-DOM CINEMATIC ADMINISTRATOR CLEARANCE MODAL -->
   <div class="admin-auth-overlay" id="adminClearanceOverlay">
     <div class="admin-auth-modal">
-      <div style="position:absolute; top:16px; right:16px; cursor:pointer; color:#9CA3AF; font-size:18px;" onclick="closeAdminClearanceModal()">✕</div>
-      <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(0, 210, 106, 0.15); border: 1.5px solid #00D26A; color: #00D26A; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px;">
+      <div style="position:absolute; top:14px; right:14px; cursor:pointer; color:#9CA3AF; font-size:18px; width:28px; height:28px; display:flex; align-items:center; justify-content:center;" onclick="closeAdminClearanceModal()">✕</div>
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0, 210, 106, 0.15); border: 1.5px solid #00D26A; color: #00D26A; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 22px;">
         🔒
       </div>
       <div class="badge-pill" style="margin-bottom: 8px;">CLEARANCE LEVEL 4 &bull; UNDERWRITING DESK</div>
-      <h3 style="font-size: 20px; font-weight: 800; color: #FAF8F5; margin-bottom: 6px;">Institutional Administrator Access</h3>
-      <p style="font-size: 13px; color: #9CA3AF; margin-bottom: 22px; line-height: 1.45;">Enter your cryptographically verified staff credentials to decrypt and unlock institutional lending records.</p>
+      <h3 style="font-size: 18px; font-weight: 800; color: #FAF8F5; margin-bottom: 6px;">Institutional Administrator Access</h3>
+      <p style="font-size: 12.5px; color: #9CA3AF; margin-bottom: 18px; line-height: 1.45;">Enter your cryptographically verified staff credentials to decrypt and unlock institutional lending records.</p>
 
       <form onsubmit="handleAdminClearanceSubmit(event)">
         <div style="text-align:left; margin-bottom:12px;">
@@ -887,11 +1340,11 @@
         
         <div id="clearanceModalAlert" style="display:none; padding:10px; border-radius:8px; font-size:12px; font-weight:600; margin-bottom:14px; background:#3B1212; color:#FCA5A5; border:1px solid #7F1D1D;"></div>
 
-        <button type="submit" class="btn-action-pri" style="width: 100%; padding: 12px; font-size: 13.5px;" id="clearanceSubmitBtn">
+        <button type="submit" class="btn-action-pri" style="width: 100%; padding: 12px; font-size: 13.5px; justify-content:center;" id="clearanceSubmitBtn">
           <span>⚡ Authenticate &amp; Unlock Desk</span>
         </button>
 
-        <a href="index.html" style="display:inline-block; margin-top:16px; font-size:12px; color:#9CA3AF; text-decoration:none;">
+        <a href="index.html" style="display:inline-block; margin-top:14px; font-size:12px; color:#9CA3AF; text-decoration:none;">
           &larr; Return to Borrower Portal
         </a>
       </form>
@@ -1013,6 +1466,25 @@
     function logoutAdmin() {
       localStorage.removeItem('oryx_auth_user');
       window.location.href = 'login.html';
+    }
+
+    // =========================================================================
+    // MOBILE SIDEBAR DRAWER INTERACTION
+    // =========================================================================
+    function openMobileSidebar() {
+      const sb = document.getElementById('mainSidebar');
+      const bd = document.getElementById('sidebarBackdrop');
+      if (sb) sb.classList.add('open');
+      if (bd) bd.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileSidebar() {
+      const sb = document.getElementById('mainSidebar');
+      const bd = document.getElementById('sidebarBackdrop');
+      if (sb) sb.classList.remove('open');
+      if (bd) bd.classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     // =========================================================================
@@ -1165,24 +1637,31 @@
       if (activeNav) activeNav.classList.add('active');
 
       const meta = VIEWS[key];
-      document.getElementById('topbarCategory').innerText = meta.category;
-      document.getElementById('topbarTitle').innerText = meta.title;
+      const catEl = document.getElementById('topbarCategory');
+      const titleEl = document.getElementById('topbarTitle');
+      if (catEl) catEl.innerText = meta.category;
+      if (titleEl) titleEl.innerText = meta.title;
 
       window.location.hash = '#' + key;
 
       const canvas = document.getElementById('mainCanvas');
-      if (key === 'dashboard') {
-        canvas.innerHTML = renderDashboardView();
-      } else {
-        canvas.innerHTML = renderTableView(key);
+      if (canvas) {
+        if (key === 'dashboard') {
+          canvas.innerHTML = renderDashboardView();
+        } else {
+          canvas.innerHTML = renderTableView(key);
+        }
       }
+
+      // Automatically dismiss mobile drawer on navigation
+      closeMobileSidebar();
     }
 
     function renderDashboardView() {
       const activeCount = DB.loan.filter(l => l.status === 'Active').length;
       return `
-        <!-- KPI METRICS ROW 1 -->
-        <div class="desk-kpi-grid">
+        <!-- KPI METRICS GRID -->
+        <div class="desk-kpi-grid" style="margin-bottom: 20px;">
           <div class="desk-kpi-card">
             <div class="kpi-title-row"><span>New Loans</span><span>...</span></div>
             <div class="kpi-value">${activeCount + 1}</div>
@@ -1197,23 +1676,19 @@
           </div>
           <div class="desk-kpi-card">
             <div class="kpi-title-row"><span>Total Disbursed</span><span>...</span></div>
-            <div class="kpi-value" style="font-size:16px;">Sh 1,000,000.00</div>
+            <div class="kpi-value">Sh 1,000,000</div>
           </div>
           <div class="desk-kpi-card">
             <div class="kpi-title-row"><span>Open Applications</span><span>...</span></div>
             <div class="kpi-value">${DB.loan_application.length}</div>
           </div>
-        </div>
-
-        <!-- KPI METRICS ROW 2 -->
-        <div class="desk-kpi-grid" style="margin-bottom: 24px;">
           <div class="desk-kpi-card">
             <div class="kpi-title-row"><span>New Applications</span><span>...</span></div>
             <div class="kpi-value">${DB.loan_application.filter(a => a.decision.includes('Review')).length}</div>
           </div>
           <div class="desk-kpi-card">
             <div class="kpi-title-row"><span>Total Sanctioned</span><span>...</span></div>
-            <div class="kpi-value" style="font-size:17px;">Sh 1.5M</div>
+            <div class="kpi-value">Sh 1.5M</div>
           </div>
           <div class="desk-kpi-card">
             <div class="kpi-title-row"><span>Active Securities</span><span>...</span></div>
@@ -1224,8 +1699,8 @@
             <div class="kpi-value">0</div>
           </div>
           <div class="desk-kpi-card">
-            <div class="kpi-title-row"><span>Total Repayments Collected</span><span>...</span></div>
-            <div class="kpi-value" style="font-size:16px; color:#34D399;">Sh 73,958.33</div>
+            <div class="kpi-title-row"><span>Repayments Collected</span><span>...</span></div>
+            <div class="kpi-value" style="color:#34D399;">Sh 73,958</div>
           </div>
         </div>
 
@@ -1240,7 +1715,7 @@
               <div class="chart-badge">📅 Last 30 Days</div>
             </div>
             <div class="svg-chart-container">
-              <svg viewBox="0 0 400 120" style="width:100%; height:100%;">
+              <svg viewBox="0 0 400 120" preserveAspectRatio="none" style="width:100%; height:100%;">
                 <defs>
                   <linearGradient id="origGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#00D26A" stop-opacity="0.3"/>
@@ -1262,7 +1737,7 @@
               <div class="chart-badge">📅 M-Pesa &amp; RTGS</div>
             </div>
             <div class="svg-chart-container">
-              <svg viewBox="0 0 400 120" style="width:100%; height:100%;">
+              <svg viewBox="0 0 400 120" preserveAspectRatio="none" style="width:100%; height:100%;">
                 <path d="M 0 110 Q 120 80 250 40 T 400 15" fill="none" stroke="#34D399" stroke-width="2.5"/>
                 <path d="M 0 115 Q 120 105 250 85 T 400 50" fill="none" stroke="#60A5FA" stroke-width="2" stroke-dasharray="4,4"/>
               </svg>
@@ -1276,34 +1751,36 @@
             <div class="table-title">⚡ Digital Applications Underwriting Queue</div>
             <button class="btn-action-pri" onclick="switchView('loan_application')">View All Applications &rarr;</button>
           </div>
-          <table class="desk-data-table">
-            <thead>
-              <tr>
-                <th>App Reference</th>
-                <th>Applicant</th>
-                <th>Facility Product</th>
-                <th>Requested</th>
-                <th>Decision / Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${DB.loan_application.slice(0, 4).map((a, idx) => `
+          <div class="table-scroll-container">
+            <table class="desk-data-table">
+              <thead>
                 <tr>
-                  <td class="mono-code">${a.id}</td>
-                  <td style="font-weight:700;">${a.applicant}</td>
-                  <td>${a.product}</td>
-                  <td style="font-family:var(--font-mono); font-weight:700;">${a.amount}</td>
-                  <td><span class="status-tag ${a.decision.includes('Sanctioned') ? 'active' : 'review'}">${a.decision}</span></td>
-                  <td>
-                    <button class="btn-action-pri" style="font-size:11px; padding:4px 10px;" onclick="openUnderwriteApp(${idx})">
-                      ⚡ Underwrite
-                    </button>
-                  </td>
+                  <th>App Reference</th>
+                  <th>Applicant</th>
+                  <th>Facility Product</th>
+                  <th>Requested</th>
+                  <th>Decision / Status</th>
+                  <th>Action</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${DB.loan_application.slice(0, 4).map((a, idx) => `
+                  <tr>
+                    <td class="mono-code">${a.id}</td>
+                    <td style="font-weight:700;">${a.applicant}</td>
+                    <td>${a.product}</td>
+                    <td style="font-family:var(--font-mono); font-weight:700;">${a.amount}</td>
+                    <td><span class="status-tag ${a.decision.includes('Sanctioned') ? 'active' : 'review'}">${a.decision}</span></td>
+                    <td>
+                      <button class="btn-action-pri" style="font-size:11px; padding:4px 10px;" onclick="openUnderwriteApp(${idx})">
+                        ⚡ Underwrite
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     }
@@ -1322,7 +1799,7 @@
                 <button class="btn-action-pri" onclick="openAddRecordModal('${key}')">+ New ${meta.singular}</button>
               </div>
             </div>
-            <div style="padding: 40px; text-align: center; color: var(--text-sub);">
+            <div style="padding: 40px; text-align: center; color: var(--text-sub); font-size: 13px;">
               No records found in DocType [${meta.doctype}]. Click "+ New ${meta.singular}" to create one.
             </div>
           </div>
@@ -1345,7 +1822,7 @@
             </div>
           </div>
 
-          <div style="overflow-x: auto;">
+          <div class="table-scroll-container">
             <table class="desk-data-table">
               <thead>
                 <tr>
@@ -1367,9 +1844,9 @@
                     }).join('')}
                     <td>
                       ${key === 'loan_application' ? `
-                        <button class="btn-action-pri" style="font-size:11px; padding:3px 8px;" onclick="openUnderwriteApp(${idx})">⚡ Underwrite</button>
+                        <button class="btn-action-pri" style="font-size:11px; padding:4px 10px;" onclick="openUnderwriteApp(${idx})">⚡ Underwrite</button>
                       ` : `
-                        <button class="btn-action-sec" style="font-size:11px; padding:3px 8px;" onclick="viewRowDetails('${key}', ${idx})">View</button>
+                        <button class="btn-action-sec" style="font-size:11px; padding:4px 10px;" onclick="viewRowDetails('${key}', ${idx})">View</button>
                       `}
                     </td>
                   </tr>
@@ -1389,52 +1866,54 @@
       const body = document.getElementById('undDrawerBody');
 
       body.innerHTML = `
-        <div style="background:var(--desk-card-surface); border:1px solid var(--desk-border); border-radius:10px; padding:16px; margin-bottom:16px;">
+        <div style="background:var(--desk-card-surface); border:1px solid var(--desk-border); border-radius:10px; padding:16px; margin-bottom:14px;">
           <div style="font-size:11px; font-weight:700; color:var(--text-sub); text-transform:uppercase;">Applicant Profile</div>
-          <div style="font-size:16px; font-weight:800; color:#FAF8F5; margin-top:2px;">${selectedUnderwriteApp.applicant}</div>
+          <div style="font-size:15px; font-weight:800; color:#FAF8F5; margin-top:2px;">${selectedUnderwriteApp.applicant}</div>
           <div style="font-size:12px; color:#9CA3AF; margin-top:2px;">National ID: 32847592 &bull; Primary Phone: +254712345678</div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-          <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px;">
+        <div class="drawer-grid-2col" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+          <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px; border:1px solid var(--desk-border);">
             <div style="font-size:10.5px; color:var(--text-sub);">Requested Facility</div>
-            <div style="font-weight:700; color:#FAF8F5; margin-top:2px;">${selectedUnderwriteApp.product}</div>
+            <div style="font-weight:700; color:#FAF8F5; margin-top:2px; font-size:12.5px;">${selectedUnderwriteApp.product}</div>
           </div>
-          <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px;">
+          <div style="background:var(--desk-card-surface); padding:12px; border-radius:8px; border:1px solid var(--desk-border);">
             <div style="font-size:10.5px; color:var(--text-sub);">Requested Amount</div>
-            <div style="font-family:var(--font-mono); font-weight:700; color:#00D26A; margin-top:2px;">${selectedUnderwriteApp.amount}</div>
+            <div style="font-family:var(--font-mono); font-weight:700; color:#00D26A; margin-top:2px; font-size:13.5px;">${selectedUnderwriteApp.amount}</div>
           </div>
         </div>
 
-        <div style="background:var(--desk-card-surface); border:1px solid var(--desk-border); border-radius:10px; padding:16px; margin-bottom:16px;">
+        <div style="background:var(--desk-card-surface); border:1px solid var(--desk-border); border-radius:10px; padding:16px; margin-bottom:14px;">
           <div style="font-size:11px; font-weight:700; color:var(--text-sub); text-transform:uppercase; margin-bottom:8px;">Credit Evaluation (CRB &amp; DTI)</div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12.5px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;">
             <span>Stated Net Monthly Income:</span>
             <strong style="font-family:var(--font-mono);">${selectedUnderwriteApp.income || 'KES 180,000.00'}</strong>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12.5px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px;">
             <span>TransUnion CRB Score:</span>
             <strong style="color:#00D26A;">745 (Tier 1 Prime)</strong>
           </div>
-          <div style="display:flex; justify-content:space-between; font-size:12.5px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px;">
             <span>Estimated Debt-to-Income:</span>
             <strong style="color:#34D399;">28.4% (Comfortable)</strong>
           </div>
         </div>
 
-        <div style="background:rgba(0, 210, 106, 0.08); border:1px dashed #00D26A; border-radius:10px; padding:14px; font-size:12.5px;">
+        <div style="background:rgba(0, 210, 106, 0.08); border:1px dashed #00D26A; border-radius:10px; padding:14px; font-size:12px;">
           <div style="font-weight:700; color:#00D26A; margin-bottom:4px;">Recommendation: IMMEDIATE SANCTION</div>
-          <div style="color:#D6DFD8; font-size:12px; line-height:1.4;">Applicant qualifies for immediate automated M-Pesa B2C disbursement under Policy Rule #2026-B.</div>
+          <div style="color:#D6DFD8; font-size:11.5px; line-height:1.4;">Applicant qualifies for immediate automated M-Pesa B2C disbursement under Policy Rule #2026-B.</div>
         </div>
       `;
 
       document.getElementById('underwriteBackdrop').style.display = 'block';
       document.getElementById('underwritingDrawer').classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeUnderwritingDrawer() {
       document.getElementById('underwriteBackdrop').style.display = 'none';
       document.getElementById('underwritingDrawer').classList.remove('open');
+      document.body.style.overflow = '';
     }
 
     function sanctionAndDisburseActiveApp() {
@@ -1549,22 +2028,29 @@
     function openNotifications() {
       document.getElementById('notifBackdrop').style.display = 'block';
       document.getElementById('notifDrawer').classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
     function closeNotifications() {
       document.getElementById('notifBackdrop').style.display = 'none';
       document.getElementById('notifDrawer').classList.remove('open');
+      document.body.style.overflow = '';
     }
 
     function openSearchModal() {
       document.getElementById('searchModal').style.display = 'flex';
-      document.getElementById('searchModalInput').focus();
+      const input = document.getElementById('searchModalInput');
+      if (input) {
+        input.focus();
+      }
       filterSearchResults('');
+      document.body.style.overflow = 'hidden';
     }
     function closeSearchModal(e) {
       if (e.target.id === 'searchModal') closeSearchModalDirect();
     }
     function closeSearchModalDirect() {
       document.getElementById('searchModal').style.display = 'none';
+      document.body.style.overflow = '';
     }
 
     function filterSearchResults(query) {
@@ -1590,6 +2076,7 @@
         closeUnderwritingDrawer();
         closeNotifications();
         closeAdminClearanceModal();
+        closeMobileSidebar();
       }
     });
 
@@ -1609,6 +2096,13 @@
       document.getElementById('adminThemeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
       localStorage.setItem('oryx_admin_theme', next);
     }
+
+    // Auto-reset drawer on window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 992) {
+        closeMobileSidebar();
+      }
+    });
 
     // Master DOM Init
     document.addEventListener('DOMContentLoaded', () => {
