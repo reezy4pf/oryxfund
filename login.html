@@ -351,7 +351,7 @@
     </div>
 
     <div class="auth-footer">
-      <p>© 2026 Oryx Fund. All Rights Reserved. • <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button></p>
+      <p>© 2026 Oryx Fund. All Rights Reserved. • <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button> • <a href="admin.html" style="color:var(--text-secondary); text-decoration:none; font-size:11.5px; font-weight:600;">Staff Desk 🔒</a></p>
     </div>
 
   </div>
@@ -411,7 +411,24 @@
     function handleSignIn(e) {
       e.preventDefault();
       const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-      
+      const pass = document.getElementById('loginPass').value;
+
+      // Administrator Authentication
+      if (ident === 'admin' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
+        const adminUser = {
+          name: 'Oryx Fund Admin',
+          email: 'admin@oryxfund.co.ke',
+          role: 'Admin'
+        };
+        localStorage.setItem('oryx_auth_user', JSON.stringify(adminUser));
+        showAlert('🔒 Administrator session verified. Redirecting to Institutional Desk...', false);
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 600);
+        return;
+      }
+
+      // Standard Borrower Authentication
       let user = null;
       try {
         const stored = localStorage.getItem('oryx_borrower_' + ident);
@@ -435,8 +452,12 @@
         localStorage.setItem('oryx_borrower_' + ident, JSON.stringify(user));
       }
 
+      user.role = 'Borrower';
       localStorage.setItem('oryx_auth_user', JSON.stringify(user));
-      window.location.href = 'index.html';
+      showAlert('✨ Welcome back! Redirecting to your Portal...', false);
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 600);
     }
 
     function toggleTheme() {
