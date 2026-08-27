@@ -1961,9 +1961,7 @@ html.dark .oryx-hero-btn-secondary:hover {
         </div>
         <div class="hero-cta-box">
           <a href="apply.html" class="oryx-hero-btn oryx-hero-btn-primary">+ Apply for Loan</a>
-          <button type="button" class="oryx-hero-btn oryx-hero-btn-secondary" onclick="openMpesaModal()" style="cursor:pointer;">
-            <span>💚 Pay Loan</span>
-          </button>
+          <button type="button" class="oryx-hero-btn oryx-hero-btn-secondary" onclick="openMpesaModal()" style="cursor:pointer;">Pay Loan</button>
         </div>
       </div>
     </div>
