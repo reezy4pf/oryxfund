@@ -163,7 +163,7 @@
       border: 1px solid var(--border-color);
       background: var(--bg-surface-alt);
       color: var(--text-primary);
-      font-size: 13.5px;
+      font-size: 15px;
       font-family: inherit;
       outline: none;
       transition: all 0.15s ease;
@@ -194,6 +194,37 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 16px 12px;
+      }
+      .auth-box {
+        max-width: 100%;
+      }
+      .auth-card {
+        padding: 6px;
+        border-radius: 14px;
+      }
+      .auth-card-inner {
+        padding: 16px 14px;
+      }
+      .form-grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+      }
+      .tab-btn {
+        padding: 9px 8px;
+        font-size: 12.5px;
+      }
+      .form-label {
+        font-size: 12px;
+      }
+      .btn-submit {
+        padding: 13px;
+        font-size: 14px;
+      }
     }
 
     .btn-submit {

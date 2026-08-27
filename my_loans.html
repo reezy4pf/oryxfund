@@ -79,8 +79,6 @@ body {
   overflow-x: hidden;
 }
 
-/* CLEAN BESPOKE STYLING */
-
 /* FULL-WIDTH STICKY NAVBAR */
 .oryx-navbar {
   position: sticky;
@@ -114,6 +112,7 @@ html.dark .oryx-navbar {
   display: flex;
   align-items: center;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .oryx-logo-img {
@@ -214,6 +213,7 @@ html.dark .oryx-capsule-tab.active {
   justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 [data-theme="dark"] .oryx-theme-toggle-btn,
@@ -241,27 +241,54 @@ html.dark .moon-icon { display: none; }
 .oryx-mobile-capsules-bar { display: none; }
 
 @media (max-width: 768px) {
+  .oryx-navbar {
+    padding: 8px 14px;
+  }
+  .oryx-nav-inner {
+    gap: 8px;
+  }
+  .oryx-logo-img {
+    height: 32px;
+    max-width: 120px;
+  }
   .oryx-nav-desktop-capsules { display: none !important; }
   .oryx-nav-mobile-right {
     display: flex !important;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+  }
+  .oryx-nav-mobile-right .oryx-capsule-tab {
+    max-width: 135px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
   }
   .oryx-mobile-capsules-bar {
     display: block !important;
     padding-top: 6px;
     margin-top: 6px;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-light);
   }
   .oryx-mobile-capsules-track {
     display: flex;
     align-items: center;
     gap: 6px;
     overflow-x: auto;
-    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .oryx-mobile-capsules-track::-webkit-scrollbar {
+    display: none;
   }
   .oryx-mobile-capsules-track .oryx-capsule-tab {
-    padding: 5px 12px;
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    padding: 6px 10px;
     font-size: 12px;
     border: 1px solid var(--border-color);
     background: var(--bg-card);
@@ -276,7 +303,14 @@ html.dark .moon-icon { display: none; }
   box-sizing: border-box;
 }
 
-/* HERO CARD (EXACT LOCALHOST 1:1) */
+@media (max-width: 768px) {
+  .oryx-portal-wrapper {
+    margin: 14px auto 60px;
+    padding: 0 12px;
+  }
+}
+
+/* HERO CARD */
 .oryx-hero-card {
   background: var(--hero-bg);
   color: #FFFFFF;
@@ -298,6 +332,8 @@ html.dark .moon-icon { display: none; }
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .oryx-badge {
@@ -311,12 +347,16 @@ html.dark .moon-icon { display: none; }
   padding: 4px 10px;
   border-radius: 20px;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .user-greeting {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #D6DFD8;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .hero-main-row {
@@ -324,6 +364,13 @@ html.dark .moon-icon { display: none; }
   align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
+}
+
+.hero-cta-box {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .oryx-title {
@@ -345,6 +392,7 @@ html.dark .moon-icon { display: none; }
 .oryx-hero-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   background: #FFFFFF !important;
   color: #1F3224 !important;
@@ -370,6 +418,56 @@ html.dark .moon-icon { display: none; }
 }
 [data-theme="dark"] .oryx-hero-btn:hover {
   background: #05E575 !important;
+}
+
+@media (max-width: 768px) {
+  .oryx-hero-card {
+    padding: 18px 16px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .hero-top-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-main-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .oryx-title {
+    font-size: 20px !important;
+    line-height: 1.25;
+  }
+  .oryx-subtitle {
+    font-size: 12.5px !important;
+    line-height: 1.45;
+  }
+  .hero-cta-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hero-cta-box .oryx-hero-btn,
+  .hero-cta-box button,
+  .hero-cta-box a {
+    width: 100%;
+    justify-content: center;
+    margin: 0 !important;
+    padding: 11px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
 }
 
 /* 4-STEP WIZARD STEPPERS */
@@ -412,6 +510,7 @@ html.dark .moon-icon { display: none; }
   font-size: 11.5px;
   font-weight: 700;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
 }
 
 .oryx-step.active .step-num {
@@ -435,6 +534,7 @@ html.dark .moon-icon { display: none; }
 .step-label {
   font-size: 12.5px;
   color: #FAF8F5;
+  white-space: nowrap;
 }
 
 .step-divider {
@@ -446,6 +546,37 @@ html.dark .moon-icon { display: none; }
 
 .step-divider.completed {
   background: #00D26A;
+}
+
+@media (max-width: 640px) {
+  .oryx-steps-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 4px !important;
+    margin-top: 16px !important;
+    padding-top: 12px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+  .oryx-step {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+  }
+  .step-num {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 10px !important;
+  }
+  .step-label {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+  .step-divider {
+    display: none !important;
+  }
 }
 
 /* STATS KPI GRID */
@@ -497,6 +628,7 @@ html.dark .moon-icon { display: none; }
 .stat-content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .stat-label {
@@ -507,6 +639,9 @@ html.dark .moon-icon { display: none; }
   letter-spacing: 0.05em;
   font-family: var(--font-mono);
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-val {
@@ -514,6 +649,33 @@ html.dark .moon-icon { display: none; }
   font-weight: 700;
   color: var(--text-color);
   font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .oryx-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .oryx-stat-card {
+    padding: 12px 14px;
+    border-radius: 12px;
+    gap: 12px;
+  }
+  .stat-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+  }
+  .stat-label {
+    font-size: 10px;
+  }
+  .stat-val {
+    font-size: 16px;
+  }
 }
 
 /* PORTAL CARDS & FORMS */
@@ -533,6 +695,14 @@ html.dark .moon-icon { display: none; }
   margin-bottom: 20px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--border-light);
+  gap: 12px;
+}
+
+.card-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .section-title {
@@ -546,6 +716,52 @@ html.dark .moon-icon { display: none; }
   font-size: 13px;
   color: var(--text-muted);
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .oryx-portal-card {
+    padding: 18px 14px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .card-section-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+  .card-section-head > span,
+  .card-section-head > .oryx-badge,
+  .card-section-head > .status-tag {
+    align-self: flex-start;
+    display: inline-flex;
+    width: fit-content;
+  }
+  .card-section-head .section-title {
+    font-size: 16px;
+  }
+  .card-section-head .section-desc {
+    font-size: 12px;
+  }
+  .card-section-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+  .card-section-actions .oryx-btn {
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 11.5px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-section-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* EMPTY STATES */
@@ -600,6 +816,7 @@ html.dark .moon-icon { display: none; }
   border: none;
   transition: all 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-decoration: none;
+  box-sizing: border-box;
 }
 
 .oryx-btn:hover {
@@ -677,11 +894,10 @@ html.dark .moon-icon { display: none; }
 }
 
 @media (max-width: 768px) {
-  .oryx-stats-grid { grid-template-columns: 1fr; }
-  .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
-  .hero-main-row { flex-direction: column; align-items: flex-start; }
-  .oryx-steps-container { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .step-divider { display: none; }
+  .form-grid-2, .form-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
 }
 
 .form-group {
@@ -706,7 +922,7 @@ html.dark .moon-icon { display: none; }
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   color: var(--text-color);
-  font-size: 13.5px;
+  font-size: 15px; /* iOS zoom prevention */
   font-family: var(--font-body);
   outline: none;
   box-sizing: border-box;
@@ -733,8 +949,8 @@ html.dark .moon-icon { display: none; }
   margin-bottom: 20px;
 }
 
-@media (max-width: 600px) {
-  .product-cards-grid { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .product-cards-grid { grid-template-columns: 1fr; gap: 10px; }
 }
 
 .product-card {
@@ -797,7 +1013,11 @@ html.dark .moon-icon { display: none; }
 }
 
 @media (max-width: 768px) {
-  .metrics-live-hud { grid-template-columns: 1fr 1fr; }
+  .metrics-live-hud {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 12px 14px;
+  }
 }
 
 .hud-title {
@@ -816,6 +1036,33 @@ html.dark .moon-icon { display: none; }
   margin-top: 4px;
 }
 
+@media (max-width: 768px) {
+  .hud-number {
+    font-size: 15px;
+  }
+}
+
+/* ACTIVE LOAN 4-COL HUD GRID */
+.hud-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .hud-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+@media (max-width: 440px) {
+  .hud-grid-4 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
 /* DISBURSAL CARDS */
 .disbursal-options-grid {
   display: grid;
@@ -824,8 +1071,11 @@ html.dark .moon-icon { display: none; }
   margin-top: 8px;
 }
 
-@media (max-width: 600px) {
-  .disbursal-options-grid { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .disbursal-options-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 
 .disbursal-option-card {
@@ -918,7 +1168,79 @@ html.dark .moon-icon { display: none; }
   margin-top: 10px;
 }
 
-/* MODAL SYSTEM (REPLACING PROMPT/ALERT) */
+/* WIZARD NAVIGATION ACTIONS */
+.wizard-nav-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 28px;
+  gap: 10px;
+}
+
+@media (max-width: 560px) {
+  .wizard-nav-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .wizard-nav-actions .oryx-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    font-size: 13.5px;
+  }
+}
+
+/* STEP 4 REVIEW GRID */
+.review-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .review-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ACCOUNT PAGE 2-COL GRID & ACTIONS */
+.oryx-account-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .oryx-account-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.account-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .account-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .account-actions-row .oryx-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 11px;
+  }
+}
+
+/* MODAL SYSTEM */
 .oryx-modal-backdrop {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -929,7 +1251,7 @@ html.dark .moon-icon { display: none; }
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 20px;
+  padding: 16px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
@@ -951,6 +1273,14 @@ html.dark .moon-icon { display: none; }
   transform: scale(0.95);
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .oryx-modal-card {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
 }
 
 .oryx-modal-backdrop.active .oryx-modal-card {
@@ -971,16 +1301,26 @@ html.dark .moon-icon { display: none; }
 
 /* AMORTIZATION TABLE ACCORDION */
 .amort-table-wrap {
-  margin-top: 20px;
+  margin-top: 14px;
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  overflow: hidden;
+  border-radius: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.amort-table-wrap::-webkit-scrollbar {
+  height: 5px;
+}
+.amort-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
 }
 
 .amort-table {
   width: 100%;
+  min-width: 500px;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 12px;
 }
 
 .amort-table th {
@@ -988,17 +1328,19 @@ html.dark .moon-icon { display: none; }
   color: var(--text-muted);
   font-weight: 700;
   text-align: left;
-  padding: 10px 14px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border-color);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
+  white-space: nowrap;
 }
 
 .amort-table td {
-  padding: 10px 14px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border-light);
   color: var(--text-color);
   font-family: var(--font-mono);
+  white-space: nowrap;
 }
 
 .amort-table tr:last-child td {
@@ -1011,6 +1353,8 @@ html.dark .moon-icon { display: none; }
   align-items: center;
   justify-content: space-between;
   margin: 16px 0 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pipeline-node {
@@ -1020,6 +1364,7 @@ html.dark .moon-icon { display: none; }
   gap: 4px;
   font-size: 11px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .pipeline-dot {
@@ -1058,10 +1403,25 @@ html.dark .moon-icon { display: none; }
   height: 2px;
   background: var(--border-color);
   margin: 0 6px 16px;
+  min-width: 12px;
 }
 
 .pipeline-line.done {
   background: #00D26A;
+}
+
+@media (max-width: 600px) {
+  .pipeline-node {
+    font-size: 9.5px;
+  }
+  .pipeline-dot {
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+  }
+  .pipeline-line {
+    margin: 0 2px 14px;
+  }
 }
 
 /* APPLICATIONS LIST CARDS */
@@ -1077,8 +1437,13 @@ html.dark .moon-icon { display: none; }
   gap: 16px;
 }
 
-@media (max-width: 600px) {
-  .app-item-card { flex-direction: column; align-items: flex-start; }
+@media (max-width: 768px) {
+  .app-item-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px;
+  }
 }
 
 .app-item-info {
@@ -1105,7 +1470,7 @@ html.dark .moon-icon { display: none; }
 }
 
 .app-item-meta {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
@@ -1114,10 +1479,19 @@ html.dark .moon-icon { display: none; }
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
+  flex-shrink: 0;
 }
 
-@media (max-width: 600px) {
-  .app-item-right { align-items: flex-start; }
+@media (max-width: 768px) {
+  .app-item-right {
+    margin-left: 0 !important;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-light);
+    padding-top: 10px;
+    width: 100%;
+  }
 }
 
 .app-item-amt {
@@ -1133,6 +1507,7 @@ html.dark .moon-icon { display: none; }
   padding: 3px 10px;
   border-radius: 20px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .badge-review {
@@ -1169,6 +1544,13 @@ html.dark .moon-icon { display: none; }
   box-shadow: var(--card-shadow);
   max-width: 680px;
   margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .oryx-success-card {
+    padding: 24px 16px;
+    border-radius: 14px;
+  }
 }
 
 .success-icon-wrap {
@@ -1318,8 +1700,8 @@ html.dark .moon-icon { display: none; }
           <h1 class="oryx-title">My Loans &amp; Repayments</h1>
           <p class="oryx-subtitle">View your active facilities, schedule amortizations, and make instant M-Pesa Paybill repayments.</p>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button type="button" class="oryx-hero-btn" onclick="openMpesaModal()" style="background:#00D26A !important; color:#000 !important; cursor:pointer;">
+        <div class="hero-cta-box">
+          <button type="button" class="oryx-hero-btn oryx-btn-mpesa" onclick="openMpesaModal()" style="cursor:pointer;">
             <span>💚 Make Repayment</span>
           </button>
           <a href="apply.html" class="oryx-hero-btn">+ Apply for Loan</a>
@@ -1376,11 +1758,11 @@ html.dark .moon-icon { display: none; }
           <h3 class="section-title">Active Facility Overview</h3>
           <p class="section-desc">Real-time facility balance, next due date, and M-Pesa STK Push clearing.</p>
         </div>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="oryx-btn oryx-btn-secondary" style="font-size:12px; padding:6px 14px;" onclick="printStatement()">
+        <div class="card-section-actions">
+          <button type="button" class="oryx-btn oryx-btn-secondary" onclick="printStatement()">
             📄 Download Statement
           </button>
-          <button type="button" class="oryx-btn oryx-btn-mpesa" style="font-size:12px; padding:6px 14px;" onclick="openMpesaModal()">
+          <button type="button" class="oryx-btn oryx-btn-mpesa" onclick="openMpesaModal()">
             ⚡ Pay via M-Pesa
           </button>
         </div>
@@ -1702,8 +2084,8 @@ html.dark .moon-icon { display: none; }
         document.getElementById('statOutstanding').innerText = 'KES ' + Number(currentActiveLoan.balance).toLocaleString('en-US', {minimumFractionDigits: 2});
 
         loanCardEl.innerHTML = `
-          <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:12px; padding:20px; margin-bottom:16px;">
-            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+          <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div class="hud-grid-4">
               <div>
                 <span class="hud-title">Facility Reference</span>
                 <div style="font-family:var(--font-mono); font-weight:700; font-size:14px; color:var(--primary-color); margin-top:2px;">${currentActiveLoan.loanId}</div>
