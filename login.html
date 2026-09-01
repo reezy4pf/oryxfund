@@ -11,294 +11,159 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <link rel="stylesheet" href="assets/css/main.css">
   <style>
-    :root {
-      --bg-body: #EAE0D8;
-      --bg-surface: #FFFFFF;
-      --bg-surface-alt: #F7F3EE;
-      --border-color: #E2D7CC;
-      --border-light: #ECE5DC;
-      --text-primary: #1F3224;
-      --text-secondary: #556B5D;
-      --text-muted: #829488;
-      --primary: #1F3224;
-      --accent-green: #059669;
-      --accent-emerald: #00D26A;
-      --card-shadow: 0 4px 20px rgba(31, 50, 36, 0.06);
-      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'IBM Plex Mono', monospace;
-    }
-
-    [data-theme="dark"], html.dark {
-      --bg-body: #09090B;
-      --bg-surface: #121215;
-      --bg-surface-alt: #18181C;
-      --border-color: #27272A;
-      --border-light: #1E1E22;
-      --text-primary: #FAF8F5;
-      --text-secondary: #A1A1AA;
-      --text-muted: #71717A;
-      --primary: #00D26A;
-      --accent-green: #00D26A;
-      --accent-emerald: #00D26A;
-      --card-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.7);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
     body {
-      background-color: var(--bg-body) !important;
-      color: var(--text-primary);
-      font-family: var(--font-body);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px 16px;
     }
-
     .auth-box {
       width: 100%;
       max-width: 440px;
       margin: 0 auto;
     }
-
     .auth-brand-head {
       text-align: center;
       margin-bottom: 24px;
     }
-
-    .auth-brand-logo {
-      display: inline-block;
-    }
-
+    .auth-brand-logo { display: inline-block; }
     .oryx-auth-logo {
       height: 48px;
       width: auto;
       max-width: 180px;
       object-fit: contain;
     }
-
-    .oryx-logo-light-img { display: inline-block; }
-    .oryx-logo-dark-img { display: none; }
-
-    [data-theme="dark"] .oryx-logo-light-img,
-    html.dark .oryx-logo-light-img {
-      display: none;
-    }
-
-    [data-theme="dark"] .oryx-logo-dark-img,
-    html.dark .oryx-logo-dark-img {
-      display: inline-block;
-    }
-
     .auth-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 10px; /* User strict directive: exactly 10px padding */
+      padding: 10px;
       box-shadow: var(--card-shadow);
     }
-
     .auth-card-inner {
-      padding: 18px 20px;
+      background: var(--bg-surface);
+      border-radius: 12px;
+      padding: 24px 22px;
     }
-
     .auth-tabs {
       display: flex;
-      background: var(--bg-surface-alt);
+      gap: 6px;
+      background: var(--bg-surface-alt, rgba(31, 50, 36, 0.05));
       padding: 4px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 20px;
+      border-radius: 10px;
+      margin-bottom: 22px;
     }
-
     .tab-btn {
       flex: 1;
-      text-align: center;
       padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      background: transparent;
       border: none;
-      color: var(--text-secondary);
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12.5px;
+      border-radius: 7px;
+      cursor: pointer;
       transition: all 0.15s ease;
     }
-
     .tab-btn.active {
-      background: var(--bg-surface);
-      color: var(--text-primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      background: var(--primary-color);
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
-
-    [data-theme="dark"] .tab-btn.active {
-      background: var(--accent-emerald);
-      color: #000000;
+    [data-theme="dark"] .tab-btn.active, html.dark .tab-btn.active {
+      background: #00D26A !important;
+      color: #000000 !important;
     }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
+    .form-group { margin-bottom: 15px; }
     .form-label {
       display: block;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
-
-    .input-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
     .form-input {
       width: 100%;
-      padding: 11px 14px;
-      border-radius: 8px;
+      background: var(--bg-body);
       border: 1px solid var(--border-color);
-      background: var(--bg-surface-alt);
-      color: var(--text-primary);
-      font-size: 15px;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-color);
       font-family: inherit;
+      font-size: 13.5px;
       outline: none;
       transition: all 0.15s ease;
+      box-sizing: border-box;
     }
-
-    .input-wrap .form-input {
-      padding-right: 40px;
-    }
-
     .form-input:focus {
-      border-color: var(--accent-emerald);
-      background: var(--bg-surface);
-      box-shadow: 0 0 0 2px rgba(0, 210, 106, 0.2);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.15);
     }
-
+    .input-wrap { position: relative; }
     .eye-btn {
       position: absolute;
       right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       background: none;
       border: none;
-      cursor: pointer;
       color: var(--text-muted);
+      cursor: pointer;
       font-size: 14px;
-      padding: 4px;
     }
-
-    .form-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media (max-width: 560px) {
-      body {
-        padding: 16px 12px;
-      }
-      .auth-box {
-        max-width: 100%;
-      }
-      .auth-card {
-        padding: 6px;
-        border-radius: 14px;
-      }
-      .auth-card-inner {
-        padding: 16px 14px;
-      }
-      .form-grid-2 {
-        grid-template-columns: 1fr !important;
-        gap: 0 !important;
-      }
-      .tab-btn {
-        padding: 9px 8px;
-        font-size: 12.5px;
-      }
-      .form-label {
-        font-size: 12px;
-      }
-      .btn-submit {
-        padding: 13px;
-        font-size: 14px;
-      }
-    }
-
     .btn-submit {
       width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      background: #1F3224;
+      background: var(--primary-color);
       color: #FFFFFF;
       border: none;
-      font-size: 14px;
+      border-radius: 8px;
+      padding: 12px;
       font-weight: 700;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.15s ease;
-      margin-top: 6px;
+      margin-top: 8px;
     }
-
-    .btn-submit:hover {
-      background: #2D4834;
-      transform: translateY(-1px);
-    }
-
-    [data-theme="dark"] .btn-submit {
-      background: var(--accent-emerald);
+    [data-theme="dark"] .btn-submit, html.dark .btn-submit {
+      background: #00D26A;
       color: #000000;
     }
-
-    .status-alert {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .status-alert.error {
-      background: #FEE2E2;
-      color: #991B1B;
-      border: 1px solid #F87171;
-    }
-
-    [data-theme="dark"] .status-alert.error {
-      background: #3B1212;
-      color: #FCA5A5;
-      border-color: #7F1D1D;
-    }
-
-    .status-alert.success {
-      background: #DCFCE7;
-      color: #166534;
-      border: 1px solid #86EFAC;
-    }
-
+    .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); }
     .auth-note {
       text-align: center;
       font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 16px;
+      color: var(--text-muted);
+      margin-top: 14px;
     }
-
     .auth-footer {
       text-align: center;
       margin-top: 24px;
-      font-size: 12px;
-      color: var(--text-secondary);
+      font-size: 11.5px;
+      color: var(--text-muted);
     }
-
+    .status-alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
     .strength-track {
       display: flex;
       gap: 4px;
-      height: 3px;
       margin-top: 6px;
+      height: 3px;
     }
-
     .strength-seg {
       flex: 1;
       background: var(--border-color);
@@ -313,13 +178,12 @@
     
     <div class="auth-brand-head">
       <a href="index.html" class="auth-brand-logo" title="Oryx Fund">
-        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-light-img">
-        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-dark-img">
+        <img src="assets/images/oryx_logo_light.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-light">
+        <img src="assets/images/oryx_logo_dark.png" alt="Oryx Fund" class="oryx-auth-logo oryx-logo-dark">
       </a>
-      <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Borrower Self-Service &amp; Digital Credit Portal</p>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">Borrower Self-Service &amp; Digital Credit Portal</p>
     </div>
 
-    <!-- Parent Card with strict 10px padding -->
     <div class="auth-card">
       <div class="auth-card-inner">
         
@@ -403,7 +267,7 @@
             </div>
           </div>
 
-          <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 8px;">
+          <div style="margin-bottom: 16px; font-size: 11.5px; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px;">
             <input type="checkbox" id="termsCheck" required checked style="margin-top: 2px; accent-color:var(--accent-emerald);">
             <label for="termsCheck">I agree to Oryx Fund Digital Lending Terms &amp; KYC Verification.</label>
           </div>
@@ -421,213 +285,150 @@
     </div>
 
     <div class="auth-footer">
-      <p>© 2026 Oryx Fund. All Rights Reserved. &bull; <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button> &bull; <a href="admin.html" style="color:var(--text-secondary); text-decoration:none; font-size:11.5px; font-weight:600;">Staff Desk 🔒</a></p>
+      <p>© 2026 Oryx Fund. All Rights Reserved. &bull; <button onclick="toggleTheme()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-weight:700;">Toggle ☀️ / 🌙 Theme</button> &bull; <a href="admin.html" style="color:var(--text-muted); text-decoration:none; font-size:11.5px; font-weight:600;">Staff Desk 🔒</a></p>
     </div>
 
   </div>
 
+  <!-- Forgot Password Modal -->
+  <div id="forgotModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:24px; max-width:380px; width:100%; text-align:center;">
+      <h3 style="font-size:16px; font-weight:700; color:var(--text-color); margin-bottom:8px;">Reset Password</h3>
+      <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
+        For demo and test accounts, default credentials are:<br>
+        <strong>Borrower:</strong> reezyhoops@gmail.com / <code style="color:var(--accent-green);">Secret123</code><br>
+        <strong>Admin:</strong> dervinaziza9@gmail.com / <code style="color:var(--accent-green);">Oryx2026</code>
+      </p>
+      <button class="btn-submit" onclick="document.getElementById('forgotModal').style.display='none'">Got it</button>
+    </div>
+  </div>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+
   <script>
-
-    // =========================================================================
-    // ORYX FUND SECURE CLIENT AUTHENTICATION & SESSION MANAGER
-    // =========================================================================
-    const ORYX_AUTH_SALT = "oryx_fund_2026_salt_sec_";
-
-    async function hashPassword(password) {
-      const enc = new TextEncoder();
-      const buf = await crypto.subtle.digest("SHA-256", enc.encode(ORYX_AUTH_SALT + password));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    function initAuthSeeds() {
-      // Seed initial default test accounts with SHA-256 hashes if uninitialized
-      if (localStorage.getItem('oryx_auth_seeded') !== 'v4') {
-        const seedUsers = [
-          {
-            id: 'usr_reezy_001',
-            name: 'Reezy Kariuki',
-            email: 'reezyhoops@gmail.com',
-            phone: '0712345678',
-            nationalId: '32847592',
-            kraPin: 'A009847291Z',
-            address: 'Kilimani, Ring Road',
-            county: 'Nairobi',
-            role: 'Borrower',
-            passwordHash: 'f8eb476d031f0035a1091eaf6cfaed5efd7f15b31ba6841f21d60dd64adf4e1a', // Secret123
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 'usr_admin_001',
-            name: 'Dervin Aziza',
-            email: 'dervinaziza9@gmail.com',
-            phone: '+254700000000',
-            nationalId: 'ADM-001',
-            kraPin: 'A000000000Z',
-            address: 'Upper Hill, Nairobi',
-            county: 'Nairobi',
-            role: 'Admin',
-            passwordHash: '91521ad19aee4d15e8ed916c75354a4411e6a5c43703ddb048411c41b67732c7', // Oryx2026 (8 chars)
-            created_at: new Date().toISOString()
-          }
-        ];
-
-        seedUsers.forEach(u => {
-          localStorage.setItem('oryx_user_' + u.id, JSON.stringify(u));
-          localStorage.setItem('oryx_idx_' + u.email.toLowerCase(), u.id);
-          localStorage.setItem('oryx_idx_' + u.phone.replace(/\s+/g, ''), u.id);
-        });
-
-        // Seed initial default active loan for Reezy to enable interactive repayment demo
-        const seedReezyLoan = {
-          loanId: 'ACC-LOAN-2026-00001',
-          productName: 'Working Capital Facility',
-          principal: 250000,
-          disbursedDate: '2026-08-15',
-          termMonths: 12,
-          monthlyRate: 1.5,
-          monthlyInstallment: 23750,
-          balance: 213750,
-          nextDueDate: '2026-09-15',
-          repayments: [
-            { id: 'REP-2026-0001', date: '2026-08-20', amount: 23750, ref: 'QK91827364', method: 'M-Pesa STK Push' }
-          ]
-        };
-        localStorage.setItem('oryx_active_loan_usr_reezy_001', JSON.stringify(seedReezyLoan));
-
-        localStorage.setItem('oryx_auth_seeded', 'v4');
-      }
-    }
-    initAuthSeeds();
-
-    function getAuthSession() {
-      try {
-        const raw = localStorage.getItem('oryx_auth_user');
-        if (!raw) return null;
-        const session = JSON.parse(raw);
-        // Check session TTL (4 hours)
-        if (session.expires_at && Date.now() > session.expires_at) {
-          clearAuthSession(false);
-          return null;
-        }
-        return session;
-      } catch(e) {
-        return null;
-      }
-    }
-
-    function setAuthSession(user) {
-      const session = {
-        userId: user.id || ('usr_' + Date.now()),
-        name: user.name || 'Borrower',
-        email: user.email,
-        phone: user.phone,
-        nationalId: user.nationalId,
-        role: user.role || 'Borrower',
-        expires_at: Date.now() + (4 * 3600 * 1000) // 4 hours
-      };
-      localStorage.setItem('oryx_auth_user', JSON.stringify(session));
-      return session;
-    }
-
-    function clearAuthSession(redirect = true) {
-      localStorage.removeItem('oryx_auth_user');
-      if (redirect) {
-        window.location.href = 'login.html';
-      }
-    }
-
-    function requireBorrowerAuth(redirectPage = 'index.html') {
-      const session = getAuthSession();
-      if (!session) {
-        window.location.href = 'login.html?redirect_to=' + encodeURIComponent(redirectPage);
-        return null;
-      }
-      return session;
-    }
-
-    function getUserRecord(userId) {
-      try {
-        return JSON.parse(localStorage.getItem('oryx_user_' + userId));
-      } catch(e) { return null; }
-    }
-
-    function saveUserRecord(user) {
-      if (!user.id) user.id = 'usr_' + Date.now();
-      localStorage.setItem('oryx_user_' + user.id, JSON.stringify(user));
-      if (user.email) localStorage.setItem('oryx_idx_' + user.email.toLowerCase(), user.id);
-      if (user.phone) localStorage.setItem('oryx_idx_' + user.phone.replace(/\s+/g, ''), user.id);
-      return user;
-    }
-
-    function getUserScopedApplications(userId) {
-      try {
-        return JSON.parse(localStorage.getItem('oryx_apps_' + userId) || '[]');
-      } catch(e) { return []; }
-    }
-
-    function saveUserScopedApplication(userId, appData) {
-      const userApps = getUserScopedApplications(userId);
-      userApps.unshift(appData);
-      localStorage.setItem('oryx_apps_' + userId, JSON.stringify(userApps));
-
-      // Also publish to global underwriting ledger for admin desk
-      try {
-        const globalApps = JSON.parse(localStorage.getItem('oryx_applications') || '[]');
-        globalApps.unshift(appData);
-        localStorage.setItem('oryx_applications', JSON.stringify(globalApps));
-      } catch(e) {}
-    }
-
-    function getUserActiveLoan(userId) {
-      try {
-        return JSON.parse(localStorage.getItem('oryx_active_loan_' + userId));
-      } catch(e) { return null; }
-    }
-
-    function saveUserActiveLoan(userId, loanData) {
-      localStorage.setItem('oryx_active_loan_' + userId, JSON.stringify(loanData));
-    }
-    
-
-    function togglePassEye(id, btn) {
-      const el = document.getElementById(id);
-      el.type = el.type === 'password' ? 'text' : 'password';
-      btn.innerText = el.type === 'password' ? '👁️' : '🔒';
-    }
-
-    function evalStrength(val) {
-      let score = 0;
-      if (val.length >= 6) score++;
-      if (/[A-Z]/.test(val)) score++;
-      if (/[0-9]/.test(val)) score++;
-      if (/[^A-Za-z0-9]/.test(val)) score++;
-
-      for (let i = 1; i <= 4; i++) {
-        const seg = document.getElementById('str' + i);
-        seg.style.background = (i <= score) ? (score <= 1 ? '#EF4444' : score === 2 ? '#F59E0B' : '#00D26A') : 'var(--border-color)';
-      }
-    }
-
-    function openForgotPassModal() {
-      const ident = prompt('Enter your registered Email Address or Phone Number to receive password reset OTP:');
-      if (ident) {
-        alert('✨ Reset instructions and an SMS OTP have been sent to: ' + ident);
-      }
+    function showAlert(msg, isErr = true) {
+      showToast(msg, isErr, 'statusAlert');
     }
 
     function switchAuthTab(tab) {
-      document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-      document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-      document.getElementById('signInForm').style.display = tab === 'login' ? 'block' : 'none';
-      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-      document.getElementById('statusAlert').style.display = 'none';
+      const loginTab = document.getElementById('tabLogin');
+      const regTab = document.getElementById('tabRegister');
+      const signInForm = document.getElementById('signInForm');
+      const registerForm = document.getElementById('registerForm');
+      hideToast('statusAlert');
+
+      if (tab === 'login') {
+        loginTab.classList.add('active');
+        regTab.classList.remove('active');
+        signInForm.style.display = 'block';
+        registerForm.style.display = 'none';
+      } else {
+        regTab.classList.add('active');
+        loginTab.classList.remove('active');
+        signInForm.style.display = 'none';
+        registerForm.style.display = 'block';
+      }
     }
 
-    function showAlert(msg, isError = true) {
-      const alertBox = document.getElementById('statusAlert');
-      alertBox.className = 'status-alert ' + (isError ? 'error' : 'success');
-      alertBox.innerText = msg;
-      alertBox.style.display = 'block';
+    function togglePassEye(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🔒';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    function evalStrength(val) {
+      const s1 = document.getElementById('str1');
+      const s2 = document.getElementById('str2');
+      const s3 = document.getElementById('str3');
+      const s4 = document.getElementById('str4');
+      [s1, s2, s3, s4].forEach(s => { s.style.background = 'var(--border-color)'; });
+
+      if (!val) return;
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val) || /[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const colors = ['#EF4444', '#F59E0B', '#10B981', '#00D26A'];
+      const activeColor = colors[score - 1] || '#EF4444';
+      if (score >= 1) s1.style.background = activeColor;
+      if (score >= 2) s2.style.background = activeColor;
+      if (score >= 3) s3.style.background = activeColor;
+      if (score >= 4) s4.style.background = activeColor;
+    }
+
+    function openForgotPassModal() {
+      document.getElementById('forgotModal').style.display = 'flex';
+    }
+
+    async function handleSignIn(e) {
+      e.preventDefault();
+      const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase().replace(/\s+/g, '');
+      const pass = document.getElementById('loginPass').value;
+      const submitBtn = document.getElementById('signInSubmitBtn');
+
+      submitBtn.innerText = 'Verifying credentials...';
+
+      // 1. Administrator Authentication
+      if (ident === 'admin' || ident === 'dervinaziza9@gmail.com' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
+        const hashed = await hashPassword(pass);
+        const adminRecord = OryxStorage.getUser('usr_admin_001');
+        const expectedHash = adminRecord ? adminRecord.passwordHash : await hashPassword('Oryx2026');
+
+        if (hashed !== expectedHash && pass !== 'Oryx2026' && pass !== 'Admin@26' && pass !== 'Dervin26' && pass !== 'Admin@2026!') {
+          submitBtn.innerText = 'Sign In to My Portal';
+          showAlert('⛔ Invalid administrator password. Please check your credentials.');
+          return;
+        }
+
+        const adminUser = adminRecord || {
+          id: 'usr_admin_001',
+          name: 'Dervin Aziza',
+          email: 'dervinaziza9@gmail.com',
+          role: 'Admin'
+        };
+        setAuthSession(adminUser);
+        showAlert('🔒 Administrator session verified. Redirecting to Institutional Desk...', false);
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 500);
+        return;
+      }
+
+      // 2. Borrower Authentication
+      const user = OryxStorage.getUserByIdentifier(ident);
+      if (!user) {
+        submitBtn.innerText = 'Sign In to My Portal';
+        showAlert('No borrower account found matching this identifier. Please create an account.');
+        return;
+      }
+
+      const enteredHash = await hashPassword(pass);
+      if (user.passwordHash && user.passwordHash !== enteredHash) {
+        submitBtn.innerText = 'Sign In to My Portal';
+        showAlert('Incorrect password. Please verify and try again.');
+        return;
+      }
+
+      user.role = 'Borrower';
+      setAuthSession(user);
+      showAlert('✨ Authentication successful! Redirecting...', false);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirect_to') || 'index.html';
+
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 500);
     }
 
     async function handleRegister(e) {
@@ -648,8 +449,8 @@
         return;
       }
 
-      const existingByEmail = localStorage.getItem('oryx_idx_' + email);
-      const existingByPhone = localStorage.getItem('oryx_idx_' + phone);
+      const existingByEmail = OryxStorage.getUserByIdentifier(email);
+      const existingByPhone = OryxStorage.getUserByIdentifier(phone);
       if (existingByEmail || existingByPhone) {
         showAlert('An account with this email or phone number already exists. Please Sign In.');
         return;
@@ -673,7 +474,7 @@
         created_at: new Date().toISOString()
       };
 
-      saveUserRecord(newBorrower);
+      OryxStorage.saveUser(newBorrower);
       setAuthSession(newBorrower);
 
       showAlert('✨ Account registered successfully! Redirecting...', false);
@@ -683,93 +484,7 @@
 
       setTimeout(() => {
         window.location.href = redirectTo;
-      }, 700);
-    }
-
-    async function handleSignIn(e) {
-      e.preventDefault();
-      const ident = document.getElementById('loginIdentifier').value.trim().toLowerCase().replace(/\s+/g, '');
-      const pass = document.getElementById('loginPass').value;
-
-      document.getElementById('signInSubmitBtn').innerText = 'Verifying credentials...';
-
-      // 1. Administrator Authentication
-      if (ident === 'admin' || ident === 'dervinaziza9@gmail.com' || ident === 'admin@oryxfund.co.ke' || ident === 'staff@oryxfund.co.ke') {
-        const hashed = await hashPassword(pass);
-        const validAdminHashes = [
-          await hashPassword('Oryx2026'),
-          await hashPassword('Admin@26'),
-          await hashPassword('Dervin26'),
-          await hashPassword('Admin@2026!'),
-          await hashPassword('password')
-        ];
-
-        if (!validAdminHashes.includes(hashed)) {
-          document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
-          showAlert('⛔ Invalid administrator password. Please check your credentials.');
-          return;
-        }
-
-        const adminUser = {
-          id: 'usr_admin_001',
-          name: 'Dervin Aziza',
-          email: 'dervinaziza9@gmail.com',
-          role: 'Admin'
-        };
-        setAuthSession(adminUser);
-        showAlert('🔒 Administrator session verified. Redirecting to Institutional Desk...', false);
-        setTimeout(() => {
-          window.location.href = 'admin.html';
-        }, 600);
-        return;
-      }
-
-      // 2. Borrower Authentication
-      let userId = localStorage.getItem('oryx_idx_' + ident);
-      if (!userId) {
-        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
-        showAlert('No borrower account found matching this identifier. Please create an account.');
-        return;
-      }
-
-      const user = getUserRecord(userId);
-      if (!user) {
-        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
-        showAlert('Account profile could not be loaded. Please re-register.');
-        return;
-      }
-
-      const enteredHash = await hashPassword(pass);
-      if (user.passwordHash && user.passwordHash !== enteredHash) {
-        document.getElementById('signInSubmitBtn').innerText = 'Sign In to My Portal';
-        showAlert('Incorrect password. Please verify and try again.');
-        return;
-      }
-
-      user.role = 'Borrower';
-      setAuthSession(user);
-      showAlert('✨ Authentication successful! Redirecting...', false);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const redirectTo = urlParams.get('redirect_to') || 'index.html';
-
-      setTimeout(() => {
-        window.location.href = redirectTo;
       }, 600);
-    }
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      const cur = html.getAttribute('data-theme') || 'light';
-      const next = cur === 'light' ? 'dark' : 'light';
-      html.setAttribute('data-theme', next);
-      html.classList.toggle('dark', next === 'dark');
-      localStorage.setItem('oryx_theme', next);
-    }
-    const saved = localStorage.getItem('oryx_theme');
-    if (saved) {
-      document.documentElement.setAttribute('data-theme', saved);
-      document.documentElement.classList.toggle('dark', saved === 'dark');
     }
   </script>
 </body>

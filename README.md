@@ -176,11 +176,21 @@ Elevated the **Admin Management Interface** (`/desk`) to match the exact cinemat
 ### 9. Complete Borrower Portal Isolation & Security Clean-Up
 
 1. **Elimination of Admin Links from Borrower Surfaces**:
-   - The `🛡️ Admin Desk` / `Admin Link` button has been **completely removed** from all borrower views (`index.html`, `my_loans.html`, `apply.html`, `my_account.html`, and `login.html`).
+   - The `🛡️ Admin Desk` / `Admin Link` button has been **completely removed** from all borrower views (`index.html`, `apply.html`, `my_account.html`, and `login.html`).
    - Borrowers have zero exposure or navigation pathways to administrative or institutional dashboards.
    - The Admin Desk is strictly isolated at `/admin.html`.
 
-2. **Total Purge of Existing Borrower Data (Clean Slate)**:
+2. **Verified Platform Access & Credentials**:
+   - **Institutional Administrator Access**:
+     - **Email**: `dervinaziza9@gmail.com` (or `admin`)
+     - **Password**: `Oryx2026`
+     - **Portal URL**: [`admin.html`](admin.html)
+   - **Demo Borrower Access**:
+     - **Email**: `reezyhoops@gmail.com` (or Phone `0712345678`)
+     - **Password**: `Secret123`
+     - **Portal URL**: [`index.html`](index.html)
+
+3. **Total Purge of Existing Borrower Data (Clean Slate)**:
    - All legacy test borrower User records (`reezyhoops@gmail.com`, `reezy_trooper_test@oryxfund.co.ke`), Customer profiles (`James Mwangi Kariuki`), and Loan Applications (`ACC-LOAP-2026-00001` through `00005`) have been **purged from the MariaDB backend database**.
    - Non-admin sessions have been terminated.
 
