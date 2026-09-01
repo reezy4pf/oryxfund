@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oryx-rail-worker
+  namespace: oryx-fund-production
+  labels:
+    app: oryx-rail-worker
+    tier: payment-worker
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: oryx-rail-worker
+  template:
+    metadata:
+      labels:
+        app: oryx-rail-worker
+    spec:
+      containers:
+      - name: worker-container
+        image: 123456789012.dkr.ecr.af-south-1.amazonaws.com/oryx-fund-worker:v2.0.0
+        command: ["python", "-m", "backend.app.workers.payment_drainer"]
+        envFrom:
+        - configMapRef:
+            name: oryx-core-config
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001

@@ -7,3 +7,23 @@ node_modules
 dist
 lending/public/dist
 .playwright-mcp
+
+# Database & SQLite files
+*.db
+*.sqlite
+*.sqlite3
+oryx_fund.db
+
+# Python bytecode & environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local configuration overrides
+.env.local

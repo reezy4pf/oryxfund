@@ -1,0 +1,99 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "title": "Oryx Fund — Executive Financial Engineering & Treasury Desk",
+  "tags": ["oryx", "treasury", "cbk", "executive"],
+  "timezone": "Africa/Nairobi",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "id": 1,
+      "title": "M-Pesa B2C Gateway Availability Rate",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "min": 90,
+          "max": 100,
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 98.0 },
+              { "color": "green", "value": 99.8 }
+            ]
+          }
+        }
+      },
+      "targets": [{ "expr": "oryx_b2c_availability_ratio * 100", "refId": "A" }]
+    },
+    {
+      "id": 2,
+      "title": "M-Pesa B2C Utility Float Runway (Days)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "days",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 7 },
+              { "color": "green", "value": 14 }
+            ]
+          }
+        }
+      },
+      "targets": [{ "expr": "oryx_utility_float_runway_days", "refId": "A" }]
+    },
+    {
+      "id": 3,
+      "title": "Portfolio at Risk (PAR 30)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 15,
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 3.0 },
+              { "color": "red", "value": 5.0 }
+            ]
+          }
+        }
+      },
+      "targets": [{ "expr": "oryx_par_30_percent", "refId": "A" }]
+    },
+    {
+      "id": 4,
+      "title": "Monthly Collection Efficiency Rate (CE_t)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "min": 80,
+          "max": 100,
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 90.0 },
+              { "color": "green", "value": 95.0 }
+            ]
+          }
+        }
+      },
+      "targets": [{ "expr": "oryx_collection_efficiency_percent", "refId": "A" }]
+    }
+  ]
+}

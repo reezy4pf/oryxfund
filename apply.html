@@ -530,12 +530,13 @@
       document.getElementById('hudPrincipal').innerText = 'KES ' + amt.toLocaleString();
       document.getElementById('hudRate').innerText = selectedRate.toFixed(2) + '%';
 
-      const totalInterest = amt * (selectedRate / 100) * term;
-      const totalRepay = amt + totalInterest;
-      const monthly = Math.round(totalRepay / term);
+      // Reducing-Balance Amortization (EMI Formula)
+      const annualRate = selectedRate * 12;
+      const monthly = typeof OryxCalculator !== 'undefined' ? OryxCalculator.calculateMonthlyPayment(amt, annualRate, term) : Math.round((amt + (amt * (selectedRate / 100) * term)) / term);
+      const totalRepay = Math.round(monthly * term * 100) / 100;
 
-      document.getElementById('hudMonthly').innerText = 'KES ' + monthly.toLocaleString();
-      document.getElementById('hudTotal').innerText = 'KES ' + Math.round(totalRepay).toLocaleString();
+      document.getElementById('hudMonthly').innerText = 'KES ' + monthly.toLocaleString(undefined, {minimumFractionDigits: 2});
+      document.getElementById('hudTotal').innerText = 'KES ' + totalRepay.toLocaleString(undefined, {minimumFractionDigits: 2});
     }
 
     function updateDtiMeter() {
@@ -573,21 +574,21 @@
       const phone = document.getElementById('app_phone').value.trim();
       const amt = parseInt(document.getElementById('amountSlider').value);
       const term = parseInt(document.getElementById('termSlider').value);
-      const totalInterest = amt * (selectedRate / 100) * term;
-      const totalRepay = amt + totalInterest;
-      const monthly = Math.round(totalRepay / term);
+      
+      const annualRate = selectedRate * 12;
+      const monthly = typeof OryxCalculator !== 'undefined' ? OryxCalculator.calculateMonthlyPayment(amt, annualRate, term) : Math.round((amt + (amt * (selectedRate / 100) * term)) / term);
 
       document.getElementById('revName').innerText = name;
       document.getElementById('revIdPhone').innerText = id + ' • ' + phone;
       document.getElementById('revProduct').innerText = selectedFacility;
       document.getElementById('revDisb').innerText = selectedDisbursalMethod === 'M-Pesa' ? 'M-Pesa Direct (' + phone + ')' : 'Bank Wire';
       document.getElementById('revPrincipal').innerText = 'KES ' + amt.toLocaleString() + '.00';
-      document.getElementById('revMonthly').innerText = 'KES ' + monthly.toLocaleString() + ' / mo (' + term + ' Mo)';
+      document.getElementById('revMonthly').innerText = 'KES ' + monthly.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' / mo (' + term + ' Mo)';
 
       document.getElementById('smsPreviewText').innerText = `"OryxFund: Dear ${name}, your application for KES ${amt.toLocaleString()} has been received. Priority underwriting review in progress."`;
     }
 
-    function submitApplication() {
+    async function submitApplication() {
       const name = document.getElementById('app_fullname').value.trim();
       const id = document.getElementById('app_national_id').value.trim();
       const phone = document.getElementById('app_phone').value.trim();
@@ -612,6 +613,11 @@
 
       // Save to User-Scoped Storage
       saveUserScopedApplication(currentSession ? currentSession.userId : 'usr_default', appData);
+
+      // Asynchronously dispatch to backend REST endpoint
+      if (typeof OryxStorage !== 'undefined' && OryxStorage.submitApplicationToBackend) {
+        OryxStorage.submitApplicationToBackend(appData);
+      }
 
       document.getElementById('formCardWrapper').style.display = 'none';
       document.getElementById('successRefCode').innerText = randomCode;

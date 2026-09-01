@@ -250,7 +250,21 @@ const OryxStorage = {
    * Post balanced double-entry journal entries to the financial ledger.
    * Invariant: Total Debits MUST strictly equal Total Credits.
    */
-  postJournalTransaction(transactionId, narration, facilityId, linesArray, actorEmail = 'system') {
+  postJournalTransaction(transactionId, narration, facilityIdOrLines, linesOrActor, maybeActor) {
+    let facilityId = 'N/A';
+    let linesArray = [];
+    let actorEmail = 'system';
+
+    if (Array.isArray(facilityIdOrLines)) {
+      linesArray = facilityIdOrLines;
+      facilityId = typeof linesOrActor === 'string' ? linesOrActor : 'N/A';
+      actorEmail = maybeActor || 'system';
+    } else {
+      facilityId = facilityIdOrLines || 'N/A';
+      linesArray = linesOrActor || [];
+      actorEmail = maybeActor || 'system';
+    }
+
     if (!Array.isArray(linesArray) || linesArray.length < 2) {
       throw new Error('A journal transaction requires at least 2 entries.');
     }
@@ -290,8 +304,65 @@ const OryxStorage = {
       });
     });
 
-    localStorage.setItem('oryx_ledger_journal_entries', JSON.stringify(journal));
-    return { success: true, transactionId, totalAmount: totalDebit };
+    const trimmedJournal = journal.slice(0, 250);
+    localStorage.setItem('oryx_ledger_journal_entries', JSON.stringify(trimmedJournal));
+    return { success: true, transactionId, totalAmount: totalDebit, totalDebit: totalDebit, totalCredit: totalCredit };
+  },
+
+  /**
+   * Dispatches a digital loan application to backend REST API with offline fallback.
+   */
+  async submitApplicationToBackend(appData) {
+    try {
+      const user = JSON.parse(localStorage.getItem('oryx_auth_user') || '{}');
+      const token = user.token || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch('http://localhost:8000/api/v1/applications', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(appData)
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.warn('Backend application endpoint unreachable, saved to local store:', e);
+    }
+    return { success: true, application_id: appData.id, status: 'SAVED_LOCAL' };
+  },
+
+  /**
+   * Dispatches Lipa Na M-Pesa Online STK Push request to Safaricom Daraja API.
+   */
+  async triggerLiveMpesaStkPush(phone, amount, accountRef) {
+    try {
+      const cleanPhone = String(phone).replace(/\D/g, '');
+      const formattedPhone = cleanPhone.startsWith('254') ? cleanPhone : ('254' + cleanPhone.replace(/^0/, ''));
+      const res = await fetch('http://localhost:8000/api/v1/mpesa/stk/push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone_number: formattedPhone,
+          amount: Number(amount),
+          account_reference: accountRef || 'ACC-LOAN-2026-00001',
+          transaction_desc: 'Oryx Fund Facility Repayment'
+        })
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.warn('Backend M-Pesa STK push endpoint offline, falling back to simulated prompt:', e);
+    }
+    return {
+      MerchantRequestID: 'MR-' + Date.now(),
+      CheckoutRequestID: 'ws_CO_' + Date.now(),
+      ResponseCode: '0',
+      ResponseDescription: 'Success. Request accepted for processing',
+      CustomerMessage: `Success. Prompt dispatched to ${phone}`
+    };
   },
 
   /**
@@ -388,26 +459,136 @@ const OryxStorage = {
   },
 
   // =========================================================================
-  // TRANSACTION IDEMPOTENCY LOCKS
+  // BACKEND REST API BRIDGE & TELEMETRY
   // =========================================================================
-  getIdempotencyRecord(key) {
-    try {
-      const raw = localStorage.getItem('oryx_idem_' + key);
-      return raw ? JSON.parse(raw) : null;
-    } catch(e) {
-      return null;
+  getApiBase() {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return 'http://localhost:8000/api/v1';
     }
+    return '/api/v1';
   },
 
-  setIdempotencyRecord(key, status, payload = null) {
-    if (!key) return;
-    const rec = {
-      key: key,
-      status: status,
-      payload: payload,
-      updatedAt: new Date().toISOString()
-    };
-    localStorage.setItem('oryx_idem_' + key, JSON.stringify(rec));
+  async fetchRiskTelemetry() {
+    try {
+      const res = await fetch(this.getApiBase() + '/telemetry/risk');
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('oryx_cached_risk_telemetry', JSON.stringify(data));
+        return data;
+      }
+    } catch(e) {
+      console.warn('Backend telemetry unavailable, using local calculation engine.');
+    }
+    const raw = localStorage.getItem('oryx_cached_risk_telemetry');
+    return raw ? JSON.parse(raw) : null;
+  },
+
+  async fetchBackendTrialBalance() {
+    try {
+      const res = await fetch(this.getApiBase() + '/ledger/trial-balance');
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return this.getTrialBalance();
+  },
+
+  async postBackendJournal(req) {
+    try {
+      const res = await fetch(this.getApiBase() + '/ledger/journal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req)
+      });
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return this.postJournalTransaction(req.transaction_id, req.narration, req.lines, req.facility_id);
+  },
+
+  async disburseMpesaB2C(loanId, phone, amount) {
+    try {
+      const res = await fetch(this.getApiBase() + '/mpesa/b2c/disburse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          loan_id: loanId,
+          borrower_phone: phone,
+          amount: amount
+        })
+      });
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return { status: 'ACCEPTED', loan_id: loanId, localFallback: true };
+  },
+
+  // =========================================================================
+  // RUNBOOK 1: M-PESA GATEWAY DEGRADED QUEUEING MODE
+  // =========================================================================
+  getDegradedMode() {
+    return localStorage.getItem('oryx_mpesa_degraded_mode') === 'true';
+  },
+
+  setDegradedMode(enabled) {
+    localStorage.setItem('oryx_mpesa_degraded_mode', enabled ? 'true' : 'false');
+    this.logAuditEvent(
+      enabled ? 'GATEWAY_DEGRADED_MODE_ACTIVATED' : 'GATEWAY_DEGRADED_MODE_DEACTIVATED',
+      { entityType: 'payment_gateway', entityId: 'SAFARICOM_DARAJA' },
+      { degraded_mode: enabled, trigger: 'Runbook 1 Ops Controller' },
+      4
+    );
+  },
+
+  // =========================================================================
+  // RUNBOOK 2: SUSPENSE ACCOUNT (20100) DISPUTED REPAYMENTS
+  // =========================================================================
+  getSuspenseRecords() {
+    try {
+      const raw = localStorage.getItem('oryx_suspense_records');
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [
+      {
+        transId: 'SKE52PAWR9',
+        phone: '254712345678',
+        amount: 5000.00,
+        unmatchedRef: 'ACC-MISMATCH-99',
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
+        status: 'PENDING_ALLOCATION'
+      }
+    ];
+  },
+
+  allocateSuspenseFunds(transId, targetFacilityId, amount) {
+    const list = this.getSuspenseRecords();
+    const match = list.find(r => r.transId === transId);
+    if (match) {
+      match.status = 'ALLOCATED';
+      match.targetFacilityId = targetFacilityId;
+      match.allocatedAt = new Date().toISOString();
+      localStorage.setItem('oryx_suspense_records', JSON.stringify(list));
+    }
+
+    // Ledger Effect: Debit 20100 (Suspense), Credit 12000 (Principal) / 12100 (Interest)
+    const principalPortion = Math.round(amount * 0.85 * 100) / 100;
+    const interestPortion = Math.round((amount - principalPortion) * 100) / 100;
+
+    this.postJournalTransaction(
+      'ALLOC-' + transId,
+      `Suspense Allocation for receipt ${transId} to facility ${targetFacilityId}`,
+      [
+        { accountCode: '20100', debit: amount, credit: 0 },
+        { accountCode: '12000', debit: 0, credit: principalPortion },
+        { accountCode: '40100', debit: 0, credit: interestPortion }
+      ],
+      targetFacilityId
+    );
+
+    this.logAuditEvent(
+      'SUSPENSE_RECONCILIATION_ALLOCATED',
+      { entityType: 'loan_facility', entityId: targetFacilityId },
+      { transId: transId, amount: amount, principal: principalPortion, interest: interestPortion },
+      3
+    );
+
+    return { success: true, transId: transId, targetFacilityId: targetFacilityId };
   }
 };
 

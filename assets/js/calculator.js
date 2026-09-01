@@ -82,7 +82,8 @@ const OryxCalculator = {
   calculateOriginationFeeWithExcise(principal, feeRatePercent = 2.0) {
     const p = parseFloat(principal) || 0;
     const netFee = Math.round(p * (feeRatePercent / 100) * 100) / 100;
-    const exciseDuty = Math.round(netFee * this.STATUTORY_EXCISE_DUTY_RATE * 100) / 100;
+    const rate = (typeof this !== 'undefined' && this && this.STATUTORY_EXCISE_DUTY_RATE) ? this.STATUTORY_EXCISE_DUTY_RATE : 0.20;
+    const exciseDuty = Math.round(netFee * rate * 100) / 100;
     const grossFee = Math.round((netFee + exciseDuty) * 100) / 100;
     const netDisbursement = Math.max(0, Math.round((p - grossFee) * 100) / 100);
 

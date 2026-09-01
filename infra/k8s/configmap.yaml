@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oryx-core-config
+  namespace: oryx-fund-production
+data:
+  ENVIRONMENT: "production"
+  PROJECT_NAME: "Oryx Fund Core Platform"
+  POSTGRES_SERVER: "oryx-aurora-postgres-primary.cluster-cbk2026.af-south-1.rds.amazonaws.com"
+  POSTGRES_DB: "oryx_fund_ledger"
+  POSTGRES_PORT: "5432"
+  REDIS_URL: "redis://oryx-redis-cluster-prod.af-south-1.cache.amazonaws.com:6379/0"
+  STATUTORY_EXCISE_DUTY_RATE: "0.20"
+  DEFAULT_APPRAISAL_FEE_RATE: "0.02"
+  DEFAULT_LATE_PENALTY_RATE: "0.02"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oryx-fund-production
+  labels:
+    environment: production
+    compliance: cbk-dcp-2022

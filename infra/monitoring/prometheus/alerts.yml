@@ -1,0 +1,54 @@
+groups:
+  - name: oryx_fund_critical_alerts
+    rules:
+      # SEC-001: P0 Critical Security Incident
+      - alert: SecurityIncidentAdminAttack
+        expr: increase(oryx_http_errors_total{path=~".*/auth/login.*"}[1m]) >= 5
+        for: 1m
+        labels:
+          severity: critical
+          incident_code: SEC-001
+          target_team: security_oncall
+        annotations:
+          summary: "Multiple failed administrative login attempts or signature mismatch"
+          description: "Over 5 failed admin logins in 1 minute. Cloudflare WAF IP block activated."
+          runbook: "Runbook SEC-001: Cryptographic log audit & IAM session revocation"
+
+      # PAY-001: P0 Critical Payment Failure Incident
+      - alert: MpesaB2CGatewayFailureSpike
+        expr: (rate(oryx_mpesa_disbursements_total{status="failed"}[5m]) / (rate(oryx_mpesa_disbursements_total[5m]) + 0.0001)) * 100 > 5
+        for: 2m
+        labels:
+          severity: critical
+          incident_code: PAY-001
+          target_team: payments_treasury_oncall
+        annotations:
+          summary: "Safaricom M-Pesa B2C failure rate exceeds 5%"
+          description: "Payment gateway experiencing error rate spikes or float depletion. Degraded Queueing Mode activated."
+          runbook: "Runbook PAY-001: Safaricom Gateway Outage & Float Rebalance"
+
+      # RISK-001: P1 High Credit Portfolio Delinquency Alert
+      - alert: PortfolioAtRiskPAR30Breach
+        expr: oryx_par_30_percent > 5.0
+        for: 1h
+        labels:
+          severity: high
+          incident_code: RISK-001
+          target_team: credit_risk_committee
+        annotations:
+          summary: "Portfolio at Risk (PAR 30) exceeds 5.0% threshold"
+          description: "Credit portfolio quality deteriorating. Automated underwriting minimum score tightened."
+          runbook: "Runbook RISK-001: Vintage cohort review & cut-off threshold adjustment"
+
+      # DB-001: P0 Critical Database Pool Saturation
+      - alert: DatabaseConnectionPoolSaturation
+        expr: (pgbouncer_pools_active_connections / pgbouncer_pools_max_connections) * 100 >= 85
+        for: 2m
+        labels:
+          severity: critical
+          incident_code: DB-001
+          target_team: devops_sre_oncall
+        annotations:
+          summary: "PgBouncer PostgreSQL connection pool utilization >= 85%"
+          description: "Database connection pool near capacity. Non-essential reporting queries rejected."
+          runbook: "Runbook DB-001: Terminate rogue long-running queries & scale read replicas"

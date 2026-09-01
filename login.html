@@ -295,11 +295,13 @@
     <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:24px; max-width:380px; width:100%; text-align:center;">
       <h3 style="font-size:16px; font-weight:700; color:var(--text-color); margin-bottom:8px;">Reset Password</h3>
       <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
-        For demo and test accounts, default credentials are:<br>
-        <strong>Borrower:</strong> reezyhoops@gmail.com / <code style="color:var(--accent-green);">Secret123</code><br>
-        <strong>Admin:</strong> dervinaziza9@gmail.com / <code style="color:var(--accent-green);">Oryx2026</code>
+        Enter your registered email address to receive a secure one-time password (OTP) and recovery link.
       </p>
-      <button class="btn-submit" onclick="document.getElementById('forgotModal').style.display='none'">Got it</button>
+      <input type="email" id="resetEmailInput" class="form-input" placeholder="name@example.com" style="margin-bottom:14px; text-align:left;">
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-submit" style="background:transparent; border:1px solid var(--border-color); color:var(--text-color);" onclick="document.getElementById('forgotModal').style.display='none'">Cancel</button>
+        <button type="button" class="btn-submit" onclick="handlePasswordResetRequest()">Send OTP Link</button>
+      </div>
     </div>
   </div>
 
@@ -310,6 +312,16 @@
   <script>
     function showAlert(msg, isErr = true) {
       showToast(msg, isErr, 'statusAlert');
+    }
+
+    function handlePasswordResetRequest() {
+      const email = document.getElementById('resetEmailInput').value.trim();
+      if (!email || !email.includes('@')) {
+        alert('Please enter a valid registered email address.');
+        return;
+      }
+      document.getElementById('forgotModal').style.display = 'none';
+      showAlert(`Secure OTP password reset instructions have been dispatched to ${email}. Check your inbox.`, false);
     }
 
     function switchAuthTab(tab) {

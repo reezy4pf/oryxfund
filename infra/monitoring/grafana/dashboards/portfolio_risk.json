@@ -1,0 +1,32 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "id": null,
+  "title": "Oryx Fund — Portfolio Risk & Delinquency Tracking (PAR 30/60/90)",
+  "tags": ["oryx", "risk", "par", "cbk"],
+  "timezone": "Africa/Nairobi",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "id": 1,
+      "title": "PAR Delinquency Curves (PAR 30 / PAR 60 / PAR 90)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "oryx_par_30_percent", "legendFormat": "PAR 30 (Watch+)", "refId": "A" },
+        { "expr": "oryx_par_60_percent", "legendFormat": "PAR 60 (Substandard+)", "refId": "B" },
+        { "expr": "oryx_par_90_percent", "legendFormat": "PAR 90 (NPL)", "refId": "C" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Monthly Cash Collections vs. Scheduled Amortization",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "oryx_actual_recoveries_monthly_kes", "legendFormat": "Actual Recoveries", "refId": "A" },
+        { "expr": "oryx_scheduled_amortization_due_kes", "legendFormat": "Scheduled Due", "refId": "B" }
+      ]
+    }
+  ]
+}

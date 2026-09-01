@@ -1046,13 +1046,22 @@
       display: block;
     }
     .oryx-desk-logo {
-      height: 28px;
+      height: 32px;
       width: auto;
-      max-width: 140px;
+      max-width: 145px;
       object-fit: contain;
       display: block;
+      transition: opacity 0.2s ease;
     }
     .oryx-logo-light-img { display: block !important; }
     .oryx-logo-dark-img { display: none !important; }
-    [data-theme="dark"] .oryx-logo-light-img, html.dark .oryx-logo-light-img { display: none !important; }
-    [data-theme="dark"] .oryx-logo-dark-img, html.dark .oryx-logo-dark-img { display: block !important; }
+    [data-theme="dark"] .oryx-logo-light-img,
+    html.dark .oryx-logo-light-img,
+    body[data-theme="dark"] .oryx-logo-light-img {
+      display: none !important;
+    }
+    [data-theme="dark"] .oryx-logo-dark-img,
+    html.dark .oryx-logo-dark-img,
+    body[data-theme="dark"] .oryx-logo-dark-img {
+      display: block !important;
+    }

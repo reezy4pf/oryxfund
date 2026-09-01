@@ -496,7 +496,7 @@
       document.getElementById('mpesaModalBackdrop').classList.remove('active');
     }
 
-    function handleTriggerMpesaStk(e) {
+    async function handleTriggerMpesaStk(e) {
       e.preventDefault();
       const phone = document.getElementById('mpesaPhoneInput').value.trim();
       const amt = Number(document.getElementById('mpesaAmountInput').value);
@@ -504,6 +504,12 @@
       document.getElementById('mpesaFormStage').style.display = 'none';
       document.getElementById('mpesaCountdownStage').style.display = 'block';
       document.getElementById('mpesaTargetPhoneDisplay').innerText = phone;
+
+      // Asynchronously trigger live Safaricom Daraja STK Push API
+      if (typeof OryxStorage !== 'undefined' && OryxStorage.triggerLiveMpesaStkPush) {
+        const facId = currentActiveLoan ? currentActiveLoan.facilityId : 'ACC-LOAN-2026-00001';
+        OryxStorage.triggerLiveMpesaStkPush(phone, amt, facId);
+      }
 
       let timer = 3;
       const countEl = document.getElementById('stkTimerCount');
