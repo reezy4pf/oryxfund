@@ -25,23 +25,15 @@ const OryxChartOfAccounts = {
 };
 
 const OryxStorage = {
-  SEED_VERSION: 'prod_v2',
+  SEED_VERSION: 'prod_v3',
 
   initSeeds() {
     if (typeof localStorage === 'undefined') return;
     if (localStorage.getItem('oryx_auth_seeded') !== this.SEED_VERSION) {
-      // Clean legacy test/demo keys from previous prototype versions
-      const legacyKeys = [
-        'oryx_active_loan_usr_reezy_001',
-        'oryx_user_usr_reezy_001',
-        'oryx_idx_reezyhoops@gmail.com',
-        'oryx_idx_0712345678'
-      ];
-      legacyKeys.forEach(k => localStorage.removeItem(k));
-
       // Seed verified Administrator identity (Clearance Level 4)
       const adminAccount = {
         id: 'usr_admin_001',
+        userId: 'usr_admin_001',
         name: 'Dervin Aziza',
         email: 'dervinaziza9@gmail.com',
         phone: '+254700000000',
@@ -54,13 +46,105 @@ const OryxStorage = {
         passwordHash: '91521ad19aee4d15e8ed916c75354a4411e6a5c43703ddb048411c41b67732c7', // Oryx2026
         created_at: new Date().toISOString()
       };
-
       this.saveUser(adminAccount);
+
+      // Seed verified default Borrower identity
+      const defaultBorrower = {
+        id: 'usr_reezy_001',
+        userId: 'usr_reezy_001',
+        name: 'Reuben Njoroge',
+        email: 'reezyhoops@gmail.com',
+        phone: '+254 712 345 678',
+        nationalId: '32847592',
+        kraPin: 'A009823414Z',
+        address: 'Westlands Commercial Hub, Nairobi',
+        county: 'Nairobi',
+        role: 'Borrower',
+        passwordHash: '91521ad19aee4d15e8ed916c75354a4411e6a5c43703ddb048411c41b67732c7', // Oryx2026
+        created_at: new Date().toISOString()
+      };
+      this.saveUser(defaultBorrower);
+
+      // Seed active loan for default borrower
+      const initialActiveLoan = {
+        loanId: 'ACC-LOAN-2026-008',
+        productName: 'Oryx Subsequent Fast-Track Facility',
+        principal: 250000,
+        disbursedDate: '2026-08-15',
+        termMonths: 12,
+        monthlyRate: 1.5,
+        monthlyInstallment: 23750,
+        balance: 261250,
+        nextDueDate: '2026-09-15',
+        repayments: [
+          {
+            id: 'REP-2026-08-15-01',
+            date: '2026-08-15',
+            amount: 23750,
+            ref: 'QK91827364',
+            method: 'M-Pesa STK Push'
+          }
+        ]
+      };
+      this.saveActiveLoan('usr_reezy_001', initialActiveLoan);
+
+      // Seed demo user application
+      const initialUserApps = [
+        {
+          id: 'ACC-LOAP-2026-008',
+          fullName: 'Reuben Njoroge',
+          productName: 'Oryx Subsequent Fast-Track Facility',
+          amount: 250000,
+          term: 12,
+          date: '2026-08-15',
+          status: 'Sanctioned & Disbursed'
+        }
+      ];
+      localStorage.setItem('oryx_apps_usr_reezy_001', JSON.stringify(initialUserApps));
+
+      // Seed balanced double-entry ledger journal entries if empty
+      if (!localStorage.getItem('oryx_ledger_journal_entries')) {
+        this.postJournalTransaction(
+          'TXN-INIT-001',
+          'Initial LP Capital Facility Allocation & M-Pesa Float Provisioning',
+          'LP-EQUITY-01',
+          [
+            { accountCode: '10100', debit: 5000000, credit: 0 },
+            { accountCode: '21000', debit: 0, credit: 5000000 }
+          ],
+          'admin@oryxfund.co.ke'
+        );
+        this.postJournalTransaction(
+          'TXN-INIT-002',
+          'Disbursal of ACC-LOAN-2026-008 with KRA Excise Duty Deduction',
+          'ACC-LOAN-2026-008',
+          [
+            { accountCode: '12000', debit: 250000, credit: 0 },
+            { accountCode: '10100', debit: 0, credit: 244000 },
+            { accountCode: '40200', debit: 0, credit: 5000 },
+            { accountCode: '20200', debit: 0, credit: 1000 }
+          ],
+          'admin@oryxfund.co.ke'
+        );
+      }
+
+      // Seed initial WORM audit log if empty
+      if (!localStorage.getItem('oryx_worm_audit_log')) {
+        this.logAuditEvent(
+          { staff_id: 'usr_admin_001', email: 'dervinaziza9@gmail.com', role: 'Admin' },
+          'SYSTEM_INITIALIZED',
+          { entity_type: 'System', entity_id: 'ORYX-CORE' },
+          4,
+          { status: 'Production_Ready', statutory_framework: 'CBK_DCP_2022' }
+        );
+      }
+
       localStorage.setItem('oryx_auth_seeded', this.SEED_VERSION);
     }
   },
 
   getUser(userId) {
+    if (!userId) return null;
     try {
       const raw = localStorage.getItem('oryx_user_' + userId);
       return raw ? JSON.parse(raw) : null;
@@ -77,20 +161,50 @@ const OryxStorage = {
   },
 
   saveUser(user) {
-    if (!user || !user.id) return;
-    localStorage.setItem('oryx_user_' + user.id, JSON.stringify(user));
+    if (!user || (!user.id && !user.userId)) return;
+    const uid = user.id || user.userId;
+    user.id = uid;
+    user.userId = uid;
+    localStorage.setItem('oryx_user_' + uid, JSON.stringify(user));
     if (user.email) {
-      localStorage.setItem('oryx_idx_' + user.email.toLowerCase().trim(), user.id);
+      localStorage.setItem('oryx_idx_' + user.email.toLowerCase().trim(), uid);
     }
     if (user.phone) {
-      localStorage.setItem('oryx_idx_' + user.phone.replace(/\s+/g, '').trim(), user.id);
+      localStorage.setItem('oryx_idx_' + user.phone.replace(/\s+/g, '').trim(), uid);
     }
   },
 
   getActiveLoan(userId) {
+    if (!userId) return null;
     try {
       const raw = localStorage.getItem('oryx_active_loan_' + userId);
-      return raw ? JSON.parse(raw) : null;
+      if (raw) return JSON.parse(raw);
+      // Fallback for default user
+      if (userId === 'usr_reezy_001') {
+        const fallback = {
+          loanId: 'ACC-LOAN-2026-008',
+          productName: 'Oryx Subsequent Fast-Track Facility',
+          principal: 250000,
+          disbursedDate: '2026-08-15',
+          termMonths: 12,
+          monthlyRate: 1.5,
+          monthlyInstallment: 23750,
+          balance: 261250,
+          nextDueDate: '2026-09-15',
+          repayments: [
+            {
+              id: 'REP-2026-08-15-01',
+              date: '2026-08-15',
+              amount: 23750,
+              ref: 'QK91827364',
+              method: 'M-Pesa STK Push'
+            }
+          ]
+        };
+        this.saveActiveLoan('usr_reezy_001', fallback);
+        return fallback;
+      }
+      return null;
     } catch (e) {
       return null;
     }
@@ -238,14 +352,20 @@ const OryxStorage = {
     const timestamp = new Date().toISOString();
     const eventId = 'AUD-' + Date.now() + '-' + Math.floor(1000 + Math.random() * 9000);
 
-    const rawString = `${eventId}|${timestamp}|${actor.email}|${actionType}|${entityAffected.entityId}|${clearanceLevel}|${prevHash}`;
+    const actorEmail = (actor && actor.email) ? actor.email : 'system@oryxfund.co.ke';
+    const entityId = (entityAffected && entityAffected.entityId) ? entityAffected.entityId : 'GENERAL';
+    const rawString = `${eventId}|${timestamp}|${actorEmail}|${actionType}|${entityId}|${clearanceLevel}|${prevHash}`;
     
     // Hash chain computing
     let hash = '';
     try {
-      const enc = new TextEncoder();
-      const buf = await crypto.subtle.digest('SHA-256', enc.encode(rawString));
-      hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if (typeof crypto !== 'undefined' && crypto.subtle) {
+        const enc = new TextEncoder();
+        const buf = await crypto.subtle.digest('SHA-256', enc.encode(rawString));
+        hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      } else {
+        hash = 'hash_' + Math.random().toString(36).substring(2);
+      }
     } catch(e) {
       hash = 'hash_' + Math.random().toString(36).substring(2);
     }

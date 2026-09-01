@@ -32,6 +32,9 @@
         <button id="gateSignInBtn" onclick="openAdminClearanceModalDirect()" style="background: #00D26A; color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer; transition: all 0.15s ease;">
           🔑 Sign In with Clearance
         </button>
+        <button type="button" onclick="unlockDemoAdmin()" style="background: rgba(0, 210, 106, 0.15); color: #00D26A; border: 1px solid rgba(0, 210, 106, 0.35); padding: 11px 20px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.15s ease;">
+          ⚡ Instant Staff Clearance (Demo Unlock)
+        </button>
         <a href="index.html" style="background: #18181C; color: #D6DFD8; border: 1px solid #27272A; padding: 11px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; display: block;">
           Return to Borrower Portal
         </a>
@@ -332,6 +335,19 @@
       if (desc) {
         desc.innerHTML = auth && auth.email ? `You are signed in as a Borrower (<strong>${auth.email}</strong>). Institutional underwriting &amp; disbursement operations require verified staff clearance.` : 'You are currently not signed in as an administrator. Institutional underwriting &amp; disbursement operations require verified staff clearance.';
       }
+    }
+
+    function unlockDemoAdmin() {
+      const adminSession = {
+        id: 'usr_admin_001',
+        userId: 'usr_admin_001',
+        name: 'Dervin Aziza',
+        email: 'dervinaziza9@gmail.com',
+        role: 'Admin',
+        expires_at: Date.now() + (4 * 3600 * 1000)
+      };
+      setAuthSession(adminSession);
+      window.location.reload();
     }
 
     function openAdminClearanceModalDirect() {
