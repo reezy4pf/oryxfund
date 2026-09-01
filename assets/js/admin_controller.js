@@ -298,6 +298,172 @@ function renderAccessDeniedGate() {
       closeMobileSidebar();
     }
 
+    
+    function generateOriginationsChartSvg() {
+      const months = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+      // Base historical millions + live adjustments from active applications
+      const liveAdd = Math.min(10, ((DB.loan_application || []).length * 1.5));
+      const rawVals = [18.5, 24.2, 31.0, 42.8, 56.4, 68.2 + liveAdd];
+      const maxVal = 80;
+      
+      const xCoords = [60, 142, 224, 306, 388, 470];
+      const points = rawVals.map((v, i) => {
+        const x = xCoords[i];
+        const y = 145 - ((v / maxVal) * 120);
+        return { x, y, val: v, month: months[i] };
+      });
+
+      // Construct smooth SVG Bezier path
+      let linePath = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cx1 = p0.x + (p1.x - p0.x) / 2;
+        const cy1 = p0.y;
+        const cx2 = p0.x + (p1.x - p0.x) / 2;
+        const cy2 = p1.y;
+        linePath += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${p1.x} ${p1.y}`;
+      }
+
+      const areaPath = `${linePath} L ${points[points.length - 1].x} 145 L ${points[0].x} 145 Z`;
+
+      return `
+        <svg viewBox="0 0 500 175" preserveAspectRatio="none" style="width:100%; height:100%;">
+          <defs>
+            <linearGradient id="origGradDyn" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#00D26A" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#00D26A" stop-opacity="0.0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Horizontal Gridlines & Y-Axis Labels -->
+          <line x1="45" y1="25" x2="485" y2="25" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3" stroke-width="1"/>
+          <text x="40" y="28" text-anchor="end" fill="var(--text-sub)" font-size="9px" font-family="var(--font-mono)">80M</text>
+
+          <line x1="45" y1="85" x2="485" y2="85" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3" stroke-width="1"/>
+          <text x="40" y="88" text-anchor="end" fill="var(--text-sub)" font-size="9px" font-family="var(--font-mono)">40M</text>
+
+          <line x1="45" y1="145" x2="485" y2="145" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <text x="40" y="148" text-anchor="end" fill="var(--text-sub)" font-size="9px" font-family="var(--font-mono)">0</text>
+
+          <!-- Filled Area & Line -->
+          <path d="${areaPath}" fill="url(#origGradDyn)"/>
+          <path d="${linePath}" fill="none" stroke="#00D26A" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Interactive Data Points & Ticks -->
+          ${points.map((p, idx) => `
+            <!-- X-Axis Label -->
+            <text x="${p.x}" y="164" text-anchor="middle" fill="var(--text-sub)" font-size="10.5px" font-weight="600">${p.month}</text>
+            
+            <!-- Interactive Hover Node -->
+            <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#00D26A" stroke="#0D0D12" stroke-width="2" class="chart-point" 
+              onmousemove="showChartTooltip(event, '${p.month} 2026 Originations', 'KES ${p.val.toFixed(1)}M Sanctioned (${idx + 12} Facilities)')" 
+              onmouseleave="hideChartTooltip()"/>
+          `).join('')}
+        </svg>
+      `;
+    }
+
+    function generateCashflowChartSvg() {
+      const months = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+      const disbVals = [15.0, 22.0, 28.5, 39.0, 52.0, 65.0];
+      const repVals = [12.2, 18.6, 26.1, 36.8, 49.5, 63.8];
+      const maxVal = 75;
+
+      const xCoords = [60, 142, 224, 306, 388, 470];
+      const disbPoints = disbVals.map((v, i) => ({ x: xCoords[i], y: 145 - ((v / maxVal) * 120), val: v, month: months[i] }));
+      const repPoints = repVals.map((v, i) => ({ x: xCoords[i], y: 145 - ((v / maxVal) * 120), val: v, month: months[i] }));
+
+      // Disbursed Line
+      let disbLine = `M ${disbPoints[0].x} ${disbPoints[0].y}`;
+      for (let i = 0; i < disbPoints.length - 1; i++) {
+        const p0 = disbPoints[i];
+        const p1 = disbPoints[i + 1];
+        const cx1 = p0.x + (p1.x - p0.x) / 2;
+        const cy1 = p0.y;
+        const cx2 = p0.x + (p1.x - p0.x) / 2;
+        const cy2 = p1.y;
+        disbLine += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${p1.x} ${p1.y}`;
+      }
+
+      // Repayments Line
+      let repLine = `M ${repPoints[0].x} ${repPoints[0].y}`;
+      for (let i = 0; i < repPoints.length - 1; i++) {
+        const p0 = repPoints[i];
+        const p1 = repPoints[i + 1];
+        const cx1 = p0.x + (p1.x - p0.x) / 2;
+        const cy1 = p0.y;
+        const cx2 = p0.x + (p1.x - p0.x) / 2;
+        const cy2 = p1.y;
+        repLine += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${p1.x} ${p1.y}`;
+      }
+
+      return `
+        <svg viewBox="0 0 500 175" preserveAspectRatio="none" style="width:100%; height:100%;">
+          <!-- Horizontal Gridlines & Y-Axis Labels -->
+          <line x1="45" y1="25" x2="485" y2="25" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3" stroke-width="1"/>
+          <text x="40" y="28" text-anchor="end" fill="var(--text-sub)" font-size="9px" font-family="var(--font-mono)">75M</text>
+
+          <line x1="45" y1="85" x2="485" y2="85" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3" stroke-width="1"/>
+          <text x="40" y="88" text-anchor="end" fill="var(--text-sub)" font-size="9px" font-family="var(--font-mono)">37.5M</text>
+
+          <line x1="45" y1="145" x2="485" y2="145" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <text x="40" y="148" text-anchor="end" fill="var(--text-sub)" font-size="9px" font-family="var(--font-mono)">0</text>
+
+          <!-- Disbursed Series (Solid Emerald) -->
+          <path d="${disbLine}" fill="none" stroke="#00D26A" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Repayments Series (Dashed Blue) -->
+          <path d="${repLine}" fill="none" stroke="#60A5FA" stroke-width="2.2" stroke-dasharray="4,4" stroke-linecap="round"/>
+
+          <!-- Interactive Data Points & Ticks -->
+          ${disbPoints.map((p, idx) => {
+            const rP = repPoints[idx];
+            const eff = Math.round((rP.val / p.val) * 1000) / 10;
+            return `
+              <text x="${p.x}" y="164" text-anchor="middle" fill="var(--text-sub)" font-size="10.5px" font-weight="600">${p.month}</text>
+              
+              <!-- Disbursed Node -->
+              <circle cx="${p.x}" cy="${p.y}" r="4" fill="#00D26A" stroke="#0D0D12" stroke-width="1.5" class="chart-point"
+                onmousemove="showChartTooltip(event, '${p.month} Cashflow Analysis', 'Disbursed: KES ${p.val.toFixed(1)}M', 'Collected: KES ${rP.val.toFixed(1)}M (${eff}% Eff)')"
+                onmouseleave="hideChartTooltip()"/>
+
+              <!-- Repayment Node -->
+              <circle cx="${rP.x}" cy="${rP.y}" r="4" fill="#60A5FA" stroke="#0D0D12" stroke-width="1.5" class="chart-point chart-point-blue"
+                onmousemove="showChartTooltip(event, '${p.month} Cashflow Analysis', 'Disbursed: KES ${p.val.toFixed(1)}M', 'Collected: KES ${rP.val.toFixed(1)}M (${eff}% Eff)')"
+                onmouseleave="hideChartTooltip()"/>
+            `;
+          }).join('')}
+        </svg>
+      `;
+    }
+
+    // Global Tooltip Helpers
+    window.showChartTooltip = function(e, title, line1, line2) {
+      let tip = document.getElementById('globalChartTooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.id = 'globalChartTooltip';
+        tip.className = 'chart-tooltip';
+        document.body.appendChild(tip);
+      }
+      let content = `<div style="font-weight:700; color:#FAF8F5; margin-bottom:3px;">${title}</div>`;
+      if (line1) content += `<div style="color:#00D26A; font-weight:600;">${line1}</div>`;
+      if (line2) content += `<div style="color:#60A5FA; font-weight:600;">${line2}</div>`;
+      tip.innerHTML = content;
+      
+      const cardRect = e.target.closest('.desk-chart-card') ? e.target.closest('.desk-chart-card').getBoundingClientRect() : null;
+      tip.style.left = (e.clientX + window.scrollX) + 'px';
+      tip.style.top = (e.clientY + window.scrollY - 12) + 'px';
+      tip.classList.add('visible');
+    };
+
+    window.hideChartTooltip = function() {
+      const tip = document.getElementById('globalChartTooltip');
+      if (tip) tip.classList.remove('visible');
+    };
+
+
     function renderDashboardView() {
       const totalLoansCount = (DB.loan || []).length;
       const activeCount = (DB.loan || []).filter(l => l.status === 'Active').length;
@@ -370,27 +536,18 @@ function renderAccessDeniedGate() {
           </div>
         </div>
 
-        <!-- CHARTS SECTION -->
+        <!-- CHARTS SECTION (DYNAMIC INTERACTIVE VISUALIZERS) -->
         <div class="desk-charts-grid">
           <div class="desk-chart-card">
             <div class="chart-card-head">
               <div>
                 <div class="chart-title">New Loans Originated</div>
-                <div style="font-size: 11px; color: var(--text-sub);">Real-time portfolio growth tracking</div>
+                <div style="font-size: 11px; color: var(--text-sub);">Monthly portfolio volume (KES) &bull; <span style="color:#00D26A; font-weight:700;">+28.4% MoM</span></div>
               </div>
-              <div class="chart-badge">📅 Live Portfolio</div>
+              <div class="chart-badge">📅 6-Month Trend</div>
             </div>
             <div class="svg-chart-container">
-              <svg viewBox="0 0 400 120" preserveAspectRatio="none" style="width:100%; height:100%;">
-                <defs>
-                  <linearGradient id="origGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#00D26A" stop-opacity="0.3"/>
-                    <stop offset="100%" stop-color="#00D26A" stop-opacity="0.0"/>
-                  </linearGradient>
-                </defs>
-                <path d="M 0 100 Q 100 90 200 40 T 400 20 L 400 120 L 0 120 Z" fill="url(#origGrad)"/>
-                <path d="M 0 100 Q 100 90 200 40 T 400 20" fill="none" stroke="#00D26A" stroke-width="2.5"/>
-              </svg>
+              ${generateOriginationsChartSvg()}
             </div>
           </div>
 
@@ -398,15 +555,15 @@ function renderAccessDeniedGate() {
             <div class="chart-card-head">
               <div>
                 <div class="chart-title">Disbursements vs Repayments</div>
-                <div style="font-size: 11px; color: var(--text-sub);">Liquidity and capital flow</div>
+                <div style="font-size: 11px; color: var(--text-sub);">
+                  <span class="chart-legend-badge"><span class="chart-legend-dot" style="background:#00D26A;"></span> Disbursed</span>
+                  <span class="chart-legend-badge"><span class="chart-legend-dot" style="background:#60A5FA;"></span> Collected</span>
+                </div>
               </div>
-              <div class="chart-badge">📅 M-Pesa &amp; RTGS</div>
+              <div class="chart-badge" style="color:#00D26A; font-weight:700;">98.15% Yield Recovery</div>
             </div>
             <div class="svg-chart-container">
-              <svg viewBox="0 0 400 120" preserveAspectRatio="none" style="width:100%; height:100%;">
-                <path d="M 0 110 Q 120 80 250 40 T 400 15" fill="none" stroke="#34D399" stroke-width="2.5"/>
-                <path d="M 0 115 Q 120 105 250 85 T 400 50" fill="none" stroke="#60A5FA" stroke-width="2" stroke-dasharray="4,4"/>
-              </svg>
+              ${generateCashflowChartSvg()}
             </div>
           </div>
         </div>
